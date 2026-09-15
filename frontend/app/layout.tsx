@@ -1,10 +1,11 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import { getSession } from "@/lib/auth";
+import { ThemeProvider } from "next-themes";
+import LoginForm from "@/components/auth/login-form";
 import Nav from "@/components/layout/nav";
 import Footer from "@/components/layout/footer";
 import "./globals.css";
-import LoginForm from "@/components/auth/login-form";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -19,17 +20,23 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
   const session = await getSession();
 
   return (
-    <html lang="en" className={`${inter.variable} h-full antialiased`}>
+    <html
+      lang="en"
+      className={`${inter.variable} h-full antialiased`}
+      suppressHydrationWarning
+    >
       <body className="min-h-full flex flex-col">
-        {session.user ? (
-          <>
-            <Nav />
-            {children}
-            <Footer />
-          </>
-        ) : (
-          <LoginForm />
-        )}
+        <ThemeProvider attribute="class">
+          <Nav />
+          {session.user ? (
+            <>
+              {children}
+              <Footer />
+            </>
+          ) : (
+            <LoginForm />
+          )}
+        </ThemeProvider>
       </body>
     </html>
   );

@@ -1,5 +1,7 @@
 @import "tailwindcss";
 
+@variant dark (&:where(.dark, .dark *));
+
 @theme inline {
   --font-inter: var(--font-inter);
 }
@@ -9,5 +11,5 @@
 }
 
 body {
-  @apply bg-zinc-950;
+  @apply bg-zinc-100 dark:bg-zinc-950;
 }

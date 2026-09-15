@@ -1,5 +1,12 @@
+import NavTheme from "./nav-theme";
+
 function Nav() {
-  return <div></div>;
+  return (
+    <nav>
+      Iridium
+      <NavTheme />
+    </nav>
+  );
 }
 
 export default Nav;
