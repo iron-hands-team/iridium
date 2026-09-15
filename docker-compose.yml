@@ -1,0 +1,43 @@
+services:
+  db:
+    image: postgres:16-alpine
+    restart: always
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: school_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+    volumes:
+      - ./backend:/app
+    ports:
+      - "8000:8000"
+    environment:
+      - DATABASE_URL=postgresql://user:password@db:5432/school_db
+    depends_on:
+      - db
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    ports:
+      - "3000:3000"
+    environment:
+      - VITE_API_URL=http://localhost:8000
+    depends_on:
+      - backend
+
+volumes:
+  postgres_data:
