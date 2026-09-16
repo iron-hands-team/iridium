@@ -1,9 +1,11 @@
 "use client";
 
 function Footer() {
-  return <footer style={{backgroundColor: "black"}}>
-    <p>👀👀👀🤤🤤</p>
-  </footer>
+  return (
+    <footer>
+      <div>&copy; {new Date().getFullYear()} Iridium</div>
+    </footer>
+  );
 }
 
 export default Footer;
