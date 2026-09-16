@@ -50,7 +50,6 @@ function LoginForm() {
       </label>
       <Link href="/reset">Forgot your password?</Link>
       {error && <div className="text-red-500">{error}</div>}
-      <Btn />
     </form>
   );
 }

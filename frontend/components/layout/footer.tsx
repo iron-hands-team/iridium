@@ -1,7 +1,9 @@
 "use client";
 
 function Footer() {
-  return <footer>Footer</footer>;
+  return <footer style={{backgroundColor: "black"}}>
+    <p>👀👀👀🤤🤤</p>
+  </footer>
 }
 
 export default Footer;

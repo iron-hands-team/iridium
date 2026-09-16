@@ -2,9 +2,10 @@ import NavTheme from "./nav-theme";
 
 function Nav() {
   return (
-    <nav>
+    <nav >
       Iridium
-      <NavTheme />
+      <NavTheme/>
+      
     </nav>
   );
 }
