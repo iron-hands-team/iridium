@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 "use client";
 import { useState } from "react";
 import Footer from "../components/layout/footer";
@@ -145,4 +146,3 @@ const [childStates, setChildStates] = useState<string[]>([]);  const [inputs, se
       </body>
     </html>
   );
-}

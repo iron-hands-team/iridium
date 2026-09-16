@@ -5,6 +5,10 @@ import { useState } from "react";
 import Input from "../ui/input";
 import Btn from "../ui/btn";
 import Link from "next/link";
+import { FaExclamationTriangle, FaSchool } from "react-icons/fa";
+
+const labelStyles =
+  "text-black dark:text-zinc-300 text-sm flex flex-col gap-y-1 w-full";
 
 function LoginForm() {
   const [userData, setUserData] = useState<LoginType>({
@@ -12,9 +16,11 @@ function LoginForm() {
     password: "",
   });
   const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState<boolean>(false);
 
   async function handleSubmit(e: React.SubmitEvent) {
     e.preventDefault();
+    setLoading(true);
     setError(null);
     const validated = loginSchema.safeParse(userData);
     if (validated.success) {
@@ -22,35 +28,49 @@ function LoginForm() {
     } else {
       setError(validated.error.issues[0].message);
     }
+    setLoading(false);
   }
 
   return (
-    <form onSubmit={handleSubmit}>
-      {/* TODO: school logo here */}
-      <div>School Name</div>
-      <label>
-        Username
-        <input
-          value={userData.username}
-          onChange={(e) =>
-            setUserData({ ...userData, username: e.target.value })
-          }
-        />
-        <Input />
-      </label>
-      <label>
-        Password
-        <input
-          value={userData.password}
-          onChange={(e) =>
-            setUserData({ ...userData, password: e.target.value })
-          }
-        />
-        <Input />
-      </label>
-      <Link href="/reset">Forgot your password?</Link>
-      {error && <div className="text-red-500">{error}</div>}
-    </form>
+    <div className="w-screen h-screen flex justify-center items-center">
+      <form
+        onSubmit={handleSubmit}
+        className="border border-zinc-800 p-5 flex flex-col gap-y-5 w-100"
+      >
+        {/* TODO: school logo here */}
+        <FaSchool size={75} className="mx-auto" />
+        <div className="text-lg font-bold text-center">Iridium Login</div>
+        <label className={labelStyles}>
+          Username
+          <Input
+            placeholder="123456"
+            value={userData.username}
+            setValue={(username) => setUserData({ ...userData, username })}
+          />
+        </label>
+        <label className={labelStyles}>
+          Password
+          <Input
+            placeholder="password123"
+            value={userData.password}
+            setValue={(password) => setUserData({ ...userData, password })}
+            type="password"
+          />
+        </label>
+        <Link
+          href="/reset"
+          className="hover:underline text-black dark:text-zinc-300 text-xs w-fit"
+        >
+          Forgot your password?
+        </Link>
+        {error && (
+          <div className="text-red-500 text-sm flex gap-x-3 items-center">
+            <FaExclamationTriangle size={15} /> {error}
+          </div>
+        )}
+        <Btn text={loading ? "Loading..." : "Log in"} primary />
+      </form>
+    </div>
   );
 }
 
