@@ -1,4 +1,10 @@
+#general
+.vscode/
+
 # frontend
 frontend/node_modules
 frontend/.next/
 frontend/next-env.d.ts
+
+#backend
+__pychache__/
