@@ -7,4 +7,4 @@ frontend/.next/
 frontend/next-env.d.ts
 
 #backend
-__pychache__/
+__pycache__/
