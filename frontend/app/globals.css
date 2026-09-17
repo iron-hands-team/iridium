@@ -13,3 +13,7 @@
 body {
   @apply bg-zinc-100 dark:bg-zinc-950;
 }
+
+p {
+    color: white;
+}
