@@ -1,0 +1,27 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  build-and-verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build all images
+        run: docker compose build
+
+      - name: Start services
+        run: docker compose up -d --wait --wait-timeout 60
+
+      - name: Failure logs
+        if: failure()
+        run: docker compose logs
+
+      - name: Finish
+        if: always()
+        run: docker compose down -v
