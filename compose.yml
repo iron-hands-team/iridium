@@ -1,6 +1,7 @@
 services:
   db:
     image: postgres:16-alpine
+    container_name: postgres-db
     restart: always
     environment:
       POSTGRES_USER: user
@@ -20,6 +21,7 @@ services:
     build:
       context: ./backend
       dockerfile: Dockerfile
+    container_name: fastapi-backend
     command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
     volumes:
       - ./backend:/app
@@ -28,22 +30,42 @@ services:
     environment:
       - DATABASE_URL=postgresql://user:password@db:5432/school_db
     depends_on:
-       db:
-          condition: service_healthy
+      db:
+        condition: service_healthy
 
   frontend:
     build:
       context: ./frontend
       dockerfile: Dockerfile
+      target: development
+    container_name: nextjs-frontend-dev
     volumes:
       - ./frontend:/app
       - /app/node_modules
+    environment:
+      NODE_ENV: development
+      PORT: "3000"
+      NEXT_PUBLIC_API_URL: "http://localhost:8000"
     ports:
       - "3000:3000"
-    environment:
-      - NEXT_PUBLIC_API_URL=http://localhost:8000
+    restart: unless-stopped
     depends_on:
       - backend
+
+  # frontend:
+  #   build:
+  #     context: ./frontend
+  #     dockerfile: Dockerfile
+  #     target: production
+  #   container_name: nextjs-frontend-prod
+  #   environment:
+  #     NODE_ENV: production
+  #     PORT: "3000"
+  #   ports:
+  #     - "3000:3000"
+  #   restart: unless-stopped
+  #   depends_on:
+  #     - backend
 
 volumes:
   postgres_data:
