@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 "use client";
 import { useState } from "react";
 import Footer from "../components/layout/footer";
@@ -7,6 +6,7 @@ import Btn from "@/components/ui/btn";
 import Nav from "@/components/layout/nav";
 import React from "react";
 import { u } from "framer-motion/client";
+import { color } from "framer-motion";
 
 
 // my plan is to create a simple database first
@@ -111,6 +111,11 @@ const [childStates, setChildStates] = useState<string[]>([]);  const [inputs, se
 
   return (
     <html style={{ backgroundColor: ""}}>
+      <style>
+        p {
+          
+        }
+      </style>
       <body>
         <div style={{ backgroundColor: "blue", height: ""}}>
 
@@ -124,10 +129,10 @@ const [childStates, setChildStates] = useState<string[]>([]);  const [inputs, se
 
             <div style={{backgroundColor: "red", display: "flex", gap: "20px", height: "60px", alignItems: "center", padding: 10}}>
               
-            <Btn onClick={addTest}><p style={{fontSize: "15px",}}>Add Section</p></Btn>
-            <Btn onClick={() => deleteTest(test.length - 1)}>
+            <button onClick={() => addTest()}><p style={{fontSize: "15px",}}>Add Section</p></button>
+            <button onClick={() => deleteTest(test.length - 1)}>
               <p style={{fontSize: "15px"}}>Delete Section</p>
-            </Btn>
+            </button>
             <input value={asd} onChange={(e) => setasd(e.target.value)}></input>
 
             </div>
@@ -146,3 +151,4 @@ const [childStates, setChildStates] = useState<string[]>([]);  const [inputs, se
       </body>
     </html>
   );
+}
