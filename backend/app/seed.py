@@ -12,7 +12,7 @@ def init_db_and_seed_admin():
         if existing_admin is None:
             admin = User(
                 username="admin",
-                hashed_password=hash_password("admin"),
+                hashed_password=hash_password("admin123"),
                 role=UserRole.admin,
             )
             db.add(admin)
