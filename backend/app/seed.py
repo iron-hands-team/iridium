@@ -1,0 +1,21 @@
+from app.database import Base, engine, SessionLocal
+from app.models import User, UserRole
+from app.auth import hash_password
+
+def init_db_and_seed_admin():
+    Base.metadata.create_all(bind=engine)
+
+    db = SessionLocal()
+    try:
+        existing_admin = db.query(User).filter(User.username == "admin").first()
+
+        if existing_admin is None:
+            admin = User(
+                username="admin",
+                hashed_password=hash_password("admin123"),
+                role=UserRole.admin,
+            )
+            db.add(admin)
+            db.commit()
+    finally:
+        db.close()

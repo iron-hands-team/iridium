@@ -4,7 +4,7 @@ import bcrypt
 from app.database import SessionLocal
 from app.models import User
 
-SECRET_KEY = os.getenv("SECRET_KEY")
+SECRET_KEY = os.getenv("JWT_SECRET_KEY")
 
 manager = LoginManager(token_url="/login", secret=SECRET_KEY)
 
@@ -24,7 +24,7 @@ def hash_password(password: str):
 
 def verify_password(plain_password: str, hashed_password: str) -> bool:
     plain_password = plain_password.encode("utf-8")
-    hashed_password = hash_password.encode("utf-8")
+    hashed_password = hashed_password.encode("utf-8")
 
     return bcrypt.checkpw(plain_password, hashed_password)
 
