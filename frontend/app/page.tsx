@@ -1,5 +1,5 @@
 function Page() {
-  return <div>hi</div>;
+  retrn <div>hi</div>;
 }
 
 export default Page;
