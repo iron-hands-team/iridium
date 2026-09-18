@@ -4,3 +4,6 @@ sqlalchemy==2.0.36
 psycopg2-binary==2.9.10
 pydantic==2.10.4
 python-dotenv==1.0.1
+fastapi-login==1.10.3
+pyjwt==2.14.0
+bcrypt==5.0.0
