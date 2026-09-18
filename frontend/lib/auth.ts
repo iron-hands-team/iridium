@@ -1,4 +1,4 @@
 export async function getSession() {
   //TODO: await fetch();
-  return { user: false };
+  return { user: true };
 }

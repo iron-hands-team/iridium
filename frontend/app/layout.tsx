@@ -4,7 +4,6 @@ import { getSession } from "@/lib/auth";
 import { ThemeProvider } from "next-themes";
 import LoginForm from "@/components/auth/login-form";
 import Nav from "@/components/layout/nav";
-import Footer from "@/components/layout/footer";
 import "./globals.css";
 
 const inter = Inter({
@@ -31,7 +30,6 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
             <>
               <Nav />
               {children}
-              <Footer />
             </>
           ) : (
             <LoginForm />

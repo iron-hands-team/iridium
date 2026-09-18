@@ -1,11 +1,11 @@
 "use client";
 
 import { type LoginType, loginSchema } from "@/lib/schemas";
+import { FaExclamationTriangle, FaSchool } from "react-icons/fa";
 import { useState } from "react";
 import Input from "../ui/input";
 import Btn from "../ui/btn";
 import Link from "next/link";
-import { FaExclamationTriangle, FaSchool } from "react-icons/fa";
 
 const labelStyles =
   "text-black dark:text-zinc-300 text-sm flex flex-col gap-y-1 w-full";
