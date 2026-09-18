@@ -9,6 +9,7 @@ from app.auth import manager,verify_password,hash_password
 from app.models import User, UserRole
 from app.schemas import LoginRequest, UserCreateRequest, UserResponse, TokenResponse
 from app.dependencies import require_admin
+from app.seed import init_db_and_seed_admin
 
 app = FastAPI(title="Iridium API")
 
@@ -67,3 +68,7 @@ def create_user(
     db.commit()
     db.refresh(user)
     return user
+
+@app.on_event("startup")
+def on_startup():
+    init_db_and_seed_admin()
