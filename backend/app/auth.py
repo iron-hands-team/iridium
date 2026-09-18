@@ -4,7 +4,7 @@ import bcrypt
 from app.database import SessionLocal
 from app.models import User
 
-SECRET_KEY = os.getenv("SECRET_KEY")
+SECRET_KEY = os.getenv("JWT_SECRET_KEY")
 
 manager = LoginManager(token_url="/login", secret=SECRET_KEY)
 
