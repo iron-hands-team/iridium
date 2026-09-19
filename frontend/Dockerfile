@@ -6,9 +6,9 @@ FROM node:${NODE_VERSION} AS dependencies
 
 WORKDIR /app
 
-COPY package.json package-lock.json* .npmrc* ./
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 
-RUN npm ci --no-audit --no-fund
+RUN SHELL=bash npm install -g pnpm && pn ci
 
 # Stage 2: development
 
@@ -16,7 +16,7 @@ FROM dependencies AS development
 
 EXPOSE 3000
 
-CMD ["npm", "run", "dev"]
+CMD ["pn", "run", "dev"]
 
 # Stage 3: build
 
@@ -30,7 +30,7 @@ COPY . .
 
 ENV NODE_ENV=production
 
-RUN npm run build
+RUN npm install -g pnpm && pn run build
 
 # Stage 4: production
 

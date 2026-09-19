@@ -5,7 +5,6 @@ import { ThemeProvider } from "next-themes";
 import LoginForm from "@/components/auth/login-form";
 import Nav from "@/components/layout/nav";
 import "./globals.css";
-import Page from "@/app/page";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -20,11 +19,6 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
   const session = await getSession();
 
   return (
-
-    <Page/>
-  );
-  return (
-    
     <html
       lang="en"
       className={`${inter.variable} h-full antialiased`}
@@ -43,6 +37,5 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
         </ThemeProvider>
       </body>
     </html>
-    
   );
 }
