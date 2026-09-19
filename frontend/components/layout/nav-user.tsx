@@ -1,5 +1,6 @@
 "use client";
 
+import type { UserType } from "@/lib/auth";
 import {
   FaSignOutAlt,
   FaUser,
@@ -14,11 +15,11 @@ import { useTheme } from "next-themes";
 import Link from "next/link";
 
 const optionStyles =
-  "hover:bg-zinc-300 dark:hover:bg-zinc-900 flex items-center gap-x-2 p-2 group cursor-pointer";
+  "hover:bg-zinc-200 dark:hover:bg-zinc-900 flex items-center gap-x-2 p-2 group cursor-pointer";
 const iconStyles =
   "group-hover:scale-110 group-hover:-translate-y-1 group-active:scale-90 group-active:translate-y-1 transition-transform!";
 
-function NavUser() {
+function NavUser({ user }: { user: UserType }) {
   const [menuOpen, setMenuOpen] = useState<boolean>(false);
   const menuRef = useRef<HTMLDivElement>(null);
   const { theme, setTheme } = useTheme();
@@ -39,11 +40,11 @@ function NavUser() {
     <div className="flex items-center gap-x-5 absolute right-50" ref={menuRef}>
       <div className="relative">
         <div
-          className="border border-zinc-800 hover:bg-zinc-300/85 dark:hover:bg-zinc-900/50 cursor-pointer flex items-center px-3 py-1.5 gap-x-3"
+          className="border border-zinc-800 hover:bg-zinc-200/85 dark:hover:bg-zinc-900/50 cursor-pointer flex items-center px-3 py-1.5 gap-x-3"
           onClick={() => setMenuOpen(!menuOpen)}
         >
           <FaUserCircle size={20} />
-          Admin
+          {user.firstName}
         </div>
         <AnimatePresence>
           {menuOpen && (
@@ -51,7 +52,7 @@ function NavUser() {
               initial={{ opacity: 0, scale: 0.5 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0 }}
-              className="absolute top-[calc(100%+15px)] right-0 border-1 border-zinc-800 w-35 bg-zinc-200 dark:bg-zinc-950 flex flex-col gap-y-1 p-2 origin-top"
+              className="absolute top-[calc(100%+15px)] right-0 border-1 border-zinc-800 w-35 bg-zinc-100 dark:bg-zinc-950 flex flex-col gap-y-1 p-2 origin-top"
             >
               <Link href="/profile" className={optionStyles}>
                 <FaUser size={18} className={iconStyles} />
