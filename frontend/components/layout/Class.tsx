@@ -208,7 +208,7 @@ export default function ClassBody() {
 							</div>
 						))}
 						<br></br>
-						<Btn text="Delete Class" onclick={() => {deleteTest}}/>
+						<Btn text="Delete Class" onclick={() => {deleteTest(i)}}/>
 
           </div>
         ))}
