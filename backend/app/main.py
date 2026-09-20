@@ -10,6 +10,7 @@ from app.models import User, UserRole
 from app.schemas import LoginRequest, UserCreateRequest, UserResponse, TokenResponse
 from app.dependencies import require_admin
 from app.seed import init_db_and_seed_admin
+from app.routers import users, announcements, clubs, events, schedule
 
 app = FastAPI(title="Iridium API")
 
@@ -20,6 +21,12 @@ app.add_middleware(
         allow_methods=["*"],
         allow_headers=["*"],
 )
+
+app.include_router(users.router)
+app.include_router(announcements.router)
+app.include_router(clubs.router)
+app.include_router(events.router)
+app.include_router(schedule.router)
 
 @app.get("/")
 def root():
