@@ -66,6 +66,8 @@ def create_user(
         username=new_user.username,
         hashed_password=hash_password(new_user.password),
         role=new_user.role,
+        first_name=new_user.first_name,
+        last_name=new_user.last_name,
     )
     db.add(user)
     db.commit()

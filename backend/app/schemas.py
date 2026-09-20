@@ -9,6 +9,8 @@ class UserCreateRequest(BaseModel):
     username: str
     password: str
     role: UserRole
+    first_name: str
+    last_name: str
 
 class UserResponse(BaseModel):
     id: int
