@@ -15,5 +15,6 @@ body {
 }
 
 p {
-    color: white;
+  font-family: sans-serif;
+  color: white;
 }

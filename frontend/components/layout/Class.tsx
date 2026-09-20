@@ -3,27 +3,35 @@
 import { useState } from "react";
 import Btn from "@/components/ui/btn";
 import "@/app/globals.css";
+import Footer from "@/components/layout/footer";
 
 interface Class {
 	id: number;
 	className: string;
 	students : Test[];
+	canShow : boolean;
 }
 
 interface Test {
   id: number;
   name: string;
   text: string;
-
 }
-
 
 export default function ClassBody() {
 	
 	//const [test, setTest] = useState<Test[]>([]);
 	const [classes, setClasses] = useState<Class[]>([]);
-
   const [asd, setAsd] = useState("");
+	
+	function updateCanShowStudents(index: number, canShow: boolean) {
+		setClasses((prev) => 
+				prev.map((item, i) => 
+					i === index ? { ...item, canShow : canShow} : item
+			)
+		);
+	}
+
 
 	function updateName(index: number, text: string) {
     setClasses((prev) =>
@@ -74,7 +82,8 @@ export default function ClassBody() {
       {
         id: prev.length,
 				className: "",
-				students: []
+				students: [],
+				canShow: true
       },
     ]);
   }
@@ -111,7 +120,7 @@ export default function ClassBody() {
       prev.map((item, i) =>
         i === classIndex
           ? 
-					{...item, students : subDeleteStudent(classes[classIndex].students, studentIndex)}
+					{...item, students : item.students.filter((_, j) => j !== studentIndex, studentIndex)}
           : item
       )
     );
@@ -132,28 +141,30 @@ export default function ClassBody() {
 		return total;
 	}
 
-  return (
+	
 
+  return (
     <div className="bg-[#131313]">
-      <div
+      <header
         style={{
           display: "flex",
+					flexDirection: "column",
           gap: "20px",
-          height: "70px",
+          height: "150px",
           alignItems: "center",
           padding: 10,
           borderTop: "1px solid gray",
           borderBottom: "1px solid gray",
+					justifyContent: "center"
+				
         }}
       >
-        <Btn text="Add Section" onclick={addClass} />
 
-        <Btn
-          text="Delete Section"
-          onclick={() => deleteTest(classes.length - 1)}
-        />
-      </div>
-
+				<p style={{fontSize: "20px"}}><b>DashBoard</b></p>
+				<p>Hmm</p>
+				<p></p>
+      </header>
+			
       <div
 
         style={{
@@ -166,6 +177,10 @@ export default function ClassBody() {
         }}
 
       >
+				<div className="flex w-2/3">
+					<Btn text="Add Section" onclick={addClass} />
+				</div>
+				<p>{classes.length == 0 ? "No classes to show. Create one on the top-left!" : ""}</p>
         {classes.map((item, i) => (
           <div
 
@@ -182,39 +197,77 @@ export default function ClassBody() {
 
             <p>#{item.id}</p>
 						
-            <p>{item.className == "" ? "[Untitled]" : item.className}</p>
-						<textarea              className="text-white dark:text-zinc-300 text-sm w-1/2 resize-none h-15 bg-[#333333] p-2"
+
+						<textarea
+							placeholder="Enter Class Name"
+							className="text-white w-full resize-none h-16 p-2 border border-black hover:border-zinc-800 pt-4.5 text-[18px] font-sans"
+
 						value={item.className}
 						onChange={(e) => {
 							updateName(i, e.target.value);
 						}}
 						></textarea>
+						<div className="w-2/3 flex">
+						<Btn text="Add Student" onclick={() => {classes[i].canShow = true;addStudent(item.students, i)}}/>
+						<Btn text={classes[i].canShow ? "Hide" : "Show"} onclick={() => updateCanShowStudents(i, !classes[i].canShow)}/>
 
-						<Btn text="Add Student" onclick={() => addStudent(item.students, i)}/>
-
-						<p>Students:</p>
-						{item.students.map((studentTest, j) => (
-							<div key={j}>
-								<div style={{display: "flex", marginTop: "10px"}} className="w-full">
-									<div className="w-full ">
-										<p>#{j} {studentTest.name == "" ? "[Untitled]" : studentTest.name}</p>
-										<textarea placeholder="Enter Student Name Here" className="text-white dark:text-zinc-300 text-sm w-1/2 resize-none h-15 bg-[#333333] p-2" value={studentTest.name} onChange={(e) => { updateStudentName(i, j, e.target.value)}}></textarea>
+						</div>
+						{classes[i].canShow && (
+							<div>
+								<p className="mt-10"><b>Students:</b></p>
+								<p>{classes[i].students.length == 0 ? "No students in your class currently." : ""}</p>
+							{item.students.map((studentTest, j) => (
+								<div key={j}>
+									<div style={{display: "flex", marginTop: "10px"}} className="w-full justify-between h-full">
+										<div className="w-2/3">
+											<p>#{j} {studentTest.name == "" ? "[Untitled]" : studentTest.name}</p>
+											<textarea placeholder="Enter Student Name Here" className="text-white dark:text-zinc-300 text-sm w-2/3 resize-none h-15 bg-[#333333] p-2 mt-2" value={studentTest.name} onChange={(e) => { updateStudentName(i, j, e.target.value)}}></textarea>
+										</div>
+										<div className="w-1/4 flex justify-center  h-full flex-col gap-2">
+											<Btn text="Edit Student Info" />
+											<Btn text="Delete Student" onclick={() => {deleteStudent(i, j)}}/>
+										</div>
 									</div>
-									
-									<Btn text="Delete Student" onclick={() => {let tempStudent = j;deleteStudent(i, j);}}/>
+
+									<br></br>
 								</div>
-
-								
+							))}
 							</div>
-						))}
-						<br></br>
-						<Btn text="Delete Class" onclick={() => {deleteTest(i)}}/>
+						)};
 
+						<br></br>
+						
+						<div className="w-1/3">
+						<Btn text="Delete Class" onclick={() => {deleteTest(i)}}/>
+						</div>
           </div>
         ))}
       </div>
-
-
+			<br></br>
+			
+			<Footer/>
+			<div className="h-100"></div>
     </div>
+		
   );
 }
+
+/*
+						<p className="mt-10"><b>Students:</b></p>
+						{item.students.map((studentTest, j) => (
+							<div key={j}>
+								<div style={{display: "flex", marginTop: "10px"}} className="w-full justify-between h-full">
+									<div className="w-2/3">
+										<p>#{j} {studentTest.name == "" ? "[Untitled]" : studentTest.name}</p>
+										<textarea placeholder="Enter Student Name Here" className="text-white dark:text-zinc-300 text-sm w-2/3 resize-none h-15 bg-[#333333] p-2 mt-2" value={studentTest.name} onChange={(e) => { updateStudentName(i, j, e.target.value)}}></textarea>
+									</div>
+									<div className="w-1/4 flex justify-center  h-full flex-col gap-2">
+										<Btn text="Edit Student Info" />
+										<Btn text="Delete Student" onclick={() => {deleteStudent(i, j)}}/>
+									</div>
+								</div>
+
+								<br></br>
+							</div>
+						))}
+*/
