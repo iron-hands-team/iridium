@@ -6,7 +6,11 @@ from app.models import User
 
 SECRET_KEY = os.getenv("JWT_SECRET_KEY")
 
+if not SECRET_KEY:
+    raise RuntimeError('Please set up secret key.')
+
 manager = LoginManager(token_url="/login", secret=SECRET_KEY)
+
 
 @manager.user_loader()
 def load_user(username: str):

@@ -1,3 +1,4 @@
+import os
 from fastapi import Depends, FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy import text
@@ -11,11 +12,18 @@ from app.schemas import LoginRequest, UserCreateRequest, UserResponse, TokenResp
 from app.dependencies import require_admin
 from app.seed import init_db_and_seed_admin
 
+from app.routers import announcements, clubs, events, schedule
+
 app = FastAPI(title="Iridium API")
+
+app.include_router(announcements.router)
+app.include_router(clubs.router)
+app.include_router(events.router)
+app.include_router(schedule.router)
 
 app.add_middleware(
         CORSMiddleware,
-        allow_origins=["http://localhost:3000"],
+        allow_origins=os.getenv("ALLOWED_ORIGINS", "http://localhost:3000").split(","),
         allow_credentials=True,
         allow_methods=["*"],
         allow_headers=["*"],
@@ -33,13 +41,13 @@ def health():
 def health_db(db: Session=Depends(get_db)):
     db.execute(text("SELECT 1"))
     return {"status": "ok", "database":"connected"}
-
+ 
 @app.post("/login", response_model=TokenResponse)
 def login(credentials: LoginRequest, db: Session = Depends(get_db)):
     user = db.query(User).filter(User.username == credentials.username).first()
 
     if user is None or not verify_password(credentials.password, user.hashed_password):
-        raise HTTPException(status_code=401, detail='Incorrect Usernam or Password,')
+        raise HTTPException(status_code=401, detail='Incorrect Username or Password.')
 
     token = manager.create_access_token(data={"sub":user.username})
     return TokenResponse(access_token=token, user=user)
