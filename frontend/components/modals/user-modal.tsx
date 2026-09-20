@@ -2,8 +2,11 @@
 
 import type { UserType } from "@/lib/auth";
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { AnimatePresence } from "framer-motion";
+import { FaExclamationTriangle } from "react-icons/fa";
 import WarningModal from "./warning-modal";
+import EditUserModal from "./edit-user-modal";
 import Modal from "../ui/modal";
 import Btn from "../ui/btn";
 
@@ -14,15 +17,31 @@ interface UserModalProps {
 
 function UserModal({ user, closeModal }: UserModalProps) {
   const [deleting, setDeleting] = useState<boolean | null>(null);
+  const [editing, setEditing] = useState<boolean>(false);
+  const [error, setError] = useState<string | null>(null);
+  const router = useRouter();
 
-  function handleManage() {
-    //TODO: open manage and edit modal
+  async function handleDelete() {
+    setDeleting(true);
+    setError(null);
+    const res = await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL}/users/${user.id}`,
+      {
+        method: "DELETE",
+        credentials: "include",
+      },
+    );
+    setDeleting(null);
+    if (res.ok) {
+      closeModal();
+      router.refresh();
+    } else {
+      setError("Failed to delete user. Please try again.");
+    }
   }
 
-  function handleDelete() {
-    //TODO: await delete
-    setDeleting(true);
-    setDeleting(null);
+  if (editing) {
+    return <EditUserModal user={user} closeModal={closeModal} />;
   }
 
   return (
@@ -38,10 +57,15 @@ function UserModal({ user, closeModal }: UserModalProps) {
           <div>Last name: {user.lastName}</div>
           <div>Is admin: {user.isAdmin ? "True" : "False"}</div>
         </div>
+        {error && (
+          <div className="text-red-500 text-sm flex gap-x-3 items-center">
+            <FaExclamationTriangle size={15} /> {error}
+          </div>
+        )}
         <div className="flex gap-x-3">
           <Btn
             text="Manage"
-            onclick={handleManage}
+            onclick={() => setEditing(true)}
             styles="text-sm w-fit!"
             primary
           />

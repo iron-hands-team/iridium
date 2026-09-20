@@ -17,6 +17,7 @@ class UserResponse(BaseModel):
     username: str
     first_name: str
     last_name: str
+    middle_name: str | None = None
     role: UserRole
 
     class Config:

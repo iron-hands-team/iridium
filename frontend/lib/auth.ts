@@ -3,16 +3,21 @@ import { cookies } from "next/headers";
 export async function getSession() {
   const cookieStore = await cookies();
   const authToken = cookieStore.get("access-token");
-  const user = authToken
-    ? await fetch(process.env.NEXT_PUBLIC_API_URL + "/me", {
-        method: "GET",
-        headers: {
-          Authorization: `Bearer ${authToken.value}`,
-          "Content-Type": "application/json",
-        },
-        cache: "no-store",
-      }).then((res) => res.json())
-    : null;
+
+  let user = null;
+  if (authToken) {
+    const res = await fetch(process.env.NEXT_PUBLIC_API_URL + "/me", {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${authToken.value}`,
+        "Content-Type": "application/json",
+      },
+      cache: "no-store",
+    });
+    if (res.ok) {
+      user = await res.json();
+    }
+  }
 
   return {
     user: user
@@ -21,6 +26,7 @@ export async function getSession() {
           lastName: user.last_name,
           firstName: user.first_name,
           middleName: user.middle_name,
+          role: user.role,
           isAdmin: user.role === "admin",
         }
       : null,
@@ -32,5 +38,6 @@ export interface UserType {
   lastName: string;
   firstName: string;
   middleName?: string;
+  role?: string;
   isAdmin?: boolean;
 }

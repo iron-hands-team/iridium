@@ -20,14 +20,18 @@ function Users({ users }: { users: UserType[] }) {
     ascending: false,
   });
   const displayed = users
-    .filter(
-      (u) =>
-        [u.lastName, u.firstName, u.middleName]
-          .join(" ")
-          .toLowerCase()
-          .includes(search.trim().toLowerCase()),
-      //TODO: implement different user type and filter by dropdown selection
+    .filter((u) =>
+      [u.lastName, u.firstName, u.middleName]
+        .join(" ")
+        .toLowerCase()
+        .includes(search.trim().toLowerCase()),
     )
+    .filter((u) => {
+      if (type === "Students") return u.role === "student";
+      if (type === "Teachers") return u.role === "teacher";
+      if (type === "Admin") return u.role === "admin";
+      return true;
+    })
     .sort((a, b) => {
       let res = 0;
       switch (sort.name) {

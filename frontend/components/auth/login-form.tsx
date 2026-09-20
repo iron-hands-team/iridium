@@ -1,8 +1,9 @@
 "use client";
 
 import { type LoginType, loginSchema } from "@/lib/schemas";
-import { FaExclamationTriangle, FaSchool } from "react-icons/fa";
+import { FaExclamationTriangle } from "react-icons/fa";
 import { useState } from "react";
+import Image from "next/image";
 import Input from "../ui/input";
 import Btn from "../ui/btn";
 import Link from "next/link";
@@ -18,7 +19,7 @@ function LoginForm() {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
 
-  async function handleSubmit(e: React.SubmitEvent) {
+  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setLoading(true);
     setError(null);
@@ -49,8 +50,13 @@ function LoginForm() {
         onSubmit={handleSubmit}
         className="border border-zinc-800 p-5 flex flex-col gap-y-5 w-100"
       >
-        {/* TODO: school logo here */}
-        <FaSchool size={75} className="mx-auto" />
+        <Image
+          src="/logo.png"
+          alt="Iridium logo"
+          width={75}
+          height={75}
+          className="mx-auto"
+        />
         <div className="text-lg font-bold text-center">Iridium Login</div>
         <label className={labelStyles}>
           Username
