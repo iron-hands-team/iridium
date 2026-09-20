@@ -13,7 +13,7 @@ function Footer() {
           alt="Iridium Logo"
           width={40}
           height={40}
-          className="mb-5"
+          className="invert-100 dark:invert-0 mb-5"
         />
       </Link>
       <div>
