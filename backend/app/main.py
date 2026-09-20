@@ -1,4 +1,4 @@
-from fastapi import Depends, FastAPI, HTTPException
+from fastapi import Depends, FastAPI, HTTPException, Response
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy import text
 from sqlalchemy.orm import Session
@@ -35,13 +35,16 @@ def health_db(db: Session=Depends(get_db)):
     return {"status": "ok", "database":"connected"}
 
 @app.post("/login", response_model=TokenResponse)
-def login(credentials: LoginRequest, db: Session = Depends(get_db)):
+def login(credentials: LoginRequest,response:Response, db: Session = Depends(get_db)):
     user = db.query(User).filter(User.username == credentials.username).first()
 
     if user is None or not verify_password(credentials.password, user.hashed_password):
-        raise HTTPException(status_code=401, detail='Incorrect Usernam or Password,')
+        raise HTTPException(status_code=401, detail='Incorrect username or password')
 
     token = manager.create_access_token(data={"sub":user.username})
+
+    response.set_cookie(key="access-token",value=token,httponly=True)
+
     return TokenResponse(access_token=token, user=user)
 
 @app.get("/me", response_model=UserResponse)

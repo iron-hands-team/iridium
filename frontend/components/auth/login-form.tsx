@@ -24,7 +24,19 @@ function LoginForm() {
     setError(null);
     const validated = loginSchema.safeParse(userData);
     if (validated.success) {
-      //TODO: await fetch
+      const response = await fetch("http://localhost:8000/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
+        body: JSON.stringify(userData),
+      });
+      if (response.ok) {
+        window.location.reload();
+      } else {
+        setError((await response.json()).detail);
+      }
     } else {
       setError(validated.error.issues[0].message);
     }

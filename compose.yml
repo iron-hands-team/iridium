@@ -4,15 +4,15 @@ services:
     container_name: postgres-db
     restart: always
     environment:
-      POSTGRES_USER: user
-      POSTGRES_PASSWORD: password
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
       POSTGRES_DB: school_db
     ports:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U user -d school_db"]
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d school_db"]
       interval: 5s
       timeout: 5s
       retries: 5
@@ -28,7 +28,7 @@ services:
     ports:
       - "8000:8000"
     environment:
-      - DATABASE_URL=postgresql://user:password@db:5432/school_db
+      - DATABASE_URL=postgresql://${DB_USER}:${DB_PASSWORD}@db:5432/school_db
       - JWT_SECRET_KEY=${JWT_SECRET_KEY}
     depends_on:
       db:
@@ -45,8 +45,7 @@ services:
       - /app/node_modules
     environment:
       NODE_ENV: development
-      PORT: "3000"
-      NEXT_PUBLIC_API_URL: "http://localhost:8000"
+      NEXT_PUBLIC_API_URL: http://fastapi-backend:8000
     ports:
       - "3000:3000"
     restart: unless-stopped

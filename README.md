@@ -33,21 +33,27 @@ To host Iridium for your school or for other purposes, simply follow these steps
    git clone https://github.com/iron-hands-team/iridium.git
    ```
 2. Open it with your favorite code editor or through the terminal
-3. If you want to set up a development instance of the app:
+3. Create the `.env` file using the `.env.example` template and replace the variables with your secrets:
+
+   ```bash
+   cp .env.example .env
+   ```
+
+4. If you want to set up a development instance of the app:
 
    ```bash
    docker compose up
    ```
 
-   and navigate to http://localhost:3000 to access the fully functional web interface
+   and navigate to http://localhost:3000 to use the fully functional web interface and access the API at http://localhost:8000
 
-4. Alternatively, if you want to run the production build of the app, uncomment the frontend production service then comment out the original frontend development service in `compose.yml`. Finally,
+5. Alternatively, if you want to run the production build of the app, uncomment the frontend production service then comment out the original frontend development service in `compose.yml`. Finally,
 
    ```bash
    docker compose up
    ```
 
-   and the stable production web interface will be available at http://localhost:3000
+   and the stable production web interface will be available at http://localhost:3000 and the API at http://localhost:8000
 
 ## Contribution
 
