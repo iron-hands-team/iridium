@@ -1,3 +1,4 @@
+import os
 from fastapi import Depends, FastAPI, HTTPException, Response
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy import text
@@ -12,11 +13,14 @@ from app.dependencies import require_admin
 from app.seed import init_db_and_seed_admin
 from app.routers import users, announcements, clubs, events, schedule
 
+FRONTEND_URL = os.getenv(
+        "FRONTEND_URL", "http://localhost:3000")
+
 app = FastAPI(title="Iridium API")
 
 app.add_middleware(
         CORSMiddleware,
-        allow_origins=["http://localhost:3000"],
+        allow_origins=[FRONTEND_URL],
         allow_credentials=True,
         allow_methods=["*"],
         allow_headers=["*"],
