@@ -28,6 +28,8 @@ COPY --from=dependencies /app/node_modules ./node_modules
 
 COPY . .
 
+ARG NEXT_PUBLIC_API_URL
+ENV NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL
 ENV NODE_ENV=production
 
 RUN npm install -g pnpm && pn run build

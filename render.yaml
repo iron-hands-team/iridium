@@ -29,7 +29,7 @@ services:
         fromService:
           type: web
           name: fastapi-backend
-          property: host
+          property: url
 
 databases:
   - name: school-db
