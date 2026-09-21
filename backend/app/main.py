@@ -54,7 +54,7 @@ def login(credentials: LoginRequest,response:Response, db: Session = Depends(get
 
     token = manager.create_access_token(data={"sub":user.username})
 
-    response.set_cookie(key="access-token",value=token,httponly=True,samesite="none",secure=True,partitioned=True,)
+    response.set_cookie(key="access-token",value=token,httponly=True,samesite="none",secure=True)
 
     return TokenResponse(access_token=token, user=user)
 
