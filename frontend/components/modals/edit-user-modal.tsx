@@ -58,15 +58,15 @@ function EditUserModal({ user, closeModal }: EditUserModalProps) {
         <h2 className="text-xl font-bold">Edit User</h2>
         <label className="text-sm flex flex-col gap-y-1">
           First Name
-          <Input value={firstName} setValue={setFirstName} />
+          <Input placeholder="" value={firstName} setValue={setFirstName} />
         </label>
         <label className="text-sm flex flex-col gap-y-1">
           Last Name
-          <Input value={lastName} setValue={setLastName} />
+          <Input placeholder="" value={lastName} setValue={setLastName} />
         </label>
         <label className="text-sm flex flex-col gap-y-1">
           Middle Name
-          <Input value={middleName} setValue={setMiddleName} />
+          <Input placeholder="" value={middleName} setValue={setMiddleName} />
         </label>
         <div className="flex items-center gap-x-3 text-sm">
           Role
