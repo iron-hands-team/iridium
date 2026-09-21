@@ -17,10 +17,10 @@ async function Page() {
         </h2>
         <div className="border-1 border-zinc-800 p-4 flex flex-col gap-y-2">
           <Btn text="View students" link="/admin/users?t=s" />
-          <Btn text="View staff" link="/admin/users?t=f" />
+          {/* <Btn text="View staff" link="/admin/users?t=f" /> */}
         </div>
       </div>
-      <div className="flex-1 min-w-[40%] flex flex-col gap-y-5">
+      {/* <div className="flex-1 min-w-[40%] flex flex-col gap-y-5">
         <h2 className={headingStyles}>
           <FaBasketball size={18} /> Club management
         </h2>
@@ -29,7 +29,7 @@ async function Page() {
           <Btn text="Edit clubs" link="/admin/c/edit" />
           <Btn text="View clubs" link="/admin/c/view" />
         </div>
-      </div>
+      </div> */}
     </div>
   );
 }

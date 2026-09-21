@@ -54,10 +54,10 @@ function NavUser({ user }: { user: UserType }) {
               exit={{ opacity: 0 }}
               className="absolute top-[calc(100%+15px)] right-0 border-1 border-zinc-800 w-35 bg-zinc-100 dark:bg-zinc-950 flex flex-col gap-y-1 p-2 origin-top"
             >
-              <Link href="/profile" className={optionStyles}>
+              {/* <Link href="/profile" className={optionStyles}>
                 <FaUser size={18} className={iconStyles} />
                 Profile
-              </Link>
+              </Link> */}
               <div
                 className={optionStyles}
                 onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
@@ -69,14 +69,14 @@ function NavUser({ user }: { user: UserType }) {
                 )}
                 Theme
               </div>
-              <Link href="/settings" className={optionStyles}>
+              {/* <Link href="/settings" className={optionStyles}>
                 <FaGear size={18} className={iconStyles} />
                 Settings
               </Link>
               <div className={optionStyles}>
                 <FaSignOutAlt size={18} className={iconStyles} />
                 Log out
-              </div>
+              </div> */}
             </motion.div>
           )}
         </AnimatePresence>

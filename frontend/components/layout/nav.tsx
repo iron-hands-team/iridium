@@ -27,12 +27,12 @@ async function Nav() {
             Manage
           </Link>
         )}
-        <Link href="/calendar" className="px-3 py-1.5">
+        {/* <Link href="/calendar" className="px-3 py-1.5">
           Calendar
         </Link>
         <Link href="/clubs" className="px-3 py-1.5">
           Clubs
-        </Link>
+        </Link> */}
         <NavUser user={session.user} />
       </nav>
     </div>
