@@ -11,6 +11,8 @@
 
 ![Website homepage screenshot](/banner.png)
 
+**Access the deployed demo version [here](https://nextjs-frontend-28r4.onrender.com/) with username `admin` and password `admin123`.**
+
 Iridium is an easy to use online platform for schools to post announcements, view schedules, and manage students and staff, inspired by [TJHSST](https://tjhsst.fcps.edu)'s intranet [Ion](https://github.com/tjcsl/ion).
 
 ## Pages
