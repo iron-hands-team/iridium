@@ -46,6 +46,7 @@ services:
     environment:
       NODE_ENV: development
       NEXT_PUBLIC_API_URL: http://fastapi-backend:8000
+      INTERNAL_API_URL: http://fastapi-backend:8000
     ports:
       - "3000:3000"
     restart: unless-stopped

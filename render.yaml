@@ -10,11 +10,11 @@ services:
         fromDatabase:
           name: school-db
           property: connectionString
-      - key: FRONTEND_URL # TODO: add var to docker compose
+      - key: FRONTEND_URL
         fromService:
           type: web
           name: nextjs-frontend
-          property: host
+          property: url
       - key: JWT_SECRET_KEY
         generateValue: true
 

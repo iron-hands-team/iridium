@@ -25,6 +25,12 @@ class UserResponse(BaseModel):
     class Config:
         from_attributes = True
 
+class UserUpdateRequest(BaseModel):
+    first_name: str | None = None
+    last_name: str | None = None
+    middle_name: str | None = None
+    role: UserRole | None = None
+
 class TokenResponse(BaseModel):
     access_token: str
     token_type: str = "bearer"

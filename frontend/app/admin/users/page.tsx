@@ -22,8 +22,9 @@ async function Page({
   const cookieStore = await cookies();
   const authToken = cookieStore.get("access-token");
 
+  const apiUrl = process.env.INTERNAL_API_URL || process.env.NEXT_PUBLIC_API_URL;
   const res = await fetch(
-    `${process.env.NEXT_PUBLIC_API_URL}/users?role=${role}`,
+    `${apiUrl}/users?role=${role}`,
     {
       headers: {
         Authorization: `Bearer ${authToken?.value}`,
