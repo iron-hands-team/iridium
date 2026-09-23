@@ -1,6 +1,7 @@
 services:
   caddy:
     image: caddy:latest
+    container_name: caddy-proxy
     restart: unless-stopped
     ports:
       - "80:80"
@@ -57,7 +58,6 @@ services:
       - /app/node_modules
     environment:
       NODE_ENV: development
-      NEXT_PUBLIC_API_URL: http://fastapi-backend:8000
       INTERNAL_API_URL: http://fastapi-backend:8000
     ports:
       - "3000:3000"
@@ -73,6 +73,7 @@ services:
   #   container_name: nextjs-frontend-prod
   #   environment:
   #     NODE_ENV: production
+  #     INTERNAL_API_URL: http://fastapi-backend:8000
   #     PORT: "3000"
   #   ports:
   #     - "3000:3000"

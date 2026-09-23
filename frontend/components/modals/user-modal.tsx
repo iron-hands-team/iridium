@@ -24,13 +24,10 @@ function UserModal({ user, closeModal }: UserModalProps) {
   async function handleDelete() {
     setDeleting(true);
     setError(null);
-    const res = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}/users/${user.id}`,
-      {
-        method: "DELETE",
-        credentials: "include",
-      },
-    );
+    const res = await fetch(`/api/users/${user.id}`, {
+      method: "DELETE",
+      credentials: "include",
+    });
     setDeleting(null);
     if (res.ok) {
       closeModal();
