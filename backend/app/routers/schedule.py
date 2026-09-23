@@ -57,3 +57,8 @@ def delete_schedule_item(
         raise HTTPException(status_code=404, detail="Schedule item not found.")
     db.delete(item)
     db.commit()
+
+
+
+
+    
