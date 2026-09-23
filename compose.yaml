@@ -1,4 +1,17 @@
 services:
+  caddy:
+    image: caddy:latest
+    container_name: caddy-proxy
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+      - "443:443/udp"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile
+      - caddy_data:/data
+      - caddy_config:/config
+
   db:
     image: postgres:16-alpine
     container_name: postgres-db
@@ -45,7 +58,6 @@ services:
       - /app/node_modules
     environment:
       NODE_ENV: development
-      NEXT_PUBLIC_API_URL: http://fastapi-backend:8000
       INTERNAL_API_URL: http://fastapi-backend:8000
     ports:
       - "3000:3000"
@@ -61,6 +73,7 @@ services:
   #   container_name: nextjs-frontend-prod
   #   environment:
   #     NODE_ENV: production
+  #     INTERNAL_API_URL: http://fastapi-backend:8000
   #     PORT: "3000"
   #   ports:
   #     - "3000:3000"
@@ -70,3 +83,5 @@ services:
 
 volumes:
   postgres_data:
+  caddy_data:
+  caddy_config:

@@ -1,4 +1,4 @@
-# Iridium
+# [Iridium](https://iridium.tonymac.net)
 
 ![Next.js](https://img.shields.io/badge/Next.js-black?style=for-the-badge&logo=next.js)
 ![React](https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react)
@@ -11,7 +11,7 @@
 
 ![Website homepage screenshot](/banner.png)
 
-**Access the deployed demo version [here](https://nextjs-frontend-28r4.onrender.com/) with username `admin` and password `admin123`.**
+**Access the deployed demo version [here](https://iridium.tonymac.net) with username `admin` and password `admin123`.**
 
 Iridium is an easy to use online platform for schools to post announcements, view schedules, and manage students and staff, inspired by [TJHSST](https://tjhsst.fcps.edu)'s intranet [Ion](https://github.com/tjcsl/ion).
 
@@ -24,6 +24,7 @@ Iridium is an easy to use online platform for schools to post announcements, vie
 
 - Frontend: [Next.js](https://nextjs.org) as the frontend framework with the technologies [React](https://react.dev), [TypeScript](https://typescriptlang.org), and [Tailwind](https://tailwindcss.com).
 - Backend: [FastAPI](https://fastapi.tiangolo.com) as the backend [Python](https://python.org) framework for the API and server operations, which connects to the [PostgreSQL](https://postgresql.org) database.
+- Reverse proxy: Iridium uses [Caddy](https://caddyserver.com/) as both a reverse proxy and a TLS certificate manager to resolve server and frontend requests.
 - Environment: the entire app is [dockerized](https://docker.com) into 3 containers, db, backend, and frontend, with all the dependencies set up.
 
 ## Quick start
@@ -47,7 +48,7 @@ To host Iridium for your school or for other purposes, simply follow these steps
    docker compose up
    ```
 
-   and navigate to http://localhost:3000 to use the fully functional web interface and access the API at http://localhost:8000
+   and navigate to https://localhost (port 80) to use the fully functional web interface and access the API at https://localhost/api
 
 5. Alternatively, if you want to run the production build of the app, uncomment the frontend production service then comment out the original frontend development service in `compose.yml`. Finally,
 
@@ -55,7 +56,7 @@ To host Iridium for your school or for other purposes, simply follow these steps
    docker compose up
    ```
 
-   and the stable production web interface will be available at http://localhost:3000 and the API at http://localhost:8000
+   and the stable production web interface will be available at https://localhost (port 80) and the API at https://localhost/api
 
 ## Contribution
 

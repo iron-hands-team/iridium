@@ -13,14 +13,13 @@ from app.dependencies import require_admin
 from app.seed import init_db_and_seed_admin
 from app.routers import users, announcements, clubs, events, schedule
 
-FRONTEND_URL = os.getenv(
-        "FRONTEND_URL", "http://localhost:3000")
+IS_PROD = os.getenv("ENVIRONMENT","development") == "production"
 
 app = FastAPI(title="Iridium API")
 
 app.add_middleware(
         CORSMiddleware,
-        allow_origins=[FRONTEND_URL],
+        allow_origins=["https://loalhost"],
         allow_credentials=True,
         allow_methods=["*"],
         allow_headers=["*"],
@@ -54,7 +53,7 @@ def login(credentials: LoginRequest,response:Response, db: Session = Depends(get
 
     token = manager.create_access_token(data={"sub":user.username})
 
-    response.set_cookie(key="access-token",value=token,httponly=True,samesite="none",secure=True)
+    response.set_cookie(key="access-token",value=token,httponly=True,samesite="lax",secure=IS_PROD)
 
     return TokenResponse(access_token=token, user=user)
 

@@ -1,0 +1,9 @@
+iridium.tonymac.net, localhost {
+    handle_path /api/* {
+        reverse_proxy fastapi-backend:8000
+    }
+
+    handle {
+        reverse_proxy nextjs-frontend-dev:3000
+    }
+}

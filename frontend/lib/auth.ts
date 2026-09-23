@@ -6,8 +6,7 @@ export async function getSession() {
 
   let user = null;
   if (authToken) {
-    const apiUrl = process.env.INTERNAL_API_URL || process.env.NEXT_PUBLIC_API_URL;
-    const res = await fetch(apiUrl + "/me", {
+    const res = await fetch(`${process.env.INTERNAL_API_URL}/me`, {
       method: "GET",
       headers: {
         Authorization: `Bearer ${authToken.value}`,
