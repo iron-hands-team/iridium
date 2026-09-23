@@ -1,0 +1,23 @@
+iridium.tonymac.net {
+    @backend_routes path /login /me /users* /announcements* /events* /clubs* /schedule* /health*
+
+    handle @backend_routes {
+        reverse_proxy localhost:8000
+    }
+
+    handle {
+        reverse_proxy localhost:3000
+    }
+}
+
+localhost {
+    @backend_routes path /login /me /users* /announcements* /events* /clubs* /schedule* /health*
+
+    handle @backend_routes {
+        reverse_proxy fastapi-backend:8000
+    }
+
+    handle {
+        reverse_proxy nextjs-frontend-dev:3000
+    }
+}

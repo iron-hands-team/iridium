@@ -1,4 +1,16 @@
 services:
+  caddy:
+    image: caddy:latest
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+      - "443:443/udp"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile
+      - caddy_data:/data
+      - caddy_config:/config
+
   db:
     image: postgres:16-alpine
     container_name: postgres-db
@@ -70,3 +82,5 @@ services:
 
 volumes:
   postgres_data:
+  caddy_data:
+  caddy_config:
