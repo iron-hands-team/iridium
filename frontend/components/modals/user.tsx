@@ -5,8 +5,8 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { AnimatePresence } from "framer-motion";
 import { FaExclamationTriangle } from "react-icons/fa";
-import WarningModal from "./warning-modal";
-import EditUserModal from "./edit-user-modal";
+import WarningModal from "./warning";
+import EditUserModal from "./edit-user";
 import Modal from "../ui/modal";
 import Btn from "../ui/btn";
 
@@ -63,18 +63,14 @@ function UserModal({ user, closeModal }: UserModalProps) {
           <Btn
             text="Manage"
             onclick={() => setEditing(true)}
-            styles="text-sm w-fit!"
+            styles="text-sm"
             primary
           />
-          <Btn
-            text="Profile"
-            link={`/profile/${user.id}`}
-            styles="text-sm w-fit!"
-          />
+          <Btn text="Profile" link={`/profile/${user.id}`} styles="text-sm" />
           <Btn
             text="Delete"
             onclick={() => setDeleting(false)}
-            styles="text-sm w-fit!"
+            styles="text-sm"
           />
         </div>
       </div>

@@ -25,7 +25,7 @@ def create_announcement(
     announcement = Announcement(
         title=new_announcement.title,
         content=new_announcement.content,
-        author_id=current_user.id,
+        author_id=current_user.id, # TODO: add a new field for target role (all, student, teacher, admin) as seen in lib/constants.ts
     )
     db.add(announcement)
     db.commit()

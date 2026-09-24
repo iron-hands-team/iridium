@@ -15,19 +15,22 @@ async function Page({
 
   const params = await searchParams;
   const type = params.t;
-  if (type !== "s" && type !== "t") redirect("/admin");
+  if (type !== "s" && type !== "t" && type !== "a") redirect("/admin");
 
-  const role = type === "s" ? "student" : "staff";
+  const role = type === "s" ? "student" : type === "t" ? "teacher" : "admin";
 
   const cookieStore = await cookies();
   const authToken = cookieStore.get("access-token");
 
-  const res = await fetch(`/api/users?role=${role}`, {
-    headers: {
-      Authorization: `Bearer ${authToken?.value}`,
+  const res = await fetch(
+    `${process.env.INTERNAL_API_URL}/users?role=${role}`,
+    {
+      headers: {
+        Authorization: `Bearer ${authToken?.value}`,
+      },
+      cache: "no-store",
     },
-    cache: "no-store",
-  });
+  );
 
   const rawUsers = res.ok ? await res.json() : [];
   const users: UserType[] = rawUsers.map((u: any) => ({

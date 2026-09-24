@@ -4,12 +4,13 @@ import type { UserType } from "@/lib/auth";
 import { useState } from "react";
 import { FaCaretUp, FaFilter } from "react-icons/fa";
 import { AnimatePresence } from "framer-motion";
+import { roles } from "@/lib/constants";
 import Input from "@/components/ui/input";
-import UserModal from "@/components/modals/user-modal";
+import UserModal from "@/components/modals/user";
 import Dropdown from "@/components/ui/dropdown";
 
 const sorts = ["ID", "Last name", "First name", "Middle name", "Admin"];
-const types = ["All", "Students", "Teachers", "Admin"];
+const types = ["All", ...roles.map((r) => r.toLowerCase())];
 
 function Users({ users }: { users: UserType[] }) {
   const [search, setSearch] = useState<string>("");

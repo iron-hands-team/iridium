@@ -5,6 +5,7 @@ import type { UserType } from "@/lib/auth";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { FaExclamationTriangle } from "react-icons/fa";
+import { roles } from "@/lib/constants";
 import Modal from "../ui/modal";
 import Btn from "../ui/btn";
 import Input from "../ui/input";
@@ -14,8 +15,6 @@ interface EditUserModalProps {
   user: UserType;
   closeModal: () => void;
 }
-
-const roles = ["student", "teacher", "admin"];
 
 function EditUserModal({ user, closeModal }: EditUserModalProps) {
   const [firstName, setFirstName] = useState(user.firstName);
@@ -78,10 +77,10 @@ function EditUserModal({ user, closeModal }: EditUserModalProps) {
           <Btn
             text={loading ? "Saving..." : "Save"}
             onclick={handleSubmit}
-            styles="text-sm w-fit!"
+            styles="text-sm"
             primary
           />
-          <Btn text="Cancel" onclick={closeModal} styles="text-sm w-fit!" />
+          <Btn text="Cancel" onclick={closeModal} styles="text-sm" />
         </div>
       </div>
     </Modal>

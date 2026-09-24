@@ -17,8 +17,10 @@ def list_users(
     query = db.query(User)
     if role == "student":
         query = query.filter(User.role == UserRole.student)
-    elif role == "staff":
-        query = query.filter(User.role.in_([UserRole.teacher, UserRole.admin]))
+    elif role == "teacher":
+        query = query.filter(User.role == UserRole.teacher)
+    elif role == "admin":
+        query = query.filter(User.role == UserRole.admin)
     return query.order_by(User.last_name, User.first_name).all()
 
 @router.patch("/users/{username}", response_model=UserResponse)

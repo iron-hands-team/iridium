@@ -29,10 +29,10 @@ function WarningModal({
           <Btn
             text={loading ? "Loading..." : "Confirm"}
             onclick={confirm}
-            styles="text-sm w-fit! bg-red-500! text-white!"
+            styles="text-sm bg-red-500! text-white!"
             primary
           />
-          <Btn text="Cancel" onclick={closeModal} styles="text-sm w-fit!" />
+          <Btn text="Cancel" onclick={closeModal} styles="text-sm" />
         </div>
       </div>
     </Modal>

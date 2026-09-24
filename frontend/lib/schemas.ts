@@ -1,3 +1,4 @@
+import { roles } from "./constants";
 import * as z from "zod";
 
 export const loginSchema = z.object({
@@ -8,4 +9,13 @@ export const loginSchema = z.object({
     .min(8, "Password has to be at least 8 characters long"),
 });
 
+export const postSchema = z.object({
+  id: z.number().optional(),
+  created_at: z.string().optional(),
+  title: z.string().trim().min(1, "Please enter a title"),
+  content: z.string().trim().min(1, "Please enter valid content"),
+  role: z.enum(["all", ...roles], "Please select a valid role to post to"),
+});
+
 export type LoginType = z.infer<typeof loginSchema>;
+export type PostType = z.infer<typeof postSchema>;
