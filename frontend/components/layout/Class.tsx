@@ -191,7 +191,7 @@ export default function ClassBody() {
               borderRadius: "8px",
 							gap: "10px"
             }}
-						className="border-1 border-zinc-800 "
+						className="border-1 border-zinc-800 hover:border-zinc-200"
 						
           >
 
@@ -207,8 +207,12 @@ export default function ClassBody() {
 							updateName(i, e.target.value);
 						}}
 						></textarea>
+      <div className="w-1/3">
+      	<Btn text="Make an Announcement 📢" onclick={() => {classes[i].canShow = true;addStudent(item.students, i)}}/>
+      </div>
+      <br></br>
 						<div className="w-2/3 flex">
-						<Btn text="Add Student" onclick={() => {classes[i].canShow = true;addStudent(item.students, i)}}/>
+						<Btn text="Add Student 🧑‍🎓" onclick={() => {classes[i].canShow = true;addStudent(item.students, i)}}/>
 						<Btn text={classes[i].canShow ? "Hide" : "Show"} onclick={() => updateCanShowStudents(i, !classes[i].canShow)}/>
 
 						</div>
@@ -233,18 +237,22 @@ export default function ClassBody() {
 								</div>
 							))}
 							</div>
-						)};
+						)}
 
 						<br></br>
-						
+						<br></br>
+      <br></br>
 						<div className="w-1/3">
 						<Btn text="Delete Class" onclick={() => {deleteTest(i)}}/>
 						</div>
           </div>
-        ))}
+    ))}
       </div>
 			<br></br>
-			
+   
+			<p className="ml-10">Brought to you by RespectableDot because he is very respectful. </p>
+
+   <br></br>
 			<Footer/>
 			<div className="h-100"></div>
     </div>
