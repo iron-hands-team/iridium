@@ -6,7 +6,6 @@ import { useState } from "react";
 import Image from "next/image";
 import Input from "../ui/input";
 import Btn from "../ui/btn";
-import Link from "next/link";
 
 const labelStyles =
   "text-black dark:text-zinc-300 text-sm flex flex-col gap-y-1 w-full";
@@ -25,7 +24,7 @@ function LoginForm() {
     setError(null);
     const validated = loginSchema.safeParse(userData);
     if (validated.success) {
-      const response = await fetch(`/api/login`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/login`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -75,12 +74,6 @@ function LoginForm() {
             type="password"
           />
         </label>
-        <Link
-          href="/reset"
-          className="hover:underline text-black dark:text-zinc-300 text-xs w-fit"
-        >
-          Forgot your password?
-        </Link>
         {error && (
           <div className="text-red-500 text-sm flex gap-x-3 items-center">
             <FaExclamationTriangle size={15} /> {error}

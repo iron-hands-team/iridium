@@ -10,6 +10,7 @@ import {
 } from "react-icons/fa";
 import { FaGear } from "react-icons/fa6";
 import { useState, useEffect, useRef } from "react";
+import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { useTheme } from "next-themes";
 import Link from "next/link";
@@ -23,6 +24,13 @@ function NavUser({ user }: { user: UserType }) {
   const [menuOpen, setMenuOpen] = useState<boolean>(false);
   const menuRef = useRef<HTMLDivElement>(null);
   const { theme, setTheme } = useTheme();
+  const router = useRouter();
+
+  async function handleLogout() {
+    await fetch("/api/logout", { method: "POST", credentials: "include" });
+    router.push("/");
+    router.refresh();
+  }
 
   useEffect(() => {
     const clickHandler = (e: MouseEvent) => {
@@ -73,7 +81,7 @@ function NavUser({ user }: { user: UserType }) {
                 <FaGear size={18} className={iconStyles} />
                 Settings
               </Link>
-              <div className={optionStyles}>
+              <div className={optionStyles} onClick={handleLogout}>
                 <FaSignOutAlt size={18} className={iconStyles} />
                 Log out
               </div>

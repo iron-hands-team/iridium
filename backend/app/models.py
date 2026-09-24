@@ -28,6 +28,8 @@ class User(Base):
     club_memberships = relationship("ClubMembership", back_populates="user")
     events_created = relationship("Event", back_populates="created_by")
     schedule_items = relationship("ScheduleItem", back_populates="user")
+    classes_taught = relationship("ClassSection", back_populates="teacher")
+    class_enrollments = relationship("ClassEnrollment", back_populates="student")
 
 class Announcement(Base):
     __tablename__ = "announcements"
@@ -81,3 +83,23 @@ class ScheduleItem(Base):
     end_time = Column(Time, nullable=True)
 
     user = relationship("User", back_populates="schedule_items")
+
+class ClassSection(Base):
+    __tablename__ = "class_sections"
+    id = Column(Integer, primary_key=True, index=True)
+    name = Column(String, nullable=False)
+    teacher_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+
+    teacher = relationship("User", back_populates="classes_taught")
+    enrollments = relationship(
+        "ClassEnrollment", back_populates="class_section", cascade="all, delete-orphan"
+    )
+
+class ClassEnrollment(Base):
+    __tablename__ = "class_enrollments"
+    id = Column(Integer, primary_key=True, index=True)
+    class_id = Column(Integer, ForeignKey("class_sections.id"), nullable=False)
+    student_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+
+    class_section = relationship("ClassSection", back_populates="enrollments")
+    student = relationship("User", back_populates="class_enrollments")

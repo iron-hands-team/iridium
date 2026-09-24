@@ -111,5 +111,30 @@ class ScheduleItemResponse(BaseModel):
     class Config:
         from_attributes = True
 
+# classes/rosters
 
-        
+class ClassSectionCreateRequest(BaseModel):
+    name: str
+    teacher_id: int | None = None  # admin only; defaults to the current user
+
+class ClassSectionUpdateRequest(BaseModel):
+    name: str | None = None
+    teacher_id: int | None = None  # admin only
+
+class ClassSectionResponse(BaseModel):
+    id: int
+    name: str
+    teacher: UserResponse
+
+    class Config:
+        from_attributes = True
+
+class AddStudentToClassRequest(BaseModel):
+    username: str
+
+class ClassEnrollmentResponse(BaseModel):
+    id: int
+    student: UserResponse
+
+    class Config:
+        from_attributes = True

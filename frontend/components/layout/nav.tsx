@@ -27,6 +27,11 @@ async function Nav() {
             Manage
           </Link>
         )}
+        {(session.user.role === "teacher" || session.user.isAdmin) && (
+          <Link href="/classes" className="px-3 py-1.5">
+            Classes
+          </Link>
+        )}
         {/* <Link href="/calendar" className="px-3 py-1.5">
           Calendar
         </Link>

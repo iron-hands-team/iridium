@@ -11,15 +11,16 @@ from app.models import User, UserRole
 from app.schemas import LoginRequest, UserCreateRequest, UserResponse, TokenResponse
 from app.dependencies import require_admin
 from app.seed import init_db_and_seed_admin
-from app.routers import users, announcements, clubs, events, schedule
+from app.routers import users, announcements, clubs, events, schedule, classes
 
-IS_PROD = os.getenv("ENVIRONMENT","development") == "production"
+IS_PROD = os.getenv("ENVIRONMENT", "development") == "production"
+FRONTEND_URL = os.getenv("FRONTEND_URL", "http://localhost:3000")
 
 app = FastAPI(title="Iridium API")
 
 app.add_middleware(
         CORSMiddleware,
-        allow_origins=["https://loalhost"],
+        allow_origins=[FRONTEND_URL],
         allow_credentials=True,
         allow_methods=["*"],
         allow_headers=["*"],
@@ -30,6 +31,7 @@ app.include_router(announcements.router)
 app.include_router(clubs.router)
 app.include_router(events.router)
 app.include_router(schedule.router)
+app.include_router(classes.router)
 
 @app.get("/")
 def root():
@@ -60,6 +62,11 @@ def login(credentials: LoginRequest,response:Response, db: Session = Depends(get
 @app.get("/me", response_model=UserResponse)
 def read_current_user(current_user: User = Depends(manager)):
     return current_user
+
+@app.post("/logout")
+def logout(response: Response):
+    response.delete_cookie(key="access-token")
+    return {"message": "Logged out."}
 
 @app.post("/users", response_model=UserResponse)
 def create_user(
