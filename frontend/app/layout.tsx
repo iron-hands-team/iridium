@@ -16,7 +16,7 @@ export const metadata: Metadata = {
 };
 
 export default async function RootLayout({ children }: LayoutProps<"/">) {
-  const session = await getSession();
+  const { user } = await getSession();
 
   return (
     <html
@@ -24,9 +24,9 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
       className={`${inter.variable} h-full antialiased`}
       suppressHydrationWarning
     >
-      <body>
+      <body suppressHydrationWarning>
         <ThemeProvider attribute="class">
-          {session.user ? (
+          {user ? (
             <>
               <Nav />
               {children}

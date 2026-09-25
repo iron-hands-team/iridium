@@ -45,7 +45,7 @@ function Dropdown({ value, setValue, values, label }: DropdownProps) {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="absolute top-[calc(100%+10px)] left-0 w-30 bg-zinc-100 dark:bg-zinc-950 border border-zinc-800 p-2"
+            className="absolute top-[calc(100%+10px)] left-0 min-w-35 bg-zinc-100 dark:bg-zinc-950 border border-zinc-800 p-2"
           >
             {label && (
               <div className="text-center pb-2 text-zinc-700 dark:text-zinc-300">

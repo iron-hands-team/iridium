@@ -1,3 +1,4 @@
+import type { RequestCookie } from "next/dist/compiled/@edge-runtime/cookies";
 import { cookies } from "next/headers";
 
 export async function getSession() {
@@ -30,7 +31,8 @@ export async function getSession() {
           isAdmin: user.role === "admin",
         }
       : null,
-  } as { user: UserType };
+    cookie: authToken,
+  } as { user: UserType; cookie: RequestCookie };
 }
 
 export interface UserType {

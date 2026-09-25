@@ -10,14 +10,21 @@ async function Page({
 }: {
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }) {
-  const session = await getSession();
-  if (!session.user.isAdmin) redirect("/");
+  const { user } = await getSession();
+  if (!user.isAdmin) redirect("/");
 
   const params = await searchParams;
   const type = params.t;
-  if (type !== "s" && type !== "t" && type !== "a") redirect("/admin");
+  if (type && type !== "s" && type !== "t" && type !== "a") redirect("/admin");
 
-  const role = type === "s" ? "student" : type === "t" ? "teacher" : "admin";
+  const role =
+    type === "s"
+      ? "student"
+      : type === "t"
+        ? "teacher"
+        : type === "a"
+          ? "admin"
+          : "all";
 
   const cookieStore = await cookies();
   const authToken = cookieStore.get("access-token");

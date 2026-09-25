@@ -55,7 +55,7 @@ def login(credentials: LoginRequest,response:Response, db: Session = Depends(get
 
     token = manager.create_access_token(data={"sub":user.username})
 
-    response.set_cookie(key="access-token",value=token,httponly=True,samesite="lax",secure=IS_PROD)
+    response.set_cookie(key="access-token",value=token,httponly=True,samesite="lax",secure=IS_PROD) # TODO: increase expiration time?
 
     return TokenResponse(access_token=token, user=user)
 

@@ -18,13 +18,13 @@ function LoginForm() {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
 
-  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+  async function handleSubmit(e: React.SubmitEvent) {
     e.preventDefault();
     setLoading(true);
     setError(null);
     const validated = loginSchema.safeParse(userData);
     if (validated.success) {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/login`, {
+      const response = await fetch("/api/login", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -54,7 +54,7 @@ function LoginForm() {
           alt="Iridium logo"
           width={75}
           height={75}
-          className="mx-auto"
+          className="mx-auto invert-100 dark:invert-0"
         />
         <div className="text-lg font-bold text-center">Iridium Login</div>
         <label className={labelStyles}>

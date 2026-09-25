@@ -3,51 +3,59 @@
 import { postSchema, type PostType } from "@/lib/schemas";
 import { useState } from "react";
 import { roles } from "@/lib/constants";
+import { useRouter } from "next/navigation";
 import Modal from "../ui/modal";
 import Input from "../ui/input";
 import Btn from "../ui/btn";
 import Textarea from "../ui/textarea";
 import Dropdown from "../ui/dropdown";
+import Checkbox from "../ui/checkbox";
 
 const labelStyles =
   "text-sm text-black dark:text-zinc-300 flex flex-col gap-y-1";
 
 interface PostAnnouncementModalProps {
   closeModal: () => void;
-  refresh: () => void;
+  existing?: PostType;
 }
 
 function PostAnnouncementModal({
   closeModal,
-  refresh,
+  existing,
 }: PostAnnouncementModalProps) {
-  const [post, setPost] = useState<PostType>({
-    title: "",
-    content: "",
-    role: "",
-  });
+  const [post, setPost] = useState<PostType>(
+    existing || {
+      title: "",
+      content: "",
+      role: "",
+      pinned: false,
+    },
+  );
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
+  const router = useRouter();
 
   async function handlePost() {
     const validated = postSchema.safeParse(post);
     if (validated.success) {
       setError(null);
       setLoading(true);
-      const res = await fetch("/api/announcements", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        credentials: "include",
-        body: JSON.stringify({
-          title: post.title,
-          content: post.content,
-        }),
-      });
+      const res = existing
+        ? { ok: false } //TODO: implement announcement editing
+        : await fetch("/api/announcements", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            credentials: "include",
+            body: JSON.stringify({
+              title: post.title,
+              content: post.content, //TODO: add post.role and post.pinned
+            }),
+          });
       setLoading(false);
       if (res.ok) {
-        refresh();
+        router.refresh();
         closeModal();
       } else {
         setError("Something went wrong, please try again");
@@ -60,7 +68,9 @@ function PostAnnouncementModal({
   return (
     <Modal closeModal={closeModal}>
       <div className="flex flex-col gap-y-5 p-5">
-        <h2 className="text-xl font-bold">Post announcement</h2>
+        <h2 className="text-xl font-bold">
+          {existing ? "Edit" : "Post"} announcement
+        </h2>
         <div className="flex flex-col gap-y-3 text-sm">
           <label className={labelStyles}>
             <div>
@@ -99,6 +109,11 @@ function PostAnnouncementModal({
               setValue={(content) => setPost({ ...post, content })}
             />
           </label>
+          <Checkbox
+            text="Pinned"
+            checked={post.pinned}
+            setChecked={(pinned) => setPost({ ...post, pinned })}
+          />
         </div>
         {error && <div className="text-sm text-red-500">{error}</div>}
         <div className="flex gap-x-3">

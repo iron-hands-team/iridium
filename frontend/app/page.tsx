@@ -1,27 +1,28 @@
 import type { PostType } from "@/lib/schemas";
-import { cookies } from "next/headers";
 import { FaBell, FaBullhorn, FaCalendar, FaLink } from "react-icons/fa";
 import { getSession } from "@/lib/auth";
-import AnnouncementBar from "@/components/home/announcement-bar";
 import Announcement from "@/components/home/announcement";
+import NewAnnouncement from "@/components/admin/new-announcement";
+import Btn from "@/components/ui/btn";
 
 const headingStyles = "text-xl font-bold flex items-center gap-x-3";
 
 async function Page() {
-  const { user } = await getSession();
+  const { user, cookie } = await getSession();
   const isAdmin = user?.isAdmin ? true : false;
-  const cookieStore = await cookies();
-  const authToken = cookieStore.get("access-token")!;
-  const announcements: PostType[] = await fetch(
+  const announcementData: PostType[] = await fetch(
     `${process.env.INTERNAL_API_URL}/announcements`,
     {
       method: "GET",
       headers: {
-        Authorization: `Bearer ${authToken.value}`,
+        Authorization: `Bearer ${cookie.value}`,
         "Content-Type": "application/json",
       },
     },
   ).then((res) => res.json());
+  const announcements = announcementData.sort((a, b) =>
+    String(b.pinned).localeCompare(String(a.pinned)),
+  );
 
   return (
     <div className="px-50 flex py-10 gap-x-15 h-[calc(100vh-53px)] overflow-y-auto pb-10">
@@ -29,11 +30,20 @@ async function Page() {
         <h2 className={headingStyles}>
           <FaBullhorn size={18} /> Announcements
         </h2>
-        {isAdmin && <AnnouncementBar />}
+        {isAdmin && (
+          <div className="flex gap-x-3">
+            <NewAnnouncement text="New post" />
+            <Btn text="Manage posts" link="/admin/announcements" />
+          </div>
+        )}
         {announcements.length > 0 ? (
           announcements.map((announcement) => {
             return (
-              <Announcement key={announcement.id} announcement={announcement} />
+              <Announcement
+                key={announcement.id}
+                announcement={announcement}
+                user={user}
+              />
             );
           })
         ) : (

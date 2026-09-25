@@ -12,6 +12,8 @@ export const loginSchema = z.object({
 export const postSchema = z.object({
   id: z.number().optional(),
   created_at: z.string().optional(),
+  pinned: z.boolean(),
+  archived: z.boolean().optional(),
   title: z.string().trim().min(1, "Please enter a title"),
   content: z.string().trim().min(1, "Please enter valid content"),
   role: z.enum(["all", ...roles], "Please select a valid role to post to"),

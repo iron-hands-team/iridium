@@ -37,7 +37,7 @@ function Modal({ children, closeModal }: ModalProps) {
         exit={{ scale: 0, y: 150 }}
         transition={{ duration: 0.7, type: "spring" }}
         ref={modalRef}
-        className="w-100 max-h-120 border border-zinc-800 bg-zinc-100 dark:bg-zinc-950 overflow-y-auto"
+        className="w-100 max-h-140 border border-zinc-800 bg-zinc-100 dark:bg-zinc-950 overflow-y-auto"
       >
         {children}
       </motion.div>
