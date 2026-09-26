@@ -391,7 +391,7 @@ export default function ClassBody() {
 							</div>
 							<br></br>
 							{classes[settingsClassIndex].assignments.map((assignments, assignmentIndex) => (
-								
+								<div></div>
 							))}
 							<br></br>
 
