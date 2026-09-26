@@ -159,11 +159,13 @@ Staff only. `204` on success, `404` if not found.
 
 ---
 
+<!-- @iamharry0121 update with new api endpoints -->
+
 ## Not yet built (frontend has no page for these)
 
-The API side is complete for announcements, events, clubs, and
-schedule — the frontend just doesn't call them yet (see `app/page.tsx`,
-`app/admin/page.tsx`).
+- Events
+- Clubs
+- Schedule
 
 There's also no password-reset endpoint (`/reset` is a frontend-only
 dead link right now) and no self-service "update your own profile"

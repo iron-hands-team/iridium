@@ -32,6 +32,9 @@ async function Nav() {
             Classes
           </Link>
         )}
+        <Link href="/schedule" className="px-3 py-1.5">
+          Schedule
+        </Link>
         <Link href="/calendar" className="px-3 py-1.5">
           Calendar
         </Link>
