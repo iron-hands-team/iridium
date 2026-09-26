@@ -7,7 +7,8 @@ import Nav from "@/components/layout/nav";
 import "./globals.css";
 import Page from "@/app/page";
 import DashboardBody from "@/components/layout/DashboardBody";
-import ClassBody from "@/components/layout/Class";
+import ClubBody from "@/components/layout/ClubTeacher";
+import ClassBody from "@/components/layout/ClassTeacher";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -21,15 +22,6 @@ export const metadata: Metadata = {
 export default async function RootLayout({ children }: LayoutProps<"/">) {
   const session = await getSession();
   
-  return (
-    <html>
-      <body>
-        <Nav/>
-        <ClassBody/>
-      </body>
-
-    </html>
-  );
   return (
     <html
       lang="en"
