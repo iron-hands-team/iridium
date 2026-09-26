@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
 import { getSession } from "@/lib/auth";
-import ClassBody from "@/components/layout/Class";
+import ClassBody from "@/components/layout/ClassTeacher";
 
 async function Page() {
   const { user } = await getSession();
