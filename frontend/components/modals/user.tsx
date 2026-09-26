@@ -1,12 +1,12 @@
 "use client";
 
-import type { UserType } from "@/lib/auth";
+import type { UserType } from "@/types/user";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { AnimatePresence } from "framer-motion";
 import { FaExclamationTriangle } from "react-icons/fa";
 import WarningModal from "./warning";
-import EditUserModal from "./edit-user";
+import NewUserModal from "./new-user";
 import Modal from "../ui/modal";
 import Btn from "../ui/btn";
 
@@ -24,7 +24,7 @@ function UserModal({ user, closeModal }: UserModalProps) {
   async function handleDelete() {
     setDeleting(true);
     setError(null);
-    const res = await fetch(`/api/users/${user.id}`, {
+    const res = await fetch(`/api/users/${user.username}`, {
       method: "DELETE",
       credentials: "include",
     });
@@ -38,7 +38,7 @@ function UserModal({ user, closeModal }: UserModalProps) {
   }
 
   if (editing) {
-    return <EditUserModal user={user} closeModal={closeModal} />;
+    return <NewUserModal existing={user} closeModal={closeModal} />;
   }
 
   return (
@@ -48,11 +48,11 @@ function UserModal({ user, closeModal }: UserModalProps) {
           {user.firstName + " " + user.lastName}
         </h2>
         <div className="flex flex-col gap-y-3 text-sm">
-          <div>ID: {user.id}</div>
+          <div>Username: {user.username}</div>
           <div>First name: {user.firstName}</div>
           {user.middleName && <div>Middle name: {user.middleName}</div>}
           <div>Last name: {user.lastName}</div>
-          <div>Is admin: {user.isAdmin ? "True" : "False"}</div>
+          <div>Role: {user.role[0].toUpperCase() + user.role.slice(1)}</div>
         </div>
         {error && (
           <div className="text-red-500 text-sm flex gap-x-3 items-center">
@@ -61,12 +61,16 @@ function UserModal({ user, closeModal }: UserModalProps) {
         )}
         <div className="flex gap-x-3">
           <Btn
-            text="Manage"
+            text="Edit"
             onclick={() => setEditing(true)}
             styles="text-sm"
             primary
           />
-          <Btn text="Profile" link={`/profile/${user.id}`} styles="text-sm" />
+          <Btn
+            text="Profile"
+            link={`/profile/${user.username}`}
+            styles="text-sm"
+          />
           <Btn
             text="Delete"
             onclick={() => setDeleting(false)}

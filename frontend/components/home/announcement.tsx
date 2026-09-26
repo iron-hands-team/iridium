@@ -1,7 +1,7 @@
 "use client";
 
 import type { PostType } from "@/lib/schemas";
-import type { UserType } from "@/lib/auth";
+import type { UserType } from "@/types/user";
 import { FaArchive, FaHeart } from "react-icons/fa";
 import { useState } from "react";
 import { AnimatePresence } from "framer-motion";
@@ -25,9 +25,9 @@ function Announcement({ announcement, user }: AnnouncementProps) {
 
   async function handleLike() {
     setLikes(
-      likes.includes(user.id)
-        ? likes.filter((l) => l !== user.id)
-        : [...likes, user.id],
+      likes.includes(user.username)
+        ? likes.filter((l) => l !== user.username)
+        : [...likes, user.username],
     );
     //TODO: add likes to announcements
   }
@@ -87,18 +87,18 @@ function Announcement({ announcement, user }: AnnouncementProps) {
         <div
           className="text-sm flex items-center gap-x-2 cursor-pointer text-zinc-700 dark:text-zinc-300 w-fit group"
           onClick={handleLike}
-          title={`${likes.includes(user.id) ? "Unlike" : "Like"} this announcement`}
+          title={`${likes.includes(user.username) ? "Unlike" : "Like"} this announcement`}
         >
           <div className="group-hover:-translate-y-0.5 group-hover:scale-115 transition-transform!">
             <FaHeart
-              className={likes.includes(user.id) ? "text-red-500" : ""}
+              className={likes.includes(user.username) ? "text-red-500" : ""}
               size={13}
             />
           </div>
           {likes.length}
         </div>
       </div>
-      {user.isAdmin && (
+      {user.role === "admin" && (
         <>
           <Menu
             options={[

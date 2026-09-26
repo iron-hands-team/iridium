@@ -5,7 +5,7 @@ import { FaEye } from "react-icons/fa";
 import { FaXmark } from "react-icons/fa6";
 
 interface InputProps {
-  placeholder: string;
+  placeholder?: string;
   value: string;
   setValue: (v: string) => void;
   type?: string;

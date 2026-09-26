@@ -31,5 +31,8 @@ def init_db_and_seed_admin():
             )
             db.add(student)
             db.commit()
+        
+        # TODO: also optionally seed announcements, events, classes, etc. to demo everything
+
     finally:
         db.close()

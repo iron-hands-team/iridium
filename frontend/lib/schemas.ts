@@ -19,5 +19,15 @@ export const postSchema = z.object({
   role: z.enum(["all", ...roles], "Please select a valid role to post to"),
 });
 
+export const newUserSchema = z.object({
+  firstName: z.string().trim().min(1, "Please enter a first name"),
+  lastName: z.string().trim().min(1, "Please enter a last name"),
+  middleName: z.string().optional().nullable(),
+  username: z.string().trim().min(1, "Please enter a username"),
+  password: z.string().optional(),
+  role: z.enum(roles, "Please assign a valid role"),
+});
+
 export type LoginType = z.infer<typeof loginSchema>;
 export type PostType = z.infer<typeof postSchema>;
+export type NewUserType = z.infer<typeof newUserSchema>;

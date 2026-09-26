@@ -85,6 +85,7 @@ def create_user(
         role=new_user.role,
         first_name=new_user.first_name,
         last_name=new_user.last_name,
+        middle_name=new_user.middle_name,
     )
     db.add(user)
     db.commit()

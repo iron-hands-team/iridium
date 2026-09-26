@@ -6,7 +6,7 @@ import Announcements from "./announcements";
 
 async function Page() {
   const { user, cookie } = await getSession();
-  if (!user.isAdmin) redirect("/");
+  if (user.role !== "admin") redirect("/");
   const announcementData: PostType[] = await fetch(
     `${process.env.INTERNAL_API_URL}/announcements`,
     {

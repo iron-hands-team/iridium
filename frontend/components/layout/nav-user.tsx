@@ -1,6 +1,6 @@
 "use client";
 
-import type { UserType } from "@/lib/auth";
+import type { UserType } from "@/types/user";
 import {
   FaSignOutAlt,
   FaUser,

@@ -12,9 +12,8 @@ interface Test {
 
 export default function DashboardBody() {
   const [test, setTest] = useState<Test[]>([]);
-  const [asd, setAsd] = useState("");
 
-	// i had to use ai for the functions cuz i dont know how to use
+  // i had to use ai for the functions cuz i dont know how to use
   function addTest() {
     setTest((prev) => [
       ...prev,
@@ -30,29 +29,19 @@ export default function DashboardBody() {
     setTest((prev) => prev.filter((_, i) => i !== index));
   }
 
-
   function updateText(index: number, text: string) {
     setTest((prev) =>
-      prev.map((item, i) =>
-        i === index
-          ? { ...item, text: text }
-          : item
-      )
+      prev.map((item, i) => (i === index ? { ...item, text: text } : item)),
     );
   }
 
   function updateName(index: number, text: string) {
     setTest((prev) =>
-      prev.map((item, i) =>
-        i === index
-          ? { ...item, name: text }
-          : item
-      )
+      prev.map((item, i) => (i === index ? { ...item, name: text } : item)),
     );
   }
 
   return (
-
     <div className="bg-[#131313]">
       <div
         style={{
@@ -74,7 +63,6 @@ export default function DashboardBody() {
       </div>
 
       <div
-
         style={{
           backgroundColor: "black",
           display: "flex",
@@ -86,7 +74,6 @@ export default function DashboardBody() {
       >
         {test.map((item, i) => (
           <div
-
             key={item.id}
             style={{
               width: "80%",
@@ -94,15 +81,13 @@ export default function DashboardBody() {
               border: "1px solid lightgray",
               borderRadius: "8px",
             }}
-						
           >
-
             <p>#{item.id}</p>
 
             <p>{item.name == "" ? "Student's Name" : item.name}</p>
 
             <textarea
-							placeholder="Enter name"
+              placeholder="Enter name"
               value={item.name}
               onChange={(e) => updateName(i, e.target.value)}
               className="text-white dark:text-zinc-300 text-sm w-full resize-none h-24 bg-[#333333] p-2"
@@ -111,18 +96,14 @@ export default function DashboardBody() {
             <p>Information:</p>
 
             <textarea
-							placeholder="Dih"
+              placeholder="Dih"
               value={item.text}
               onChange={(e) => updateText(i, e.target.value)}
               className="text-white dark:text-zinc-300 text-sm w-full resize-none h-24 bg-[#333333] p-2"
             />
-
-
           </div>
         ))}
       </div>
-
-
     </div>
   );
 }

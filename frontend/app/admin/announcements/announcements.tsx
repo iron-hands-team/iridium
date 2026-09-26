@@ -1,7 +1,7 @@
 "use client";
 
 import type { PostType } from "@/lib/schemas";
-import type { UserType } from "@/lib/auth";
+import type { UserType } from "@/types/user";
 import { useState } from "react";
 import { FaFilter } from "react-icons/fa";
 import Input from "@/components/ui/input";

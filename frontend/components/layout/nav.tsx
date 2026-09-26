@@ -4,7 +4,7 @@ import Link from "next/link";
 import Image from "next/image";
 
 async function Nav() {
-  const session = await getSession();
+  const { user } = await getSession();
 
   return (
     <div className="sticky top-0 z-10 bg-zinc-100 dark:bg-zinc-950">
@@ -22,23 +22,23 @@ async function Nav() {
           />
           Iridium
         </Link>
-        {session.user.isAdmin && (
+        {user.role === "admin" && (
           <Link href="/admin" className="px-3 py-1.5">
             Manage
           </Link>
         )}
-        {(session.user.role === "teacher" || session.user.isAdmin) && (
+        {user.role !== "student" && (
           <Link href="/classes" className="px-3 py-1.5">
             Classes
           </Link>
         )}
-        {/* <Link href="/calendar" className="px-3 py-1.5">
+        <Link href="/calendar" className="px-3 py-1.5">
           Calendar
         </Link>
         <Link href="/clubs" className="px-3 py-1.5">
           Clubs
-        </Link> */}
-        <NavUser user={session.user} />
+        </Link>
+        <NavUser user={user} />
       </nav>
     </div>
   );

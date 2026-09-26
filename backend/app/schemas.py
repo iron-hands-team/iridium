@@ -13,6 +13,7 @@ class UserCreateRequest(BaseModel):
     role: UserRole
     first_name: str
     last_name: str
+    middle_name: str | None = None
 
 class UserResponse(BaseModel):
     id: int

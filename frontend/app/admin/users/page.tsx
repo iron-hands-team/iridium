@@ -1,52 +1,27 @@
-import type { UserType } from "@/lib/auth";
+import type { UserResponse, UserType } from "@/types/user";
 import { getSession } from "@/lib/auth";
-import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { FaUsers } from "react-icons/fa";
 import Users from "./users";
 
-async function Page({
-  searchParams,
-}: {
-  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
-}) {
-  const { user } = await getSession();
-  if (!user.isAdmin) redirect("/");
+async function Page() {
+  const { user, cookie } = await getSession();
+  if (user.role !== "admin") redirect("/");
 
-  const params = await searchParams;
-  const type = params.t;
-  if (type && type !== "s" && type !== "t" && type !== "a") redirect("/admin");
-
-  const role =
-    type === "s"
-      ? "student"
-      : type === "t"
-        ? "teacher"
-        : type === "a"
-          ? "admin"
-          : "all";
-
-  const cookieStore = await cookies();
-  const authToken = cookieStore.get("access-token");
-
-  const res = await fetch(
-    `${process.env.INTERNAL_API_URL}/users?role=${role}`,
-    {
-      headers: {
-        Authorization: `Bearer ${authToken?.value}`,
-      },
-      cache: "no-store",
+  const res = await fetch(`${process.env.INTERNAL_API_URL}/users`, {
+    headers: {
+      Authorization: `Bearer ${cookie.value}`,
     },
-  );
+    cache: "no-store",
+  });
 
   const rawUsers = res.ok ? await res.json() : [];
-  const users: UserType[] = rawUsers.map((u: any) => ({
-    id: u.username,
+  const users: UserType[] = rawUsers.map((u: UserResponse) => ({
+    username: u.username,
     lastName: u.last_name,
     firstName: u.first_name,
     middleName: u.middle_name,
     role: u.role,
-    isAdmin: u.role === "admin",
   }));
 
   return (

@@ -9,7 +9,6 @@ const headingStyles = "text-xl font-bold flex items-center gap-x-3";
 
 async function Page() {
   const { user, cookie } = await getSession();
-  const isAdmin = user?.isAdmin ? true : false;
   const announcementData: PostType[] = await fetch(
     `${process.env.INTERNAL_API_URL}/announcements`,
     {
@@ -30,7 +29,7 @@ async function Page() {
         <h2 className={headingStyles}>
           <FaBullhorn size={18} /> Announcements
         </h2>
-        {isAdmin && (
+        {user.role === "admin" && (
           <div className="flex gap-x-3">
             <NewAnnouncement text="New post" />
             <Btn text="Manage posts" link="/admin/announcements" />
