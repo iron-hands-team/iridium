@@ -5,7 +5,7 @@ from app.database import get_db
 from app.auth import manager
 from app.models import Club, ClubMembership, User
 from app.schemas import ClubCreateRequest, ClubResponse, ClubMemberResponse
-from app.dependencies import require_staff
+from app.dependencies import require_staff, require_admin
 
 router = APIRouter(prefix="/clubs", tags=["clubs"])
 
@@ -30,6 +30,18 @@ def create_club(
     db.commit()
     db.refresh(club)
     return club
+
+@router.delete("/{club_id}", status_code=204)
+def delete_club(
+    club_id: int,
+    db: Session = Depends(get_db),
+    _admin: User = Depends(require_admin),
+):
+    existing = db.query(Club).filter(Club.id == club_id).first()
+    if existing is None:
+        raise HTTPException(status_code=404, detail="Club not found.")
+    db.delete(club)
+    db.commit()
 
 @router.get("/{club_id}/members", response_model=list[ClubMemberResponse])
 def list_club_members(

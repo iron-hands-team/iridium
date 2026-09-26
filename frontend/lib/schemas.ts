@@ -1,4 +1,4 @@
-import { roles } from "./constants";
+import { roles, categories } from "./constants";
 import * as z from "zod";
 
 export const loginSchema = z.object({
@@ -28,6 +28,16 @@ export const newUserSchema = z.object({
   role: z.enum(roles, "Please assign a valid role"),
 });
 
+export const newClubSchema = z.object({
+  name: z.string().trim().min(1, "Please enter a name"),
+  description: z.string().optional(),
+  sponsorId: z.number().optional(),
+  categories: z.array(
+    z.enum(categories, "Please assign at least one category"),
+  ),
+});
+
 export type LoginType = z.infer<typeof loginSchema>;
 export type PostType = z.infer<typeof postSchema>;
 export type NewUserType = z.infer<typeof newUserSchema>;
+export type NewClubType = z.infer<typeof newClubSchema>;

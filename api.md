@@ -110,9 +110,15 @@ Auth required (any role). Alphabetical.
 Staff only. Body: `{ name, description?, sponsor_id? }`.
 `400` if a club with that name already exists.
 
+### `DELETE /clubs/{club_id}`
+
+Admin only. `204` on success, `404` if club not found.
+
 ### `GET /clubs/{club_id}/members`
 
 Auth required (any role). List of `{ id, user: UserResponse }`.
+
+<!-- TODO: add patch to update club data -->
 
 ### `POST /clubs/{club_id}/join`
 
