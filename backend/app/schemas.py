@@ -40,6 +40,15 @@ class TokenResponse(BaseModel):
 class AnnouncementCreateRequest(BaseModel):
     title: str
     content: str
+    pinned: bool = False
+    role: str = "all"
+
+class AnnouncementUpdateRequest(BaseModel):
+    title: str | None = None
+    content: str | None = None
+    pinned: bool | None = None
+    archived: bool | None = None
+    role: str | None = None
 
 class AnnouncementResponse(BaseModel):
     id: int
@@ -47,20 +56,32 @@ class AnnouncementResponse(BaseModel):
     content: str
     author: UserResponse
     created_at: datetime
+    pinned: bool
+    archived: bool
+    role: str
+    likes: list[str]
 
     class Config:
-        from_attribute = True
+        from_attributes = True
 
 class ClubCreateRequest(BaseModel):
     name: str
     description: str | None = None
     sponsor_id: int | None = None
+    categories: list[str] = []
+
+class ClubUpdateRequest(BaseModel):
+    name: str | None = None
+    description: str | None = None
+    sponsor_id: int | None = None
+    categories: list[str] | None = None
 
 class ClubResponse(BaseModel):
     id: int
     name: str
     description: str | None
     sponsor: UserResponse | None
+    categories: list[str]
 
     class Config:
         from_attributes = True

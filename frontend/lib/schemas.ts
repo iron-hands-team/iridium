@@ -17,6 +17,7 @@ export const postSchema = z.object({
   title: z.string().trim().min(1, "Please enter a title"),
   content: z.string().trim().min(1, "Please enter valid content"),
   role: z.enum(["all", ...roles], "Please select a valid role to post to"),
+  likes: z.array(z.string()).optional(),
 });
 
 export const newUserSchema = z.object({

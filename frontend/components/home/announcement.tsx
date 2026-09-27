@@ -17,27 +17,48 @@ interface AnnouncementProps {
 }
 
 function Announcement({ announcement, user }: AnnouncementProps) {
-  const [likes, setLikes] = useState<string[]>([]);
   const [editing, setEditing] = useState<boolean | null>(null);
   const [archiving, setArchiving] = useState<boolean | null>(null);
   const [deleting, setDeleting] = useState<boolean | null>(null);
   const router = useRouter();
+  const likes = announcement.likes || [];
+  const liked = likes.includes(user.username);
 
   async function handleLike() {
-    setLikes(
-      likes.includes(user.username)
-        ? likes.filter((l) => l !== user.username)
-        : [...likes, user.username],
-    );
-    //TODO: add likes to announcements
+    await fetch(`/api/announcements/${announcement.id}/like`, {
+      method: liked ? "DELETE" : "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      credentials: "include",
+    });
+    router.refresh();
   }
 
   async function handlePin() {
-    //TODO: pin/unpin announcements
+    await fetch(`/api/announcements/${announcement.id}`, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      credentials: "include",
+      body: JSON.stringify({ pinned: !announcement.pinned }),
+    });
+    router.refresh();
   }
 
   async function handleArchive() {
-    //TODO: archive/unarchive announcements
+    setArchiving(true);
+    await fetch(`/api/announcements/${announcement.id}`, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      credentials: "include",
+      body: JSON.stringify({ archived: !announcement.archived }),
+    });
+    router.refresh();
+    setArchiving(null);
   }
 
   async function handleDelete() {

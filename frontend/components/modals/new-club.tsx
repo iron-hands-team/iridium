@@ -41,11 +41,16 @@ function NewClubModal({ closeModal, existing }: NewClubModalProps) {
     const validated = newClubSchema.safeParse(club);
     if (validated.success) {
       if (existing) {
-        res = await fetch("/api/clubs", {
-          method: "PATCH", //patch endpoint doesn't work yet
+        res = await fetch(`/api/clubs/${existing.id}`, {
+          method: "PATCH",
           credentials: "include",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(club),
+          body: JSON.stringify({
+            name: club.name,
+            description: club.description,
+            sponsor_id: club.sponsorId,
+            categories: club.categories,
+          }),
         });
       } else {
         res = await fetch("/api/clubs", {
@@ -55,7 +60,8 @@ function NewClubModal({ closeModal, existing }: NewClubModalProps) {
           body: JSON.stringify({
             name: club.name,
             description: club.description,
-            sponsor_id: club.sponsorId, //TODO: add club categories
+            sponsor_id: club.sponsorId,
+            categories: club.categories,
           }),
         });
       }

@@ -10,6 +10,10 @@ import Dropdown from "@/components/ui/dropdown";
 import Checkbox from "@/components/ui/checkbox";
 import ClubModal from "@/components/modals/club";
 import NewClub from "@/components/admin/new-club";
+import { isReactCompilerRequired } from "next/dist/build/swc";
+import { q } from "framer-motion/client";
+import { FcMultipleSmartphones } from "react-icons/fc";
+import { Ewert } from "next/font/google";
 
 const types = ["All", ...categories];
 const sorts = ["Id", "Name", "Description", "Sponsor", "Categories"];
@@ -33,7 +37,7 @@ function Clubs({ clubs }: { clubs: ClubType[] }) {
     .filter((c) => {
       return type === types[0]
         ? true
-        : c.categories.includes(type as ClubCategory);
+        : (c.categories || []).includes(type as ClubCategory);
     })
     .sort((a, b) => {
       let res = 0;
@@ -58,7 +62,7 @@ function Clubs({ clubs }: { clubs: ClubType[] }) {
           );
           break;
         case sorts[4]:
-          res = a.categories.join(", ").localeCompare(b.categories.join(", "));
+          res = (a.categories || []).join(", ").localeCompare((b.categories || []).join(", "));
           break;
       }
       return (sort.ascending ? -1 : 1) * res;

@@ -4,7 +4,7 @@ from sqlalchemy.orm import Session
 from app.database import get_db
 from app.auth import manager
 from app.models import Club, ClubMembership, User
-from app.schemas import ClubCreateRequest, ClubResponse, ClubMemberResponse
+from app.schemas import ClubCreateRequest, ClubUpdateRequest, ClubResponse, ClubMemberResponse
 from app.dependencies import require_staff, require_admin
 
 router = APIRouter(prefix="/clubs", tags=["clubs"])
@@ -31,6 +31,30 @@ def create_club(
     db.refresh(club)
     return club
 
+@router.patch("/{club_id}", response_model=ClubResponse)
+def update_club(
+    club_id: int,
+    updates: ClubUpdateRequest,
+    db: Session = Depends(get_db),
+    _staff: User = Depends(require_staff),
+):
+    club = db.query(Club).filter(Club.id == club_id).first()
+    if club is None:
+        raise HTTPException(status_code=404, detail="Club not found.")
+
+    data = updates.model_dump(exclude_unset=True)
+    if "name" in data and data["name"] != club.name:
+        name_taken = db.query(Club).filter(Club.name == data["name"]).first()
+        if name_taken is not None:
+            raise HTTPException(status_code=400, detail="Club already exists.")
+
+    for field, value in data.items():
+        setattr(club, field, value)
+
+    db.commit()
+    db.refresh(club)
+    return club
+
 @router.delete("/{club_id}", status_code=204)
 def delete_club(
     club_id: int,
@@ -40,7 +64,7 @@ def delete_club(
     existing = db.query(Club).filter(Club.id == club_id).first()
     if existing is None:
         raise HTTPException(status_code=404, detail="Club not found.")
-    db.delete(club)
+    db.delete(existing)
     db.commit()
 
 @router.get("/{club_id}/members", response_model=list[ClubMemberResponse])

@@ -41,7 +41,19 @@ function PostAnnouncementModal({
       setError(null);
       setLoading(true);
       const res = existing
-        ? { ok: false } //TODO: implement announcement editing
+        ? await fetch(`/api/announcements/${existing.id}`, {
+            method: "PATCH",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            credentials: "include",
+            body: JSON.stringify({
+              title: post.title,
+              content: post.content,
+              role: post.role,
+              pinned: post.pinned,
+            }),
+          })
         : await fetch("/api/announcements", {
             method: "POST",
             headers: {
@@ -50,7 +62,9 @@ function PostAnnouncementModal({
             credentials: "include",
             body: JSON.stringify({
               title: post.title,
-              content: post.content, //TODO: add post.role and post.pinned
+              content: post.content,
+              role: post.role,
+              pinned: post.pinned,
             }),
           });
       setLoading(false);

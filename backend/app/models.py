@@ -1,7 +1,8 @@
 import enum
 from datetime import datetime, timezone
 
-from sqlalchemy import Column, Integer, String, Enum, Text, DateTime, Time, ForeignKey
+from sqlalchemy import Column, Integer, String, Enum, Text, DateTime, Time, Boolean, ForeignKey
+from sqlalchemy.dialects.postgresql import ARRAY
 from sqlalchemy.orm import relationship
 from app.database import Base
 
@@ -30,6 +31,7 @@ class User(Base):
     schedule_items = relationship("ScheduleItem", back_populates="user")
     classes_taught = relationship("ClassSection", back_populates="teacher")
     class_enrollments = relationship("ClassEnrollment", back_populates="student")
+    announcement_likes = relationship("AnnouncementLike", back_populates="user")
 
 class Announcement(Base):
     __tablename__ = "announcements"
@@ -38,8 +40,27 @@ class Announcement(Base):
     content = Column(Text, nullable=False)
     author_id = Column(Integer, ForeignKey("users.id"), nullable=False)
     created_at = Column(DateTime(timezone=True), default=utcnow, nullable=False)
+    pinned = Column(Boolean, nullable=False, default=False)
+    archived = Column(Boolean, nullable=False, default=False)
+    role = Column(String, nullable=False, default="all")  # "all", "student", "teacher", or "admin"
 
     author = relationship("User", back_populates="announcements")
+    like_records = relationship(
+        "AnnouncementLike", back_populates="announcement", cascade="all, delete-orphan"
+    )
+
+    @property
+    def likes(self):
+        return [like.user.username for like in self.like_records]
+
+class AnnouncementLike(Base):
+    __tablename__ = "announcement_likes"
+    id = Column(Integer, primary_key=True, index=True)
+    announcement_id = Column(Integer, ForeignKey("announcements.id"), nullable=False)
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+
+    announcement = relationship("Announcement", back_populates="like_records")
+    user = relationship("User", back_populates="announcement_likes")
 
 class Club(Base):
     __tablename__ = "clubs"
@@ -47,6 +68,7 @@ class Club(Base):
     name = Column(String, nullable=False, unique=True)
     description = Column(Text, nullable=True)
     sponsor_id = Column(Integer, ForeignKey("users.id"), nullable=True)
+    categories = Column(ARRAY(String), nullable=False, default=list)
 
     sponsor = relationship("User", back_populates="clubs_sponsored")
     members = relationship("ClubMembership", back_populates="club")
