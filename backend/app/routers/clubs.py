@@ -14,7 +14,7 @@ def list_clubs(
     db: Session = Depends(get_db),
     _current_user: User = Depends(manager),
 ):
-    return db.query(Club).order_by(Club.name).all()
+    return db.query(Club).order_by(Club.name).all() # TODO: add joined field for whether current user is a member
 
 @router.post("", response_model=ClubResponse)
 def create_club(
@@ -25,7 +25,7 @@ def create_club(
     existing = db.query(Club).filter(Club.name == new_club.name).first()
     if existing is not None:
         raise HTTPException(status_code=400, detail="Club already exists.")
-    club = Club(**new_club.model_dump())
+    club = Club(**new_club.model_dump()) # TODO: only allow sponsor to be teacher or admin (add multiple sponsors?)
     db.add(club)
     db.commit()
     db.refresh(club)

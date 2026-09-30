@@ -1,4 +1,4 @@
-import { roles, categories } from "./constants";
+import { roles } from "./constants";
 import * as z from "zod";
 
 export const loginSchema = z.object({
@@ -33,9 +33,9 @@ export const newClubSchema = z.object({
   name: z.string().trim().min(1, "Please enter a name"),
   description: z.string().optional(),
   sponsorId: z.number().optional(),
-  categories: z.array(
-    z.enum(categories, "Please assign at least one category"),
-  ),
+  categories: z
+    .array(z.string().trim())
+    .min(1, "Please assign at least one category"),
 });
 
 export const newEventSchema = z.object({

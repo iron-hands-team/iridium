@@ -5,6 +5,7 @@ import { FaBook, FaBullhorn } from "react-icons/fa";
 import NewAnnouncement from "@/components/admin/new-announcement";
 import NewUser from "@/components/admin/new-user";
 import Btn from "@/components/ui/btn";
+import NewClub from "@/components/admin/new-club";
 
 const headingStyles = "text-xl font-bold flex items-center gap-x-3";
 
@@ -38,7 +39,7 @@ async function Page() {
         </h2>
         <div className="border-1 border-zinc-800 px-4 py-2 flex flex-col gap-y-2">
           <Btn text="Manage clubs" link="/admin/clubs" primary />
-          <Btn text="Add club" />
+          <NewClub primary full />
         </div>
       </div>
       <div className="flex-1 min-w-[40%] flex flex-col gap-y-5">

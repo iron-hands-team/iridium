@@ -1,19 +1,15 @@
 "use client";
 
-import type { ClubCategory, ClubType } from "@/types/clubs";
+import type { ClubType } from "@/types/clubs";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { FaExclamationTriangle } from "react-icons/fa";
-import { categories } from "@/lib/constants";
 import { newClubSchema, NewClubType } from "@/lib/schemas";
 import Modal from "../ui/modal";
 import Btn from "../ui/btn";
 import Input from "../ui/input";
-import Dropdown from "../ui/dropdown";
+import Categories from "../clubs/categories";
 
-const displayCategories = categories.map(
-  (c) => c[0].toUpperCase() + c.slice(1),
-);
 const labelStyles = "text-sm flex flex-col gap-y-1";
 
 interface NewClubModalProps {
@@ -104,7 +100,7 @@ function NewClubModal({ closeModal, existing }: NewClubModalProps) {
             Sponsor ID <span className="text-red-500">*</span>
           </div>
           <Input
-            value={club.sponsorId + "" || ""}
+            value={club.sponsorId ? club.sponsorId + "" : ""}
             setValue={(s) => setClub({ ...club, sponsorId: Number(s) })}
           />
         </label>
@@ -112,19 +108,9 @@ function NewClubModal({ closeModal, existing }: NewClubModalProps) {
           <div>
             Categories <span className="text-red-500">*</span>
           </div>
-          <Dropdown
-            value={club.categories.length > 0 ? club.categories.join(", ") : ""}
-            setValue={(category) =>
-              setClub({
-                ...club,
-                categories: [
-                  ...club.categories,
-                  category.toLowerCase() as ClubCategory,
-                ],
-              })
-            }
-            values={displayCategories}
-            above
+          <Categories
+            categories={club.categories}
+            setCategories={(categories) => setClub({ ...club, categories })}
           />
         </div>
         {error && (

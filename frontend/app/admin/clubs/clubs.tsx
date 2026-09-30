@@ -1,22 +1,17 @@
 "use client";
 
-import type { ClubCategory, ClubType } from "@/types/clubs";
+import type { ClubType } from "@/types/clubs";
 import { useState } from "react";
 import { FaCaretUp, FaFilter } from "react-icons/fa";
 import { AnimatePresence } from "framer-motion";
-import { categories } from "@/lib/constants";
 import Input from "@/components/ui/input";
 import Dropdown from "@/components/ui/dropdown";
 import Checkbox from "@/components/ui/checkbox";
 import ClubModal from "@/components/modals/club";
 import NewClub from "@/components/admin/new-club";
-import { isReactCompilerRequired } from "next/dist/build/swc";
-import { q } from "framer-motion/client";
-import { FcMultipleSmartphones } from "react-icons/fc";
-import { Ewert } from "next/font/google";
 
-const types = ["All", ...categories];
-const sorts = ["Id", "Name", "Description", "Sponsor", "Categories"];
+const types = ["All"]; //TODO: allow saving categories to db and fetching here
+const sorts = ["ID", "Name", "Description", "Sponsor", "Categories"];
 
 function Clubs({ clubs }: { clubs: ClubType[] }) {
   const [search, setSearch] = useState<string>("");
@@ -29,15 +24,20 @@ function Clubs({ clubs }: { clubs: ClubType[] }) {
   const [club, setClub] = useState<ClubType | null>(null);
   const displayed = clubs
     .filter((c) =>
-      [c.id, c.name, c.description, c.sponsor?.lastName]
+      [
+        c.name,
+        c.description,
+        c.id,
+        ...c.categories,
+        c.sponsor?.lastName,
+        c.sponsor?.firstName,
+      ]
         .join(" ")
         .toLowerCase()
         .includes(search.trim().toLowerCase()),
     )
     .filter((c) => {
-      return type === types[0]
-        ? true
-        : (c.categories || []).includes(type as ClubCategory);
+      return type === types[0] ? true : (c.categories || []).includes(type);
     })
     .sort((a, b) => {
       let res = 0;
@@ -62,7 +62,9 @@ function Clubs({ clubs }: { clubs: ClubType[] }) {
           );
           break;
         case sorts[4]:
-          res = (a.categories || []).join(", ").localeCompare((b.categories || []).join(", "));
+          res = (a.categories || [])
+            .join(", ")
+            .localeCompare((b.categories || []).join(", "));
           break;
       }
       return (sort.ascending ? -1 : 1) * res;
@@ -111,7 +113,7 @@ function Clubs({ clubs }: { clubs: ClubType[] }) {
             return (
               <div
                 key={s}
-                className={`${i === 0 ? "flex-1" : "flex-2"} cursor-pointer font-bold px-4 py-2 hover:bg-zinc-200 dark:hover:bg-zinc-900 flex items-center gap-x-3`}
+                className={`${i === 0 ? "flex-1" : i % 2 !== 0 ? "flex-2" : "flex-4"} cursor-pointer font-bold px-4 py-2 hover:bg-zinc-200 dark:hover:bg-zinc-900 flex items-center gap-x-3`}
                 onClick={() =>
                   setSort({
                     ascending: sort.name === s ? !sort.ascending : false,
@@ -149,14 +151,19 @@ function Clubs({ clubs }: { clubs: ClubType[] }) {
                       )
                     }
                   />
-                  <div className="flex flex-1" onClick={() => setClub(c)}>
+                  <div
+                    className="flex flex-1 items-center"
+                    onClick={() => setClub(c)}
+                  >
                     <div className="flex-1 px-4">{c.id}</div>
                     <div className="flex-2 px-4">{c.name}</div>
-                    <div className="flex-2 px-4">{c.description || "-"}</div>
+                    <div className="flex-4 px-4">{c.description || "-"}</div>
                     <div className="flex-2 px-4">
-                      {c.sponsor?.lastName || "-"}
+                      {c.sponsor
+                        ? c.sponsor.lastName + ", " + c.sponsor.firstName
+                        : "-"}
                     </div>
-                    <div className="flex-2 px-4">
+                    <div className="flex-4 px-4">
                       {c.categories ? c.categories.join(", ") : "-"}
                     </div>
                   </div>

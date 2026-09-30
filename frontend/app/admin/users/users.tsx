@@ -11,7 +11,14 @@ import Dropdown from "@/components/ui/dropdown";
 import NewUser from "@/components/admin/new-user";
 import Checkbox from "@/components/ui/checkbox";
 
-const sorts = ["Username", "Last name", "First name", "Middle name", "Role"];
+const sorts = [
+  "ID",
+  "Username",
+  "Last name",
+  "First name",
+  "Middle name",
+  "Role",
+];
 const types = ["All", ...roles.map((r) => r[0].toUpperCase() + r.slice(1))];
 
 function Users({ users }: { users: UserType[] }) {
@@ -25,7 +32,7 @@ function Users({ users }: { users: UserType[] }) {
   });
   const displayed = users
     .filter((u) =>
-      [u.lastName, u.firstName, u.middleName, u.username]
+      [u.lastName, u.firstName, u.middleName, u.username, u.id]
         .join(" ")
         .toLowerCase()
         .includes(search.trim().toLowerCase()),
@@ -42,18 +49,21 @@ function Users({ users }: { users: UserType[] }) {
           );
           break;
         case sorts[0]:
-          res = a.username.localeCompare(b.username);
+          res = a.id! - b.id!;
           break;
         case sorts[1]:
-          res = a.lastName.localeCompare(b.lastName);
+          res = a.username.localeCompare(b.username);
           break;
         case sorts[2]:
-          res = a.firstName.localeCompare(b.firstName);
+          res = a.lastName.localeCompare(b.lastName);
           break;
         case sorts[3]:
-          res = (a.middleName || "z").localeCompare(b.middleName || "z");
+          res = a.firstName.localeCompare(b.firstName);
           break;
         case sorts[4]:
+          res = (a.middleName || "z").localeCompare(b.middleName || "z");
+          break;
+        case sorts[5]:
           res = a.role.localeCompare(b.role);
           break;
       }
@@ -105,7 +115,7 @@ function Users({ users }: { users: UserType[] }) {
             return (
               <div
                 key={s}
-                className={`${i === 4 ? "flex-1" : "flex-2"} cursor-pointer font-bold px-4 py-2 hover:bg-zinc-200 dark:hover:bg-zinc-900 flex items-center gap-x-3`}
+                className={`${i === 0 || i === 5 ? "flex-1" : "flex-2"} cursor-pointer font-bold px-4 py-2 hover:bg-zinc-200 dark:hover:bg-zinc-900 flex items-center gap-x-3`}
                 onClick={() =>
                   setSort({
                     ascending: sort.name === s ? !sort.ascending : false,
@@ -144,6 +154,7 @@ function Users({ users }: { users: UserType[] }) {
                     }
                   />
                   <div className="flex flex-1" onClick={() => setUser(u)}>
+                    <div className="flex-1 px-4">{u.id}</div>
                     <div className="flex-2 px-4">
                       {u.username.slice(0, 10) +
                         (u.username.length > 10 ? "..." : "")}

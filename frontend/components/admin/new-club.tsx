@@ -5,7 +5,12 @@ import { useState } from "react";
 import Btn from "../ui/btn";
 import NewClubModal from "../modals/new-club";
 
-function NewClub({ full }: { full?: boolean }) {
+interface NewClubProps {
+  full?: boolean;
+  primary?: boolean;
+}
+
+function NewClub({ full, primary }: NewClubProps) {
   const [creating, setCreating] = useState<boolean>(false);
 
   return (
@@ -14,7 +19,7 @@ function NewClub({ full }: { full?: boolean }) {
         text="New club"
         onclick={() => setCreating(true)}
         styles={full ? "w-full!" : ""}
-        primary
+        primary={!primary}
       />
       <AnimatePresence>
         {creating && <NewClubModal closeModal={() => setCreating(false)} />}

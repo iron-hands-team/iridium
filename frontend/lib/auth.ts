@@ -1,6 +1,7 @@
 import type { RequestCookie } from "next/dist/compiled/@edge-runtime/cookies";
 import type { UserResponse, UserType } from "@/types/user";
 import { cookies } from "next/headers";
+import { parseUser } from "./helpers";
 
 export async function getSession() {
   const cookieStore = await cookies();
@@ -22,15 +23,7 @@ export async function getSession() {
   }
 
   return {
-    user: user
-      ? {
-          username: user.username,
-          lastName: user.last_name,
-          firstName: user.first_name,
-          middleName: user.middle_name,
-          role: user.role,
-        }
-      : null,
+    user: user ? parseUser(user) : null,
     cookie: authToken,
   } as { user: UserType; cookie: RequestCookie };
 }

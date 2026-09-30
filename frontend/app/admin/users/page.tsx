@@ -17,6 +17,7 @@ async function Page() {
 
   const rawUsers = res.ok ? await res.json() : [];
   const users: UserType[] = rawUsers.map((u: UserResponse) => ({
+    id: u.id,
     username: u.username,
     lastName: u.last_name,
     firstName: u.first_name,

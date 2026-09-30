@@ -1,4 +1,5 @@
 export interface UserType {
+  id?: number;
   username: string;
   lastName: string;
   firstName: string;
@@ -7,6 +8,7 @@ export interface UserType {
 }
 
 export interface UserResponse {
+  id: number;
   username: string;
   last_name: string;
   first_name: string;
