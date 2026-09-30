@@ -8,7 +8,9 @@ function Page() {
       <h1 className="text-black dark:text-white font-extrabold text-9xl">
         404
       </h1>
-      <p>Sorry, that page doesn&apos;t exist on Iridium...</p>
+      <p className="text-zinc-700 dark:text-zinc-300">
+        Sorry, that page doesn&apos;t exist on Iridium...
+      </p>
       <div className="flex gap-x-5">
         <Btn text="Home" link="/" primary />
         <Btn text="Back" onclick={() => window.history.back()} />

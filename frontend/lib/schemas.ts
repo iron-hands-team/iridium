@@ -3,10 +3,10 @@ import * as z from "zod";
 
 export const loginSchema = z.object({
   username: z.string().trim().min(1, "Please enter a valid username"),
-  password: z
-    .string()
-    .trim()
-    .min(8, "Password has to be at least 8 characters long"),
+  password: z.union(
+    [z.string().trim().min(8), z.string().trim().length(0)],
+    "Password has to be either empty or at least 8 characters long",
+  ),
 });
 
 export const postSchema = z.object({
@@ -25,7 +25,10 @@ export const newUserSchema = z.object({
   lastName: z.string().trim().min(1, "Please enter a last name"),
   middleName: z.string().optional().nullable(),
   username: z.string().trim().min(1, "Please enter a username"),
-  password: z.string().optional(),
+  password: z.union(
+    [z.string().trim().min(8), z.string().trim().length(0)],
+    "Password has to be either empty or at least 8 characters long",
+  ),
   role: z.enum(roles, "Please assign a valid role"),
 });
 
