@@ -3,8 +3,8 @@ from sqlalchemy.orm import Session
 
 from app.database import get_db
 from app.auth import manager
-from app.models import Event, User
-from app.schemas import EventCreateRequest, EventResponse
+from app.models import Event, EventRSVP, User
+from app.schemas import EventCreateRequest, EventUpdateRequest, EventResponse
 from app.dependencies import require_staff
 
 router = APIRouter(prefix="/events", tags=["events"])
@@ -35,6 +35,24 @@ def create_event(
     db.refresh(event)
     return event
 
+@router.patch("/{event_id}", response_model=EventResponse)
+def update_event(
+    event_id: int,
+    updates: EventUpdateRequest,
+    db: Session = Depends(get_db),
+    _staff: User = Depends(require_staff),
+):
+    event = db.query(Event).filter(Event.id == event_id).first()
+    if event is None:
+        raise HTTPException(status_code=404, detail="Event not found.")
+
+    for field, value in updates.model_dump(exclude_unset=True).items():
+        setattr(event, field, value)
+
+    db.commit()
+    db.refresh(event)
+    return event
+
 @router.delete("/{event_id}", status_code=204)
 def delete_event(
     event_id: int,
@@ -46,3 +64,45 @@ def delete_event(
         raise HTTPException(status_code=404, detail="Event not found.")
     db.delete(event)
     db.commit()
+
+@router.post("/{event_id}/rsvp", response_model=EventResponse)
+def rsvp_event(
+    event_id: int,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(manager),
+):
+    event = db.query(Event).filter(Event.id == event_id).first()
+    if event is None:
+        raise HTTPException(status_code=404, detail="Event not found.")
+
+    existing = (
+        db.query(EventRSVP)
+        .filter(EventRSVP.event_id == event_id, EventRSVP.user_id == current_user.id)
+        .first()
+    )
+    if existing is None:
+        db.add(EventRSVP(event_id=event_id, user_id=current_user.id))
+        db.commit()
+        db.refresh(event)
+    return event
+
+@router.delete("/{event_id}/rsvp", response_model=EventResponse)
+def cancel_rsvp(
+    event_id: int,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(manager),
+):
+    event = db.query(Event).filter(Event.id == event_id).first()
+    if event is None:
+        raise HTTPException(status_code=404, detail="Event not found.")
+
+    existing = (
+        db.query(EventRSVP)
+        .filter(EventRSVP.event_id == event_id, EventRSVP.user_id == current_user.id)
+        .first()
+    )
+    if existing is not None:
+        db.delete(existing)
+        db.commit()
+        db.refresh(event)
+    return event

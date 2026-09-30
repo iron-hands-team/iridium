@@ -38,7 +38,17 @@ export const newClubSchema = z.object({
   ),
 });
 
+export const newEventSchema = z.object({
+  id: z.number().optional(),
+  title: z.string().trim().min(1, "Please enter a title"),
+  description: z.string().optional(),
+  location: z.string().optional(),
+  start_time: z.string().min(1, "Please choose a start time"),
+  end_time: z.string().optional(),
+});
+
 export type LoginType = z.infer<typeof loginSchema>;
 export type PostType = z.infer<typeof postSchema>;
 export type NewUserType = z.infer<typeof newUserSchema>;
 export type NewClubType = z.infer<typeof newClubSchema>;
+export type NewEventType = z.infer<typeof newEventSchema>;

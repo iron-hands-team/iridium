@@ -32,6 +32,7 @@ class User(Base):
     classes_taught = relationship("ClassSection", back_populates="teacher")
     class_enrollments = relationship("ClassEnrollment", back_populates="student")
     announcement_likes = relationship("AnnouncementLike", back_populates="user")
+    event_rsvps = relationship("EventRSVP", back_populates="user")
 
 class Announcement(Base):
     __tablename__ = "announcements"
@@ -93,6 +94,22 @@ class Event(Base):
     created_by_id = Column(Integer, ForeignKey("users.id"), nullable=False)
 
     created_by = relationship("User", back_populates="events_created")
+    rsvp_records = relationship(
+        "EventRSVP", back_populates="event", cascade="all, delete-orphan"
+    )
+
+    @property
+    def attendees(self):
+        return [rsvp.user.username for rsvp in self.rsvp_records]
+
+class EventRSVP(Base):
+    __tablename__ = "event_rsvps"
+    id = Column(Integer, primary_key=True, index=True)
+    event_id = Column(Integer, ForeignKey("events.id"), nullable=False)
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+
+    event = relationship("Event", back_populates="rsvp_records")
+    user = relationship("User", back_populates="event_rsvps")
 
 class ScheduleItem(Base):
     __tablename__ = "schedule_items"

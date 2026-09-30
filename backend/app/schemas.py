@@ -100,6 +100,13 @@ class EventCreateRequest(BaseModel):
     start_time: datetime
     end_time: datetime | None = None
 
+class EventUpdateRequest(BaseModel):
+    title: str | None = None
+    description: str | None = None
+    location: str | None = None
+    start_time: datetime | None = None
+    end_time: datetime | None = None
+
 class EventResponse(BaseModel):
     id: int
     title: str
@@ -108,6 +115,7 @@ class EventResponse(BaseModel):
     start_time: datetime
     end_time: datetime | None
     created_by: UserResponse
+    attendees: list[str]
 
     class Config:
         from_attributes = True
