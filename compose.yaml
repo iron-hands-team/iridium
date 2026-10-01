@@ -20,7 +20,8 @@ services:
       - ./garage.toml:/etc/garage.toml
       - garage_meta:/var/lib/garage/meta
       - garage_data:/var/lib/garage/data
-    env_file: .env
+    environment:
+      GARAGE_RPC_SECRET: ${GARAGE_RPC_SECRET}
 
   db:
     image: postgres:16-alpine
@@ -51,9 +52,9 @@ services:
     ports:
       - "8000:8000"
     environment:
-      - DATABASE_URL=postgresql://${DB_USER}:${DB_PASSWORD}@db:5432/school_db
-      - JWT_SECRET_KEY=${JWT_SECRET_KEY}
-      - FRONTEND_URL=${FRONTEND_URL:-http://localhost:3000}
+      DATABASE_URL: postgresql://${DB_USER}:${DB_PASSWORD}@db:5432/school_db
+      JWT_SECRET_KEY: ${JWT_SECRET_KEY}
+      FRONTEND_URL: ${FRONTEND_URL:-http://localhost:3000}
     depends_on:
       db:
         condition: service_healthy
