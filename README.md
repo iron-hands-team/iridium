@@ -23,9 +23,9 @@ Iridium is an easy to use online platform for schools to post announcements, vie
 ## Architecture
 
 - Frontend: [Next.js](https://nextjs.org) as the frontend framework with the technologies [React](https://react.dev), [TypeScript](https://typescriptlang.org), and [Tailwind](https://tailwindcss.com).
-- Backend: [FastAPI](https://fastapi.tiangolo.com) as the backend [Python](https://python.org) framework for the API and server operations, which connects to the [PostgreSQL](https://postgresql.org) database.
+- Backend: [FastAPI](https://fastapi.tiangolo.com) as the backend [Python](https://python.org) framework for the API and server operations, which connects to the [PostgreSQL](https://postgresql.org) database and the [Garage](https://garagehq.deuxfleurs.fr/) object storage.
 - Reverse proxy: Iridium uses [Caddy](https://caddyserver.com/) as both a reverse proxy and a TLS certificate manager to resolve server and frontend requests.
-- Environment: the entire app is [dockerized](https://docker.com) into 3 containers, db, backend, and frontend, with all the dependencies set up.
+- Environment: the entire app is [dockerized](https://docker.com) into 5 containers: caddy, garage, db, backend, and frontend, with all the dependencies set up.
 
 ## Quick start
 

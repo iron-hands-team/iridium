@@ -10,6 +10,7 @@ env:
   DB_USER: "user"
   DB_PASSWORD: "database-password"
   JWT_SECRET_KEY: "secretkey123"
+  GARAGE_RPC_SECRET: "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef"
 
 jobs:
   build-and-verify:
