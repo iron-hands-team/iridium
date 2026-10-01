@@ -12,6 +12,16 @@ services:
       - caddy_data:/data
       - caddy_config:/config
 
+  garage:
+    image: dxflrs/garage:v2.4.1
+    container_name: garage-storage
+    restart: unless-stopped
+    volumes:
+      - ./garage.toml:/etc/garage.toml
+      - garage_meta:/var/lib/garage/meta
+      - garage_data:/var/lib/garage/data
+    env_file: .env
+
   db:
     image: postgres:16-alpine
     container_name: postgres-db
@@ -86,3 +96,5 @@ volumes:
   postgres_data:
   caddy_data:
   caddy_config:
+  garage_meta:
+  garage_data:

@@ -5,6 +5,7 @@ export interface UserType {
   firstName: string;
   middleName?: string;
   role: RoleType;
+  image?: string;
 }
 
 export interface UserResponse {
@@ -14,6 +15,7 @@ export interface UserResponse {
   first_name: string;
   middle_name: string;
   role: RoleType;
+  image: string;
 }
 
 export type RoleType = "student" | "teacher" | "admin";

@@ -62,7 +62,7 @@ function NavUser({ user }: { user: UserType }) {
               exit={{ opacity: 0 }}
               className="absolute top-[calc(100%+15px)] right-0 border-1 border-zinc-800 w-35 bg-zinc-100 dark:bg-zinc-950 flex flex-col gap-y-1 p-2 origin-top"
             >
-              <Link href="/profile" className={optionStyles}>
+              <Link href={`/profile/${user.username}`} className={optionStyles}>
                 <FaUser size={18} className={iconStyles} />
                 Profile
               </Link>

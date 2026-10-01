@@ -46,6 +46,8 @@ def health_db(db: Session=Depends(get_db)):
     db.execute(text("SELECT 1"))
     return {"status": "ok", "database":"connected"}
 
+#TODO: add health endpoint for garage storage
+
 @app.post("/login", response_model=TokenResponse)
 def login(credentials: LoginRequest,response:Response, db: Session = Depends(get_db)):
     user = db.query(User).filter(User.username == credentials.username).first()

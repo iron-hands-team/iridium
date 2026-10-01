@@ -4,7 +4,7 @@ from sqlalchemy.orm import Session
 from app.database import get_db
 from app.models import User, UserRole
 from app.schemas import UserResponse, UserUpdateRequest
-from app.dependencies import require_admin
+from app.dependencies import require_admin, manager
 
 router = APIRouter()
 
@@ -22,6 +22,18 @@ def list_users(
     elif role == "admin":
         query = query.filter(User.role == UserRole.admin)
     return query.order_by(User.last_name, User.first_name).all()
+
+@router.get("/users/{username}", response_model=UserResponse)
+def get_user(
+    username: str,
+    db: Session = Depends(get_db),
+    _current_user: User = Depends(manager),
+):
+    user = db.query(User).filter(User.username == username).first()
+    if user is None:
+        raise HTTPException(status_code=404, detail="User not found.")
+    
+    return user
 
 @router.patch("/users/{username}", response_model=UserResponse)
 def update_user(

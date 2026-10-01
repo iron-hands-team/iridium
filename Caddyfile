@@ -3,6 +3,10 @@ iridium.tonymac.net, localhost {
         reverse_proxy fastapi-backend:8000
     }
 
+    handle /s3/* {
+        reverse_proxy garage-storage:3900
+    }
+
     handle {
         reverse_proxy nextjs-frontend-dev:3000
     }

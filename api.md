@@ -47,6 +47,11 @@ Admin only. Lists users. `role=staff` returns `teacher` + `admin`; any
 other value (or omitted) returns everyone matching `student` filtering
 logic as written — pass `student` or `staff` explicitly.
 
+### `GET /users/{username}`
+
+Auth required (any role).
+Returns `UserResponse`. `404` if user not found.
+
 ### `PATCH /users/{username}`
 
 Admin only. Partial update — only send the fields you're changing.

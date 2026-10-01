@@ -8,7 +8,8 @@ def init_db_and_seed_admin():
     db = SessionLocal()
     try:
         existing_admin = db.query(User).filter(User.username == "admin").first()
-        existing_student = db.query(User).filter(User.username == "student1").first()
+        existing_teacher = db.query(User).filter(User.username == "teacher").first()
+        existing_student = db.query(User).filter(User.username == "student").first()
 
         if existing_admin is None:
             admin = User(
@@ -21,12 +22,23 @@ def init_db_and_seed_admin():
             db.add(admin)
             db.commit()
 
+        if existing_teacher is None:
+            teacher = User(
+                username="teacher",
+                hashed_password=hash_password("teacher123"),
+                first_name="teacher",
+                last_name="teacher",
+                role=UserRole.teacher,
+            )
+            db.add(teacher)
+            db.commit()
+
         if existing_student is None:
             student = User(
-                username="student1",
+                username="student",
                 hashed_password=hash_password("student123"),
-                first_name="student 1",
-                last_name="student 1",
+                first_name="student",
+                last_name="student",
                 role=UserRole.student,
             )
             db.add(student)
