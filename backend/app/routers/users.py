@@ -3,8 +3,9 @@ from sqlalchemy.orm import Session
 
 from app.database import get_db
 from app.models import User, UserRole
-from app.schemas import UserResponse, UserUpdateRequest
+from app.schemas import UserResponse, UserUpdateRequest, UploadResponse
 from app.dependencies import require_admin, manager
+from app.s3 import s3_client, BUCKET_NAME, ENDPOINT
 
 router = APIRouter()
 
@@ -32,8 +33,33 @@ def get_user(
     user = db.query(User).filter(User.username == username).first()
     if user is None:
         raise HTTPException(status_code=404, detail="User not found.")
-    
+
     return user
+
+@router.get("/users/upload/{username}", response_model=UploadResponse)
+def get_upload_url(
+    username: str,
+    db: Session = Depends(get_db),
+    _current_user: User = Depends(manager),
+):
+    if _current_user.role != "admin" and _current_user.username != username:
+        raise HTTPException(status_code=403, detail="Insufficient permission")
+    user = db.query(User).filter(User.username == username).first()
+    if user is None:
+        raise HTTPException(status_code=404, detail="User not found.")
+
+    object_key = f"avatars/{username}/avatar"
+
+    url = s3_client.generate_presigned_url(
+        ClientMethod="put_object",
+        Params={"Bucket": BUCKET_NAME, "Key": object_key},
+        ExpiresIn=120,
+    ).replace(ENDPOINT, "")
+
+    setattr(user, "image", True)
+    db.commit()
+
+    return {"presigned_url": url}
 
 @router.patch("/users/{username}", response_model=UserResponse)
 def update_user(

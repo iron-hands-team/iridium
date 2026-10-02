@@ -10,7 +10,7 @@ import {
 } from "react-icons/fa";
 import { FaGear } from "react-icons/fa6";
 import { useState, useEffect, useRef } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { useTheme } from "next-themes";
 import Link from "next/link";
@@ -25,6 +25,7 @@ function NavUser({ user }: { user: UserType }) {
   const menuRef = useRef<HTMLDivElement>(null);
   const { theme, setTheme } = useTheme();
   const router = useRouter();
+  const pathname = usePathname();
 
   async function handleLogout() {
     await fetch("/api/logout", { method: "POST", credentials: "include" });
@@ -43,6 +44,10 @@ function NavUser({ user }: { user: UserType }) {
       document.removeEventListener("click", clickHandler);
     };
   }, []);
+
+  useEffect(() => {
+    setMenuOpen(false);
+  }, [pathname]);
 
   return (
     <div className="flex items-center gap-x-5 absolute right-50" ref={menuRef}>

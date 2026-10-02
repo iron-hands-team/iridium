@@ -7,3 +7,4 @@ python-dotenv==1.0.1
 fastapi-login==1.10.3
 pyjwt==2.14.0
 bcrypt==5.0.0
+boto3==1.43.0

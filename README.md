@@ -42,21 +42,36 @@ To host Iridium for your school or for other purposes, simply follow these steps
    cp .env.example .env
    ```
 
-4. If you want to set up a development instance of the app:
+4. Start the Garage container to configure it:
 
    ```bash
-   docker compose up
+   docker compose up -d garage
    ```
 
-   and navigate to https://localhost (port 80) to use the fully functional web interface and access the API at https://localhost/api
-
-5. Alternatively, if you want to run the production build of the app, uncomment the frontend production service then comment out the original frontend development service in `compose.yml`. Finally,
+5. Run the following commands to set a new Garage layout and set up the keys:
 
    ```bash
-   docker compose up
+   docker exec -it garage /garage status
+   docker exec -it garage /garage layout assign <ID_FROM_PREV_COMMAND> -c 5G -z garage
+   docker exec -it garage /garage layout apply --version 1
+   docker exec -it garage /garage key create iridium-key
+   docker exec -it garage /garage bucket create iridium-uploads
+   docker exec -it garage /garage bucket allow --read --write iridium-uploads --key iridium-key
    ```
 
-   and the stable production web interface will be available at https://localhost (port 80) and the API at https://localhost/api
+6. Copy the Garage access and secret keys to `.env` (`GARAGE_ACCESS_KEY` and `GARAGE_SECRET_KEY`) and start Docker compose:
+
+   ```bash
+   docker compose up -d
+   ```
+
+7. Alternatively, if you want to run the production build of the app, uncomment the frontend production service then comment out the original frontend development service in `compose.yaml` and run:
+
+   ```bash
+   docker compose up -d
+   ```
+
+8. Navigate to https://localhost (port 80) to use the fully functional web interface and access the API at https://localhost/api
 
 ## Contribution
 

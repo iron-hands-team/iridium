@@ -9,9 +9,10 @@ import AvatarModal from "../modals/avatar";
 interface AvatarProps {
   image?: string;
   canEdit: boolean;
+  username: string;
 }
 
-function Avatar({ image, canEdit }: AvatarProps) {
+function Avatar({ image, canEdit, username }: AvatarProps) {
   const [editing, setEditing] = useState<boolean>(false);
 
   return (
@@ -28,6 +29,7 @@ function Avatar({ image, canEdit }: AvatarProps) {
             width={150}
             height={150}
             className="mx-auto my-5"
+            unoptimized
           />
         ) : (
           <FaUserCircle size={150} className="mx-auto my-5" />
@@ -35,7 +37,11 @@ function Avatar({ image, canEdit }: AvatarProps) {
       </div>
       <AnimatePresence>
         {editing && (
-          <AvatarModal closeModal={() => setEditing(false)} image={image} />
+          <AvatarModal
+            closeModal={() => setEditing(false)}
+            imageUrl={image}
+            username={username}
+          />
         )}
       </AnimatePresence>
     </>

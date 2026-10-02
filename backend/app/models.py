@@ -21,7 +21,7 @@ class User(Base):
     last_name = Column(String, nullable=False)
     first_name = Column(String, nullable=False)
     middle_name = Column(String, nullable=True)
-    image = Column(String, nullable=True)
+    image = Column(Boolean, nullable=True)
     hashed_password = Column(String, nullable=False)
     role = Column(Enum(UserRole), default=UserRole.student, nullable=False)
 

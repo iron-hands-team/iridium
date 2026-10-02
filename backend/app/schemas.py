@@ -21,7 +21,7 @@ class UserResponse(BaseModel):
     first_name: str
     last_name: str
     middle_name: str | None = None
-    image: str | None = None
+    image: bool | None = None
     role: UserRole
 
     class Config:
@@ -32,7 +32,10 @@ class UserUpdateRequest(BaseModel):
     last_name: str | None = None
     middle_name: str | None = None
     role: UserRole | None = None
-    image: str | None = None
+    image: bool | None = None
+
+class UploadResponse(BaseModel):
+    presigned_url: str
 
 class TokenResponse(BaseModel):
     access_token: str

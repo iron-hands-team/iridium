@@ -3,7 +3,13 @@ iridium.tonymac.net, localhost {
         reverse_proxy fastapi-backend:8000
     }
 
-    handle /s3/* {
+    handle_path /s3/files/* {
+        reverse_proxy garage-storage:3902 {
+            header_up Host iridium-uploads.web.garage
+        }
+    }
+
+    handle_path /s3/* {
         reverse_proxy garage-storage:3900
     }
 
