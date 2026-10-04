@@ -26,9 +26,8 @@ function Avatar({ image, canEdit, username }: AvatarProps) {
           <Image
             src={image}
             alt="User avatar"
-            width={150}
-            height={150}
-            className="mx-auto my-5"
+            width={300}
+            height={300}
             unoptimized
           />
         ) : (

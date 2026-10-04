@@ -5,7 +5,7 @@ from app.database import get_db
 from app.models import User, UserRole
 from app.schemas import UserResponse, UserUpdateRequest, UploadResponse
 from app.dependencies import require_admin, manager
-from app.s3 import s3_client, BUCKET_NAME, ENDPOINT
+from app.s3 import s3_client, s3_internal, BUCKET_NAME, ENDPOINT
 
 router = APIRouter()
 
@@ -60,6 +60,27 @@ def get_upload_url(
     db.commit()
 
     return {"presigned_url": url}
+
+@router.delete("/users/upload/{username}", status_code=204)
+def delete_upload_url(
+    username: str,
+    db: Session = Depends(get_db),
+    _current_user: User = Depends(manager),
+):
+    if _current_user.role != "admin" and _current_user.username != username:
+        raise HTTPException(status_code=403, detail="Insufficient permission")
+    user = db.query(User).filter(User.username == username).first()
+    if user is None:
+        raise HTTPException(status_code=404, detail="User not found.")
+    if not user.image:
+        raise HTTPException(status_code=404, detail="Image not found.")
+
+    s3_internal.delete_object(
+        Bucket=BUCKET_NAME,
+        Key=f"avatars/{username}/avatar",
+    )
+    setattr(user, "image", False)
+    db.commit()
 
 @router.patch("/users/{username}", response_model=UserResponse)
 def update_user(

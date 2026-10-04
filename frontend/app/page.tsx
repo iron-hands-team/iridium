@@ -1,9 +1,11 @@
 import type { PostType } from "@/lib/schemas";
-import { FaBell, FaBullhorn, FaCalendar, FaLink } from "react-icons/fa";
+import { FaBell, FaBullhorn, FaCalendar, FaLink, FaMap } from "react-icons/fa";
 import { getSession } from "@/lib/auth";
+import { mapUrl } from "@/lib/helpers";
 import Announcement from "@/components/home/announcement";
 import NewAnnouncement from "@/components/admin/new-announcement";
 import Btn from "@/components/ui/btn";
+import Image from "next/image";
 
 const headingStyles = "text-xl font-bold flex items-center gap-x-3";
 
@@ -22,6 +24,14 @@ async function Page() {
   const announcements = announcementData.sort((a, b) =>
     String(b.pinned).localeCompare(String(a.pinned)),
   );
+  const mapData = await fetch(`${process.env.INTERNAL_API_URL}/map`, {
+    method: "GET",
+    headers: {
+      Authorization: `Bearer ${cookie.value}`,
+      "Content-Type": "application/json",
+    },
+  }).then((res) => res.json());
+  const mapItems: string[] = mapData.map((m: { label: string }) => m.label);
 
   return (
     <div className="px-50 flex py-10 gap-x-15 h-[calc(100vh-53px)] overflow-y-auto pb-10">
@@ -51,7 +61,7 @@ async function Page() {
           </div>
         )}
       </div>
-      <div className="flex flex-col gap-y-5 w-70 sticky top-0">
+      <div className="flex flex-col gap-y-5 w-70">
         <h2 className={headingStyles}>
           <FaBell size={18} /> Schedule
         </h2>
@@ -70,6 +80,30 @@ async function Page() {
         <div className="border-1 border-zinc-800 px-4 py-2">
           <h2>Links</h2>
         </div>
+        {mapItems.length > 0 && (
+          <>
+            <h2 className={headingStyles}>
+              <FaMap size={18} /> Map
+            </h2>
+            <div className="flex flex-col items-center gap-y-10">
+              {mapItems.map((m, i) => (
+                <div
+                  key={i}
+                  className="flex flex-col gap-y-3 items-center text-sm text-zinc-700 dark:text-zinc-300"
+                >
+                  <Image
+                    src={mapUrl(i)}
+                    alt="Map item"
+                    width={500}
+                    height={500}
+                    unoptimized
+                  />
+                  {m}
+                </div>
+              ))}
+            </div>
+          </>
+        )}
       </div>
     </div>
   );

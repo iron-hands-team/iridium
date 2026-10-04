@@ -1,6 +1,6 @@
 import type { UserResponse } from "@/types/user";
 import { getSession } from "@/lib/auth";
-import { parseUser } from "@/lib/helpers";
+import { parseUser, profileUrl } from "@/lib/helpers";
 import { notFound } from "next/navigation";
 import { FaUser } from "react-icons/fa";
 import Edit from "@/components/profile/edit";
@@ -28,11 +28,7 @@ async function Page({ params }: { params: Promise<{ username: string }> }) {
     <div className="flex gap-x-10 px-50 py-10">
       <div className="border border-zinc-800 w-70 flex flex-col gap-y-5 p-5 text-sm">
         <Avatar
-          image={
-            user.image
-              ? `/s3/files/avatars/${user.username}/avatar?t=${new Date().getTime()}`
-              : undefined
-          }
+          image={user.image ? profileUrl(user.username) : undefined}
           canEdit={
             currentUser.role === "admin" ||
             currentUser.username === user.username

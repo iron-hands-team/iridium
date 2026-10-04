@@ -15,3 +15,12 @@ s3_client = boto3.client(
     region_name="garage",
     config=Config(signature_version="s3v4", s3={"addressing_style": "path"}),
 )
+
+s3_internal = boto3.client(
+    "s3",
+    endpoint_url="http://garage-storage:3900",
+    aws_access_key_id=ACCESS_KEY,
+    aws_secret_access_key=SECRET_KEY,
+    region_name="garage",
+    config=Config(signature_version="s3v4", s3={"addressing_style": "path"}),
+)

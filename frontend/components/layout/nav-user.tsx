@@ -13,7 +13,9 @@ import { useState, useEffect, useRef } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { useTheme } from "next-themes";
+import { profileUrl } from "@/lib/helpers";
 import Link from "next/link";
+import Image from "next/image";
 
 const optionStyles =
   "hover:bg-zinc-200 dark:hover:bg-zinc-900 flex items-center gap-x-2 p-2 group cursor-pointer";
@@ -53,10 +55,22 @@ function NavUser({ user }: { user: UserType }) {
     <div className="flex items-center gap-x-5 absolute right-50" ref={menuRef}>
       <div className="relative">
         <div
-          className="border border-zinc-800 hover:bg-zinc-200/85 dark:hover:bg-zinc-900/50 cursor-pointer flex items-center px-3 py-1.5 gap-x-3"
+          className="border border-zinc-800 hover:bg-zinc-200/85 dark:hover:bg-zinc-900/50 cursor-pointer flex items-center px-3 p-1 gap-x-3"
           onClick={() => setMenuOpen(!menuOpen)}
         >
-          <FaUserCircle size={20} />
+          {user.image ? (
+            <Image
+              src={profileUrl(user.username)}
+              alt="User avatar"
+              width={35}
+              height={35}
+              className="w-7 h-7"
+              unoptimized
+              suppressHydrationWarning
+            />
+          ) : (
+            <FaUserCircle size={30} />
+          )}
           {user.firstName}
         </div>
         <AnimatePresence>

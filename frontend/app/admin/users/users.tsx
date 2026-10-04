@@ -2,7 +2,7 @@
 
 import type { UserType } from "@/types/user";
 import { useState } from "react";
-import { FaCaretUp, FaFilter } from "react-icons/fa";
+import { FaCaretUp, FaCheck, FaFilter, FaUserCircle } from "react-icons/fa";
 import { AnimatePresence } from "framer-motion";
 import { roles } from "@/lib/constants";
 import Input from "@/components/ui/input";
@@ -10,6 +10,8 @@ import UserModal from "@/components/modals/user";
 import Dropdown from "@/components/ui/dropdown";
 import NewUser from "@/components/admin/new-user";
 import Checkbox from "@/components/ui/checkbox";
+import Image from "next/image";
+import { profileUrl } from "@/lib/helpers";
 
 const sorts = [
   "ID",
@@ -96,7 +98,7 @@ function Users({ users }: { users: UserType[] }) {
       <div>
         <div className="flex">
           <div
-            className="w-12 hover:bg-zinc-200 dark:hover:bg-zinc-900 cursor-pointer flex items-center justify-center"
+            className="w-12 hover:bg-zinc-200 dark:hover:bg-zinc-900 cursor-pointer flex items-center px-4"
             onClick={() =>
               setSort({
                 ascending: sort.name === "selected" ? !sort.ascending : false,
@@ -104,13 +106,9 @@ function Users({ users }: { users: UserType[] }) {
               })
             }
           >
-            {sort.name === "selected" && (
-              <FaCaretUp
-                size={15}
-                className={`transition-transform! ${sort.ascending && "rotate-180"}`}
-              />
-            )}
+            <FaCheck size={15} />
           </div>
+          <div className="w-10" />
           {sorts.map((s, i) => {
             return (
               <div
@@ -154,6 +152,19 @@ function Users({ users }: { users: UserType[] }) {
                     }
                   />
                   <div className="flex flex-1" onClick={() => setUser(u)}>
+                    <div className="flex justify-center w-10">
+                      {u.image ? (
+                        <Image
+                          src={profileUrl(u.username)}
+                          alt="User avatar"
+                          width={30}
+                          height={30}
+                          unoptimized
+                        />
+                      ) : (
+                        <FaUserCircle size={25} className="w-full" />
+                      )}
+                    </div>
                     <div className="flex-1 px-4">{u.id}</div>
                     <div className="flex-2 px-4">
                       {u.username.slice(0, 10) +

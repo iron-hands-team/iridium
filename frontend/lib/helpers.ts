@@ -11,3 +11,11 @@ export function parseUser(user: UserResponse): UserType {
     image: user.image,
   };
 }
+
+export function profileUrl(username: string) {
+  return `/s3/files/avatars/${username}/avatar?t=${new Date().getTime()}`;
+}
+
+export function mapUrl(index: number) {
+  return `/s3/files/map/${index}?t=${new Date().getTime()}`;
+}

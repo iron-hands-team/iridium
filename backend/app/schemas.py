@@ -173,3 +173,15 @@ class ClassEnrollmentResponse(BaseModel):
 
     class Config:
         from_attributes = True
+
+# general school info
+
+class AddMapItemsRequest(BaseModel):
+    labels: list[str]
+
+class MapUploadResponse(BaseModel):
+    uploads: list[str]
+
+class MapResponse(BaseModel):
+    id: int
+    label: str

@@ -3,6 +3,7 @@
 import { FaUserCircle } from "react-icons/fa";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { profileUrl } from "@/lib/helpers";
 import Modal from "../ui/modal";
 import Image from "next/image";
 import Btn from "../ui/btn";
@@ -42,15 +43,20 @@ function AvatarModal({ closeModal, imageUrl, username }: AvatarModalProps) {
           body: file,
         });
         if (upload.ok) {
-          setImage(
-            `/s3/files/avatars/${username}/avatar?t=${new Date().getTime()}`,
-          );
+          setImage(profileUrl(username));
         }
       }
       setSaving(false);
       router.refresh();
-      closeModal();
+    } else if (!image && imageUrl) {
+      setSaving(true);
+      await fetch(`/api/users/upload/${username}`, {
+        method: "DELETE",
+      });
+      setSaving(false);
+      router.refresh();
     }
+    closeModal();
   }
 
   return (
@@ -105,7 +111,9 @@ function AvatarModal({ closeModal, imageUrl, username }: AvatarModalProps) {
               setFile(null);
               setImage(null);
             }}
-            styles={!file ? "opacity-0 pointer-events-none" : "opacity-100"}
+            styles={
+              !file && !image ? "opacity-0 pointer-events-none" : "opacity-100"
+            }
           />
         </div>
       </div>

@@ -143,3 +143,8 @@ class ClassEnrollment(Base):
 
     class_section = relationship("ClassSection", back_populates="enrollments")
     student = relationship("User", back_populates="class_enrollments")
+
+class MapItem(Base):
+    __tablename__ = "map_items"
+    id = Column(Integer, primary_key=True, index=True)
+    label = Column(String, nullable=True)
