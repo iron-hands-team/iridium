@@ -23,6 +23,14 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
   const session = await getSession();
   
   return (
+    <html>
+      <body>
+        <Nav/>
+        <ClassBody/>
+      </body>
+    </html>
+  )
+  return (
     <html
       lang="en"
       className={`${inter.variable} h-full antialiased`}
