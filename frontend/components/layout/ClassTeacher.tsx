@@ -1,26 +1,18 @@
 "use client";
 
-<<<<<<< HEAD
 import { useState, useEffect, useCallback } from "react";
 import { FaExclamationTriangle, FaChevronDown, FaChevronRight } from "react-icons/fa";
-=======
-import { useState } from "react";
->>>>>>> 67ab82ca1a53cde6641ccb631e8d7c140a6c7e04
 import Btn from "@/components/ui/btn";
-import "@/app/globals.css";
+import Input from "@/components/ui/input";
 import Footer from "@/components/layout/footer";
-import { a, i } from "framer-motion/client";
-import Header from "@/components/layout/header";
-import { cs } from "@/lib/classStore";
-import AssignmentsPopupClassTeacher from "@/components/layout/assignmentsPopupClassTeacher";
-import MessagesPopupClassTeacher from "@/components/layout/messagesPopupClassTeacher";
-import SettingsPopupClassTeacher from "@/components/layout/settingsPopupClassTeacher";
-import StudentsPopupClassTeacher from "@/components/layout/studentsPopupClassTeacher";
-import BodyClassTeacher from "@/components/layout/BodyClassTeacher";
 
-// imports are correct i think
+interface UserSummary {
+  id: number;
+  username: string;
+  first_name: string;
+  last_name: string;
+}
 
-<<<<<<< HEAD
 interface Enrollment {
   id: number;
   student: UserSummary;
@@ -58,13 +50,19 @@ async function api(path: string, init?: RequestInit) {
   }
   return res.status === 204 ? null : res.json();
 }
-=======
->>>>>>> 67ab82ca1a53cde6641ccb631e8d7c140a6c7e04
 
 export default function ClassBody() {
-  const [asd, setAsd] = useState("");
+  const [classes, setClasses] = useState<ClassSection[]>([]);
+  const [roster, setRoster] = useState<Record<number, Enrollment[]>>({});
+  const [expanded, setExpanded] = useState<Record<number, boolean>>({});
+  const [newClassName, setNewClassName] = useState("");
+  const [studentInputs, setStudentInputs] = useState<Record<number, string>>(
+    {},
+  );
+  const [renaming, setRenaming] = useState<Record<number, string>>({});
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-<<<<<<< HEAD
   const [assignments, setAssignments] = useState<Record<number, Assignment[]>>(
     {},
   );
@@ -93,21 +91,20 @@ export default function ClassBody() {
       setLoading(false);
     }
   }, []);
-=======
->>>>>>> 67ab82ca1a53cde6641ccb631e8d7c140a6c7e04
 
-	
+  useEffect(() => {
+    loadClasses();
+  }, [loadClasses]);
 
-	const borderColors: Record<string, string> = {
-			blue: "border-blue-500",
-			red: "border-red-500",
-			green: "border-green-500",
-			yellow: "border-yellow-500",
-			purple: "border-purple-500",
-			gray: "border-zinc-500",
-	};
+  async function loadRoster(classId: number) {
+    try {
+      const data: Enrollment[] = await api(`/classes/${classId}/students`);
+      setRoster((prev) => ({ ...prev, [classId]: data }));
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Failed to load roster.");
+    }
+  }
 
-<<<<<<< HEAD
   function toggleExpanded(classId: number) {
     const next = !expanded[classId];
     setExpanded((prev) => ({ ...prev, [classId]: next }));
@@ -118,65 +115,84 @@ export default function ClassBody() {
       loadAssignments(classId);
     }
   }
-=======
-	const buttonColors: Record<string, string> = {
-		blue: "bg-blue-600",
-		red: "bg-red-800",
-		green: "bg-green-800",
-		yellow: "bg-yellow-600",
-		purple: "bg-purple-800",
-		gray: "bg-zinc-800",
-	};
-	const settingsPopup = cs((state)=>state.settingsPopup);
-	const setSettingsPopup = cs((state)=>state.setSettingsPopup);
-	const settingsClassIndex = cs((state)=> state.settingsClassIndex);
-	
-	const setSettingsClassIndex = cs((state)=> state.setSettingsClassIndex);
-	const studentsPopup = cs((state)=>state.studentsPopup);
-	const setStudentsPopup = cs((state)=>state.setStudentsPopup);
-	const setSettingsStudentsIndex= cs((state)=>state.setSettingsStudentsIndex);
->>>>>>> 67ab82ca1a53cde6641ccb631e8d7c140a6c7e04
 
-	const assignmentsPopup = cs((state)=>state.assignmentsPopup);
-	const setAssignmentsPopup = cs((state)=>state.setAssignmentsPopup);
-	const messagePopup = cs((state)=>state.messagePopup);
-	const setMessagePopup = cs((state)=>state.setMessagePopup);
+  async function addClass() {
+    if (!newClassName.trim()) return;
+    try {
+      setError(null);
+      await api("/classes", {
+        method: "POST",
+        body: JSON.stringify({ name: newClassName.trim() }),
+      });
+      setNewClassName("");
+      await loadClasses();
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Failed to add class.");
+    }
+  }
 
+  async function deleteClass(classId: number) {
+    try {
+      setError(null);
+      await api(`/classes/${classId}`, { method: "DELETE" });
+      setClasses((prev) => prev.filter((c) => c.id !== classId));
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Failed to delete class.");
+    }
+  }
 
-	const classes = cs((state) => state.classes);
-	const addClass = cs((state) => state.addClass);
-	const addStudent = cs((state) => state.addStudent);
-	const setClassName = cs((state)=> state.setClassName);
+  async function saveRename(classId: number) {
+    const name = renaming[classId]?.trim();
+    if (!name) return;
+    try {
+      setError(null);
+      await api(`/classes/${classId}`, {
+        method: "PATCH",
+        body: JSON.stringify({ name }),
+      });
+      setRenaming((prev) => {
+        const next = { ...prev };
+        delete next[classId];
+        return next;
+      });
+      await loadClasses();
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Failed to rename class.");
+    }
+  }
 
-	const setStudentname = cs((state) => state.setStudentName);
+  async function addStudent(classId: number) {
+    const username = studentInputs[classId]?.trim();
+    if (!username) return;
+    try {
+      setError(null);
+      await api(`/classes/${classId}/students`, {
+        method: "POST",
+        body: JSON.stringify({ username }),
+      });
+      setStudentInputs((prev) => ({ ...prev, [classId]: "" }));
+      await loadRoster(classId);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Failed to add student.");
+    }
+  }
 
-
-	const updateCanShowStudents = cs((state)=>state.updateCanShowStudents);
-
-	function nothing() {
-
-	}
-
-	function functionSetSettings(id:number){//{id, className, students, canShow} : Class) {
-		setSettingsClassIndex(id);
-		setSettingsPopup(true);
-	}
-
-	function functionSetStudent(classIndex : number, studentIndex : number) {
-		setStudentsPopup(true);
-		setSettingsClassIndex(classIndex);
-		setSettingsStudentsIndex(studentIndex);
-	}
-
-	function functionSetAssignment(classIndex : number) {
-		setSettingsClassIndex(classIndex);
-		setAssignmentsPopup(true);
-	}
-
-	function functionSetMessage(classIndex : number) {
-		setMessagePopup(true);
-		setSettingsClassIndex(classIndex);
-	}
+  async function removeStudent(classId: number, studentId: number) {
+    try {
+      setError(null);
+      await api(`/classes/${classId}/students/${studentId}`, {
+        method: "DELETE",
+      });
+      setRoster((prev) => ({
+        ...prev,
+        [classId]: (prev[classId] || []).filter(
+          (e) => e.student.id !== studentId,
+        ),
+      }));
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Failed to remove student.");
+    }
+  }
 
   async function loadAssignments(classId: number) {
     try {
@@ -262,17 +278,89 @@ export default function ClassBody() {
   }
 
   return (
-		
-    <div className="bg-[#131313]">
+    <div className="bg-[#131313] min-h-screen text-white">
+      <header className="flex flex-col gap-y-2 items-center py-8 border-t border-b border-zinc-800">
+        <p className="text-xl font-bold">Your Classes</p>
+        <p className="text-sm text-zinc-400">
+          Manage your class sections and rosters
+        </p>
+      </header>
 
-			{settingsPopup && settingsClassIndex != -1 &&(<SettingsPopupClassTeacher/>)}
-			{studentsPopup && (<StudentsPopupClassTeacher/>)}
+      <div className="flex flex-col items-center gap-y-5 p-6">
+        <div className="w-2/3 flex gap-x-3">
+          <Input
+            placeholder="New class name"
+            value={newClassName}
+            setValue={setNewClassName}
+          />
+          <Btn text="Add Class" onclick={addClass} primary />
+        </div>
 
-			{ assignmentsPopup &&( <AssignmentsPopupClassTeacher/>)}
+        {error && (
+          <div className="w-2/3 text-red-500 text-sm flex gap-x-3 items-center">
+            <FaExclamationTriangle size={15} /> {error}
+          </div>
+        )}
 
-			{ messagePopup && (<MessagesPopupClassTeacher/>)}
+        {loading ? (
+          <p className="text-sm text-zinc-400">Loading classes...</p>
+        ) : classes.length === 0 ? (
+          <p className="text-sm text-zinc-400">
+            No classes to show. Create one above!
+          </p>
+        ) : (
+          classes.map((section) => (
+            <div
+              key={section.id}
+              className="w-4/5 p-4 rounded-lg border border-zinc-800 flex flex-col gap-y-3"
+            >
+              <div className="flex justify-between items-start gap-x-3">
+                <div className="flex-1">
+                  <p className="text-xs text-zinc-500">#{section.id}</p>
+                  {renaming[section.id] !== undefined ? (
+                    <div className="flex gap-x-2 mt-1">
+                      <Input
+                        placeholder="Class name"
+                        value={renaming[section.id]}
+                        setValue={(v) =>
+                          setRenaming((prev) => ({ ...prev, [section.id]: v }))
+                        }
+                      />
+                      <Btn
+                        text="Save"
+                        onclick={() => saveRename(section.id)}
+                        primary
+                      />
+                    </div>
+                  ) : (
+                    <p className="text-lg font-bold">{section.name}</p>
+                  )}
+                  <p className="text-xs text-zinc-500">
+                    Teacher: {section.teacher.first_name}{" "}
+                    {section.teacher.last_name}
+                  </p>
+                </div>
+                <div className="flex gap-x-2">
+                  <Btn
+                    text={expanded[section.id] ? "Hide" : "Show"}
+                    onclick={() => toggleExpanded(section.id)}
+                  />
+                  <Btn
+                    text="Rename"
+                    onclick={() =>
+                      setRenaming((prev) => ({
+                        ...prev,
+                        [section.id]: section.name,
+                      }))
+                    }
+                  />
+                  <Btn
+                    text="Delete Class"
+                    onclick={() => deleteClass(section.id)}
+                  />
+                </div>
+              </div>
 
-<<<<<<< HEAD
               {expanded[section.id] && (
                 <div className="flex flex-col gap-y-3 mt-2">
                   <p className="font-bold text-sm">Students</p>
@@ -477,132 +565,9 @@ export default function ClassBody() {
             </div>
           ))
         )}
-=======
-
-			<div className="flex justify-end p-[10px] items-center bg-pink-900">
-				<div className="w-[50px]">
-					<Btn onclick={()=>nothing()} text="?"/>
-				</div>
-			</div>
-			
-			<Header headerText = {(
-				<div className="flex justify-center flex-col items-center">
-					<p className="text-[30px] text-center">Class Dashboard</p>
-					<p>hmmm</p>
-
-				</div>)} />
-			
-      <div
-
-        style={{
-          backgroundColor: "black",
-          display: "flex",
-          alignItems: "center",
-          flexDirection: "column",
-          gap: "20px",
-          padding: 10,
-        }}
-      >
-				<div className="flex w-2/3">
-					<Btn text="Add Section" onclick={()=>addClass()} />
-				</div>
-				<p>{classes.length == 0 ? "No classes to show. Create one on the top-left!" : ""}</p>
-        {classes.map((item, i) => (
-          <div
-
-            key={i}
-            style={{
-              width: "80%",
-              padding: "15px",
-              borderRadius: "8px",
-							gap: "10px"
-            }}
-						className={"border-1 "+classes[i].color+" hover:border-white"}
-          >
-
-            <p>#{item.id}</p>
-						
-						<div className="flex gap-10 align-middle justify-center">
-							<textarea
-								placeholder="Enter Class Name"
-								className="text-white w-full resize-none h-16 p-2 border border-black hover:border-zinc-800 pt-4 text-[20px] font-sans "
-
-								value={item.className}
-								onChange={(e) => {
-									setClassName(i, e.target.value, "className")
-								}}
-							></textarea>
-							<div className="w-[100px] flex align-middle">
-								<Btn onclick={() => functionSetSettings(classes[i].id)} text="Settings"/>
-							</div>
-						</div>
-						<br></br>
-      <div className="w-2/3 flex">
-      	<Btn text="Manage Announcement 📢" onclick={() => functionSetMessage(i)}/>
-      	<Btn text="Manage Assignments" onclick={() => functionSetAssignment(i)}/>
->>>>>>> 67ab82ca1a53cde6641ccb631e8d7c140a6c7e04
       </div>
-      <br></br>
-						<div className="w-2/3 flex">
-						<Btn text="Add Student 🧑‍🎓" onclick={() => {classes[i].canShow = true;addStudent(item.students, i)}}/>
-						<Btn text={classes[i].canShow ? "Hide Students" : "Show Students"} onclick={() => updateCanShowStudents(i, !classes[i].canShow)}/>
 
-						</div>
-						{classes[i].canShow && (
-							<div>
-								<p className="mt-10"><b>Students:</b></p>
-								<p>{classes[i].students.length == 0 ? "No students in your class currently." : ""}</p>
-							{item.students.map((studentTest, j) => (
-								<div key={j}>
-									<div style={{display: "flex", marginTop: "10px"}} className="w-full justify-between h-full">
-										<div className="w-1/2 flex items-center gap-2.5">
-											<p>#{j}</p>
-
-											<textarea
-												placeholder="Enter Student Name Here"
-												className="text-white w-full resize-none h-12 p-2 border border-black hover:border-zinc-800 pt-2.5 text-[18px] font-sans"
-												value={studentTest.name}
-												onChange={(a) => setStudentname(i, j, a.target.value, "name")}
-											/>
-										</div>
-										<div className="w-1/4 flex justify-center  h-full flex-col gap-2">
-											<Btn text="Edit Student Info" onclick={() => {functionSetStudent(i, j)}}/>
-											<Btn text="Message" onclick={()=>nothing()}/>
-										</div>
-									</div>
-									<br></br>
-								</div>
-							))}
-							</div>
-						)}
-
-						<br></br>
-						<br></br>
-      <br></br>
-						<div className="w-1/3">
-						</div>
-          </div>
-    ))}
-					<div>
-
-
-			
-
-		</div>
-			<br></br>
-      </div>
-			<br></br>
-			<p className="ml-10">Brought to you by RespectableDot because he is very respectful. </p>
-
-   <br></br>
-			<Footer/>
-			<div className="h-100"></div>
+      <Footer />
     </div>
-		
   );
-<<<<<<< HEAD
 }
-=======
-}
-
->>>>>>> 67ab82ca1a53cde6641ccb631e8d7c140a6c7e04

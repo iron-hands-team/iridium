@@ -4,7 +4,6 @@ import { getSession } from "@/lib/auth";
 import { ThemeProvider } from "next-themes";
 import LoginForm from "@/components/auth/login-form";
 import Nav from "@/components/layout/nav";
-import ClassTeacher from "@/components/layout/ClassTeacher";
 import "./globals.css";
 
 const inter = Inter({
@@ -20,13 +19,6 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
   const { user } = await getSession();
 
   return (
-    <html>
-      <body>
-        <ClassTeacher/>
-      </body>
-    </html>
-  )
-  /*return (
     <html
       lang="en"
       className={`${inter.variable} h-full antialiased`}
@@ -45,5 +37,5 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
         </ThemeProvider>
       </body>
     </html>
-  );*/
+  );
 }
