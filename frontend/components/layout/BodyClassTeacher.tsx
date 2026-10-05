@@ -1,44 +1,9 @@
-"use client";
-
-import { useState } from "react";
+"use client"
+import {cs} from "@/lib/classStore";
 import Btn from "@/components/ui/btn";
 import "@/app/globals.css";
-import Footer from "@/components/layout/footer";
-import { a, i } from "framer-motion/client";
-import Header from "@/components/layout/header";
-import { cs } from "@/lib/classStore";
-import AssignmentsPopupClassTeacher from "@/components/layout/assignmentsPopupClassTeacher";
-import MessagesPopupClassTeacher from "@/components/layout/messagesPopupClassTeacher";
-import SettingsPopupClassTeacher from "@/components/layout/settingsPopupClassTeacher";
-import StudentsPopupClassTeacher from "@/components/layout/studentsPopupClassTeacher";
-import BodyClassTeacher from "@/components/layout/BodyClassTeacher";
 
-// imports are correct i think
-
-
-export default function ClassBody() {
-  const [asd, setAsd] = useState("");
-
-
-	
-
-	const borderColors: Record<string, string> = {
-			blue: "border-blue-500",
-			red: "border-red-500",
-			green: "border-green-500",
-			yellow: "border-yellow-500",
-			purple: "border-purple-500",
-			gray: "border-zinc-500",
-	};
-
-	const buttonColors: Record<string, string> = {
-		blue: "bg-blue-600",
-		red: "bg-red-800",
-		green: "bg-green-800",
-		yellow: "bg-yellow-600",
-		purple: "bg-purple-800",
-		gray: "bg-zinc-800",
-	};
+export default function BodyClassTeacher() {
 	const settingsPopup = cs((state)=>state.settingsPopup);
 	const setSettingsPopup = cs((state)=>state.setSettingsPopup);
 	const settingsClassIndex = cs((state)=> state.settingsClassIndex);
@@ -64,10 +29,7 @@ export default function ClassBody() {
 
 	const updateCanShowStudents = cs((state)=>state.updateCanShowStudents);
 
-	function nothing() {
-
-	}
-
+ 
 	function functionSetSettings(id:number){//{id, className, students, canShow} : Class) {
 		setSettingsClassIndex(id);
 		setSettingsPopup(true);
@@ -88,33 +50,13 @@ export default function ClassBody() {
 		setMessagePopup(true);
 		setSettingsClassIndex(classIndex);
 	}
+ function nothing() {
+  
+ }
+ 
 
-  return (
-		
-    <div className="bg-[#131313]">
-
-			{settingsPopup && settingsClassIndex != -1 &&(<SettingsPopupClassTeacher/>)}
-			{studentsPopup && (<StudentsPopupClassTeacher/>)}
-
-			{ assignmentsPopup &&( <AssignmentsPopupClassTeacher/>)}
-
-			{ messagePopup && (<MessagesPopupClassTeacher/>)}
-
-
-			<div className="flex justify-end p-[10px] items-center bg-pink-900">
-				<div className="w-[50px]">
-					<Btn onclick={()=>nothing()} text="?"/>
-				</div>
-			</div>
-			
-			<Header headerText = {(
-				<div className="flex justify-center flex-col items-center">
-					<p className="text-[30px] text-center">Class Dashboard</p>
-					<p>hmmm</p>
-
-				</div>)} />
-			
-      <div
+ return (
+         <div
 
         style={{
           backgroundColor: "black",
@@ -205,21 +147,10 @@ export default function ClassBody() {
           </div>
     ))}
 					<div>
-
-
 			
 
 		</div>
 			<br></br>
       </div>
-			<br></br>
-			<p className="ml-10">Brought to you by RespectableDot because he is very respectful. </p>
-
-   <br></br>
-			<Footer/>
-			<div className="h-100"></div>
-    </div>
-		
-  );
+ );
 }
-
