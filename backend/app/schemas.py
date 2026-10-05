@@ -185,3 +185,41 @@ class MapUploadResponse(BaseModel):
 class MapResponse(BaseModel):
     id: int
     label: str
+
+# gradebook
+
+class AssignmentCreateRequest(BaseModel):
+    name: str
+    max_score: float = 100
+
+class GradeResponse(BaseModel):
+    id: int
+    student: UserResponse
+    score: float | None
+
+    class Config:
+        from_attributes = True
+
+class AssignmentResponse(BaseModel):
+    id: int
+    name: str
+    max_score: float
+    class_id: int
+    grades: list[GradeResponse]
+
+    class Config:
+        from_attributes = True
+
+class GradeUpdateRequest(BaseModel):
+    score: float | None = None
+
+class StudentAssignmentGrade(BaseModel):
+    id: int
+    name: str
+    max_score: float
+    score: float | None
+
+class StudentClassGrades(BaseModel):
+    class_id: int
+    class_name: str
+    assignments: list[StudentAssignmentGrade]

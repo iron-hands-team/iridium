@@ -1,7 +1,7 @@
 import enum
 from datetime import datetime, timezone
 
-from sqlalchemy import Column, Integer, String, Enum, Text, DateTime, Time, Boolean, ForeignKey
+from sqlalchemy import Column, Integer, String, Enum, Text, DateTime, Time, Boolean, Float, ForeignKey
 from sqlalchemy.dialects.postgresql import ARRAY
 from sqlalchemy.orm import relationship
 from app.database import Base
@@ -34,6 +34,7 @@ class User(Base):
     class_enrollments = relationship("ClassEnrollment", back_populates="student")
     announcement_likes = relationship("AnnouncementLike", back_populates="user")
     event_rsvps = relationship("EventRSVP", back_populates="user")
+    grades = relationship("Grade", back_populates="student")
 
 class Announcement(Base):
     __tablename__ = "announcements"
@@ -134,6 +135,32 @@ class ClassSection(Base):
     enrollments = relationship(
         "ClassEnrollment", back_populates="class_section", cascade="all, delete-orphan"
     )
+    assignments = relationship(
+        "Assignment", back_populates="class_section", cascade="all, delete-orphan"
+    )
+
+class Assignment(Base):
+    __tablename__ = "assignments"
+    id = Column(Integer, primary_key=True, index=True)
+    class_id = Column(Integer, ForeignKey("class_sections.id"), nullable=False)
+    name = Column(String, nullable=False)
+    max_score = Column(Float, nullable=False, default=100)
+    created_at = Column(DateTime(timezone=True), default=utcnow, nullable=False)
+
+    class_section = relationship("ClassSection", back_populates="assignments")
+    grades = relationship(
+        "Grade", back_populates="assignment", cascade="all, delete-orphan"
+    )
+
+class Grade(Base):
+    __tablename__ = "grades"
+    id = Column(Integer, primary_key=True, index=True)
+    assignment_id = Column(Integer, ForeignKey("assignments.id"), nullable=False)
+    student_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    score = Column(Float, nullable=True)
+
+    assignment = relationship("Assignment", back_populates="grades")
+    student = relationship("User", back_populates="grades")
 
 class ClassEnrollment(Base):
     __tablename__ = "class_enrollments"
@@ -143,8 +170,3 @@ class ClassEnrollment(Base):
 
     class_section = relationship("ClassSection", back_populates="enrollments")
     student = relationship("User", back_populates="class_enrollments")
-
-class MapItem(Base):
-    __tablename__ = "map_items"
-    id = Column(Integer, primary_key=True, index=True)
-    label = Column(String, nullable=True)

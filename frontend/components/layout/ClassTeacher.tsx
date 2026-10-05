@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import { FaExclamationTriangle } from "react-icons/fa";
+import { FaExclamationTriangle, FaChevronDown, FaChevronRight } from "react-icons/fa";
 import Btn from "@/components/ui/btn";
 import Input from "@/components/ui/input";
 import Footer from "@/components/layout/footer";
@@ -22,6 +22,20 @@ interface ClassSection {
   id: number;
   name: string;
   teacher: UserSummary;
+}
+
+interface Grade {
+  id: number;
+  student: UserSummary;
+  score: number | null;
+}
+
+interface Assignment {
+  id: number;
+  name: string;
+  max_score: number;
+  class_id: number;
+  grades: Grade[];
 }
 
 async function api(path: string, init?: RequestInit) {
@@ -48,6 +62,23 @@ export default function ClassBody() {
   const [renaming, setRenaming] = useState<Record<number, string>>({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  const [assignments, setAssignments] = useState<Record<number, Assignment[]>>(
+    {},
+  );
+  const [openAssignment, setOpenAssignment] = useState<Record<number, boolean>>(
+    {},
+  );
+  const [addingAssignment, setAddingAssignment] = useState<
+    Record<number, boolean>
+  >({});
+  const [newAssignmentName, setNewAssignmentName] = useState<
+    Record<number, string>
+  >({});
+  const [newAssignmentMax, setNewAssignmentMax] = useState<
+    Record<number, string>
+  >({});
+  const [scoreDrafts, setScoreDrafts] = useState<Record<string, string>>({});
 
   const loadClasses = useCallback(async () => {
     try {
@@ -79,6 +110,9 @@ export default function ClassBody() {
     setExpanded((prev) => ({ ...prev, [classId]: next }));
     if (next && !roster[classId]) {
       loadRoster(classId);
+    }
+    if (next && !assignments[classId]) {
+      loadAssignments(classId);
     }
   }
 
@@ -158,6 +192,89 @@ export default function ClassBody() {
     } catch (e) {
       setError(e instanceof Error ? e.message : "Failed to remove student.");
     }
+  }
+
+  async function loadAssignments(classId: number) {
+    try {
+      const data: Assignment[] = await api(`/classes/${classId}/assignments`);
+      setAssignments((prev) => ({ ...prev, [classId]: data }));
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Failed to load gradebook.");
+    }
+  }
+
+  async function addAssignment(classId: number) {
+    const name = newAssignmentName[classId]?.trim();
+    const maxRaw = newAssignmentMax[classId]?.trim();
+    const max_score = maxRaw ? Number(maxRaw) : 100;
+    if (!name || Number.isNaN(max_score) || max_score <= 0) return;
+    try {
+      setError(null);
+      await api(`/classes/${classId}/assignments`, {
+        method: "POST",
+        body: JSON.stringify({ name, max_score }),
+      });
+      setNewAssignmentName((prev) => ({ ...prev, [classId]: "" }));
+      setNewAssignmentMax((prev) => ({ ...prev, [classId]: "" }));
+      setAddingAssignment((prev) => ({ ...prev, [classId]: false }));
+      await loadAssignments(classId);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Failed to add assignment.");
+    }
+  }
+
+  async function deleteAssignment(classId: number, assignmentId: number) {
+    try {
+      setError(null);
+      await api(`/assignments/${assignmentId}`, { method: "DELETE" });
+      setAssignments((prev) => ({
+        ...prev,
+        [classId]: (prev[classId] || []).filter((a) => a.id !== assignmentId),
+      }));
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Failed to delete assignment.");
+    }
+  }
+
+  async function saveScore(
+    classId: number,
+    assignmentId: number,
+    studentId: number,
+  ) {
+    const key = `${assignmentId}:${studentId}`;
+    const raw = scoreDrafts[key];
+    const score = raw === undefined || raw === "" ? null : Number(raw);
+    if (score !== null && Number.isNaN(score)) return;
+    try {
+      setError(null);
+      await api(`/assignments/${assignmentId}/grades/${studentId}`, {
+        method: "PATCH",
+        body: JSON.stringify({ score }),
+      });
+      setAssignments((prev) => ({
+        ...prev,
+        [classId]: (prev[classId] || []).map((a) =>
+          a.id !== assignmentId
+            ? a
+            : {
+                ...a,
+                grades: a.grades.map((g) =>
+                  g.student.id === studentId ? { ...g, score } : g,
+                ),
+              },
+        ),
+      }));
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Failed to save score.");
+    }
+  }
+
+  function toggleAssignment(classId: number, assignmentId: number) {
+    setOpenAssignment((prev) => ({
+      ...prev,
+      [assignmentId]: !prev[assignmentId],
+    }));
+    if (!assignments[classId]) loadAssignments(classId);
   }
 
   return (
@@ -290,6 +407,157 @@ export default function ClassBody() {
                           />
                         </div>
                       ))}
+                    </div>
+                  )}
+
+                  <div className="flex items-center justify-between mt-4">
+                    <p className="font-bold text-sm">Gradebook</p>
+                    <Btn
+                      text={addingAssignment[section.id] ? "Cancel" : "+ Assignment"}
+                      styles="text-xs"
+                      onclick={() =>
+                        setAddingAssignment((prev) => ({
+                          ...prev,
+                          [section.id]: !prev[section.id],
+                        }))
+                      }
+                    />
+                  </div>
+
+                  {addingAssignment[section.id] && (
+                    <div className="flex gap-x-2">
+                      <Input
+                        placeholder="Assignment name"
+                        value={newAssignmentName[section.id] || ""}
+                        setValue={(v) =>
+                          setNewAssignmentName((prev) => ({
+                            ...prev,
+                            [section.id]: v,
+                          }))
+                        }
+                      />
+                      <Input
+                        placeholder="Max score (100)"
+                        type="number"
+                        value={newAssignmentMax[section.id] || ""}
+                        setValue={(v) =>
+                          setNewAssignmentMax((prev) => ({
+                            ...prev,
+                            [section.id]: v,
+                          }))
+                        }
+                      />
+                      <Btn
+                        text="Add"
+                        onclick={() => addAssignment(section.id)}
+                        primary
+                      />
+                    </div>
+                  )}
+
+                  {(assignments[section.id] || []).length === 0 ? (
+                    <p className="text-sm text-zinc-500">
+                      No assignments yet.
+                    </p>
+                  ) : (
+                    <div className="flex flex-col gap-y-2">
+                      {assignments[section.id].map((assignment) => {
+                        const isOpen = !!openAssignment[assignment.id];
+                        const graded = assignment.grades.filter(
+                          (g) => g.score !== null,
+                        );
+                        const avg =
+                          graded.length > 0
+                            ? (
+                                graded.reduce(
+                                  (sum, g) => sum + (g.score || 0),
+                                  0,
+                                ) / graded.length
+                              ).toFixed(1)
+                            : null;
+                        return (
+                          <div
+                            key={assignment.id}
+                            className="border border-zinc-800 rounded-md"
+                          >
+                            <div
+                              className="flex justify-between items-center p-2 cursor-pointer"
+                              onClick={() =>
+                                toggleAssignment(section.id, assignment.id)
+                              }
+                            >
+                              <div className="flex items-center gap-x-2 text-sm">
+                                {isOpen ? (
+                                  <FaChevronDown size={10} />
+                                ) : (
+                                  <FaChevronRight size={10} />
+                                )}
+                                <span className="font-bold">
+                                  {assignment.name}
+                                </span>
+                                <span className="text-zinc-500">
+                                  /{assignment.max_score}
+                                </span>
+                                {avg && (
+                                  <span className="text-zinc-500">
+                                    &middot; avg {avg}
+                                  </span>
+                                )}
+                              </div>
+                              <Btn
+                                text="Delete"
+                                styles="text-xs"
+                                onclick={(e?: React.MouseEvent) => {
+                                  e?.stopPropagation();
+                                  deleteAssignment(section.id, assignment.id);
+                                }}
+                              />
+                            </div>
+                            {isOpen && (
+                              <div className="flex flex-col gap-y-1 p-2 pt-0">
+                                {assignment.grades.map((grade) => {
+                                  const key = `${assignment.id}:${grade.student.id}`;
+                                  return (
+                                    <div
+                                      key={grade.id}
+                                      className="flex justify-between items-center text-sm"
+                                    >
+                                      <span>
+                                        {grade.student.first_name}{" "}
+                                        {grade.student.last_name}
+                                      </span>
+                                      <div className="flex items-center gap-x-1">
+                                        <input
+                                          type="number"
+                                          className="w-16 bg-transparent border-b border-zinc-700 text-right text-sm focus:outline-none"
+                                          placeholder="-"
+                                          defaultValue={grade.score ?? ""}
+                                          onChange={(e) =>
+                                            setScoreDrafts((prev) => ({
+                                              ...prev,
+                                              [key]: e.target.value,
+                                            }))
+                                          }
+                                          onBlur={() =>
+                                            saveScore(
+                                              section.id,
+                                              assignment.id,
+                                              grade.student.id,
+                                            )
+                                          }
+                                        />
+                                        <span className="text-zinc-500">
+                                          /{assignment.max_score}
+                                        </span>
+                                      </div>
+                                    </div>
+                                  );
+                                })}
+                              </div>
+                            )}
+                          </div>
+                        );
+                      })}
                     </div>
                   )}
                 </div>

@@ -24,14 +24,21 @@ async function Page() {
   const announcements = announcementData.sort((a, b) =>
     String(b.pinned).localeCompare(String(a.pinned)),
   );
-  const mapData = await fetch(`${process.env.INTERNAL_API_URL}/map`, {
+  const mapRes = await fetch(`${process.env.INTERNAL_API_URL}/map`, {
     method: "GET",
     headers: {
       Authorization: `Bearer ${cookie.value}`,
       "Content-Type": "application/json",
     },
-  }).then((res) => res.json());
-  const mapItems: string[] = mapData.map((m: { label: string }) => m.label);
+  });
+  const mapData = await mapRes.json().catch(() => null);
+  if (!mapRes.ok || !Array.isArray(mapData)) {
+    console.error("Failed to load map items:", mapRes.status, mapData);
+  }
+  const mapItems: string[] =
+    mapRes.ok && Array.isArray(mapData)
+      ? mapData.map((m: { label: string }) => m.label)
+      : [];
 
   return (
     <div className="px-50 flex py-10 gap-x-15 h-[calc(100vh-53px)] overflow-y-auto pb-10">
