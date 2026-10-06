@@ -175,3 +175,9 @@ class MapItem(Base):
     __tablename__ = "map_items"
     id = Column(Integer, primary_key=True, index=True)
     label = Column(String, nullable=True)
+
+class Rule(Base):
+    __tablename__ = "rules"
+    id = Column(Integer, primary_key=True, index=True)
+    name = Column(String, nullable=False)
+    description = Column(String, nullable=True)

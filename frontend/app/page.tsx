@@ -5,9 +5,11 @@ import { mapUrl } from "@/lib/helpers";
 import Announcement from "@/components/home/announcement";
 import NewAnnouncement from "@/components/admin/new-announcement";
 import Btn from "@/components/ui/btn";
+import Link from "next/link";
 import Image from "next/image";
 
 const headingStyles = "text-xl font-bold flex items-center gap-x-3";
+const linkStyles = "text-sm hover:underline w-fit";
 
 async function Page() {
   const { user, cookie } = await getSession();
@@ -84,8 +86,17 @@ async function Page() {
         <h2 className={headingStyles}>
           <FaLink size={18} /> Links
         </h2>
-        <div className="border-1 border-zinc-800 px-4 py-2">
-          <h2>Links</h2>
+        <div className="border-1 border-zinc-800 p-4 flex">
+          <div className="flex w-[50%] flex-col gap-y-3">
+            <Link href="/rules" className={linkStyles}>
+              School rules
+            </Link>
+          </div>
+          <div className="flex w-[50%] flex-col gap-y-3">
+            <Link href="/profile" className={linkStyles}>
+              Profile
+            </Link>
+          </div>
         </div>
         {mapItems.length > 0 && (
           <>

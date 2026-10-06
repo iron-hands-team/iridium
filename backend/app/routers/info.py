@@ -2,8 +2,8 @@ from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
 
 from app.database import get_db
-from app.models import MapItem, User
-from app.schemas import MapUploadResponse, AddMapItemsRequest, MapResponse
+from app.models import MapItem, User, Rule
+from app.schemas import MapUploadResponse, AddMapItemsRequest, MapResponse, RuleResponse
 from app.dependencies import require_admin, manager
 from app.s3 import s3_client, s3_internal, BUCKET_NAME, ENDPOINT
 
@@ -57,4 +57,26 @@ def delete_upload_url(
             Key=f"map/{index}",
         )
     map_items.delete()
+    db.commit()
+
+
+@router.get("/rules", response_model=list[RuleResponse])
+def get_rules(db: Session = Depends(get_db), _current_user: User = Depends(manager)):
+    rules = db.query(Rule)
+    return rules.all()
+
+
+@router.post("/rules", status_code=201)
+def create_rules(
+    rules: list[RuleResponse],
+    db: Session = Depends(get_db),
+    _admin: User = Depends(require_admin),
+):
+    db.query(Rule).delete()
+
+    new_items = []
+    for rule in rules:
+        new_items.append(Rule(name=rule.name, description=rule.description))
+
+    db.add_all(new_items)
     db.commit()

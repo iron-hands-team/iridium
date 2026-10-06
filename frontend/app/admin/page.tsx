@@ -7,6 +7,7 @@ import NewUser from "@/components/admin/new-user";
 import Btn from "@/components/ui/btn";
 import NewClub from "@/components/admin/new-club";
 import NewMap from "@/components/admin/new-map";
+import NewRule from "@/components/admin/new-rule";
 
 const headingStyles = "text-xl font-bold flex items-center gap-x-3";
 
@@ -58,7 +59,7 @@ async function Page() {
         </h2>
         <div className="border-1 border-zinc-800 px-4 py-2 flex flex-col gap-y-2">
           <NewMap />
-          <Btn text="Add class" />
+          <NewRule text="Edit rules" />
         </div>
       </div>
     </div>

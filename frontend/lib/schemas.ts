@@ -50,8 +50,17 @@ export const newEventSchema = z.object({
   end_time: z.string().optional(),
 });
 
+export const newRulesSchema = z.array(
+  z.object({
+    id: z.number(),
+    name: z.string().trim().min(1, "Please enter a rule name"),
+    description: z.string().optional().nullable(),
+  }),
+);
+
 export type LoginType = z.infer<typeof loginSchema>;
 export type PostType = z.infer<typeof postSchema>;
 export type NewUserType = z.infer<typeof newUserSchema>;
 export type NewClubType = z.infer<typeof newClubSchema>;
 export type NewEventType = z.infer<typeof newEventSchema>;
+export type RuleType = z.infer<typeof newRulesSchema.element>;
