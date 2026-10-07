@@ -5,6 +5,7 @@ import { notFound } from "next/navigation";
 import { FaUser } from "react-icons/fa";
 import Edit from "@/components/profile/edit";
 import Avatar from "@/components/profile/avatar";
+import Delete from "@/components/profile/delete";
 
 async function Page({ params }: { params: Promise<{ username: string }> }) {
   const { username } = await params;
@@ -42,6 +43,8 @@ async function Page({ params }: { params: Promise<{ username: string }> }) {
         <div>Role: {user.role[0].toUpperCase() + user.role.slice(1)}</div>
         <div>ID: {user.id}</div>
         {currentUser.role === "admin" && <Edit user={user} />}
+        {currentUser.username === user.username &&
+          currentUser.role !== "admin" && <Delete username={user.username} />}
       </div>
       <div className="flex-1 flex flex-col gap-y-5">
         <h2 className="text-xl font-bold flex items-center gap-x-3">

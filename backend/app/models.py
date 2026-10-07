@@ -24,6 +24,8 @@ class User(Base):
     image = Column(Boolean, nullable=True)
     hashed_password = Column(String, nullable=False)
     role = Column(Enum(UserRole), default=UserRole.student, nullable=False)
+    requesting = Column(Boolean, nullable=True)
+    requesting_delete = Column(Boolean, nullable=True)
 
     announcements = relationship("Announcement", back_populates="author")
     clubs_sponsored = relationship("Club", back_populates="sponsor")

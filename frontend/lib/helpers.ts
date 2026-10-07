@@ -9,6 +9,8 @@ export function parseUser(user: UserResponse): UserType {
     middleName: user.middle_name,
     role: user.role,
     image: user.image,
+    requesting: user.requesting,
+    requestingDelete: user.requesting_delete,
   };
 }
 

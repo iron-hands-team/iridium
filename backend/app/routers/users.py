@@ -3,9 +3,10 @@ from sqlalchemy.orm import Session
 
 from app.database import get_db
 from app.models import User, UserRole
-from app.schemas import UserResponse, UserUpdateRequest, UploadResponse
+from app.schemas import UserResponse, UserUpdateRequest, UploadResponse, ResetPasswordRequest
 from app.dependencies import require_admin, manager
 from app.s3 import s3_client, s3_internal, BUCKET_NAME, ENDPOINT
+from app.auth import hash_password
 
 router = APIRouter()
 
@@ -111,3 +112,69 @@ def delete_user(
         raise HTTPException(status_code=404, detail="User not found.")
     db.delete(user)
     db.commit()
+
+@router.post("/users/{username}/request", status_code=202)
+def request_reset(
+    username: str,
+    db: Session = Depends(get_db),
+):
+    user = db.query(User).filter(User.username == username).first()
+    if user is not None and not user.requesting:
+        user.requesting = True
+        db.commit()
+
+    return {"detail":"If the account exists, an admin has been notified to reset the password"}
+
+@router.post("/users/{username}/request-delete", status_code=202)
+def request_delete(
+    username: str,
+    db: Session = Depends(get_db),
+    _current_user: User = Depends(manager),
+):
+    user = db.query(User).filter(User.username == username).first()
+    if user is None:
+        raise HTTPException(status_code=404, detail="User not found.")
+    if user.username != username:
+        raise HTTPException(status_code=405, detail="Uh..., what do you think you're doing?")
+    user.requesting_delete = True
+    db.commit()
+
+@router.patch("/users/{username}/reset", response_model=UserResponse)
+def reset_password(
+    username: str,
+    req: ResetPasswordRequest,
+    db: Session = Depends(get_db),
+    _admin: User = Depends(require_admin),
+):
+    user = db.query(User).filter(User.username == username).first()
+    if user is None:
+        raise HTTPException(status_code=404, detail="User not found.")
+    if not user.requesting:
+        raise HTTPException(status_code=405, detail="User is not requesting a password reset.")
+
+    if not req.clear:
+        user.hashed_password = hash_password(req.password)
+    
+    user.requesting = False
+
+    db.commit()
+    db.refresh(user)
+    return user
+
+@router.patch("/users/{username}/clear", response_model=UserResponse)
+def reset_password(
+    username: str,
+    db: Session = Depends(get_db),
+    _admin: User = Depends(require_admin),
+):
+    user = db.query(User).filter(User.username == username).first()
+    if user is None:
+        raise HTTPException(status_code=404, detail="User not found.")
+    if not user.requesting_delete:
+        raise HTTPException(status_code=405, detail="User is not requesting account deletion.")
+
+    user.requesting_delete = False
+
+    db.commit()
+    db.refresh(user)
+    return user

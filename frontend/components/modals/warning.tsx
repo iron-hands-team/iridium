@@ -1,5 +1,6 @@
 "use client";
 
+import { FaExclamationTriangle } from "react-icons/fa";
 import Modal from "../ui/modal";
 import Btn from "../ui/btn";
 
@@ -9,6 +10,8 @@ interface WarningModalProps {
   confirm: () => void;
   closeModal: () => void;
   loading?: boolean;
+  error?: string;
+  children?: React.ReactNode;
 }
 
 function WarningModal({
@@ -17,6 +20,8 @@ function WarningModal({
   confirm,
   closeModal,
   loading,
+  error,
+  children,
 }: WarningModalProps) {
   return (
     <Modal closeModal={closeModal}>
@@ -25,6 +30,11 @@ function WarningModal({
         <p className="text-zinc-700! dark:text-zinc-300! text-sm">
           {description}
         </p>
+        {error && (
+          <div className="text-red-500 text-sm flex gap-x-3 items-center">
+            <FaExclamationTriangle size={15} /> {error}
+          </div>
+        )}
         <div className="flex gap-x-3">
           <Btn
             text={loading ? "Loading..." : "Confirm"}
@@ -32,6 +42,7 @@ function WarningModal({
             styles="text-sm bg-red-500! border-red-500! text-white!"
             primary
           />
+          {children}
           <Btn text="Cancel" onclick={closeModal} styles="text-sm" />
         </div>
       </div>

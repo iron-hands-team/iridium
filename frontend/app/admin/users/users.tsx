@@ -5,13 +5,15 @@ import { useState } from "react";
 import { FaCaretUp, FaCheck, FaFilter, FaUserCircle } from "react-icons/fa";
 import { AnimatePresence } from "framer-motion";
 import { roles } from "@/lib/constants";
+import { profileUrl } from "@/lib/helpers";
 import Input from "@/components/ui/input";
 import UserModal from "@/components/modals/user";
 import Dropdown from "@/components/ui/dropdown";
 import NewUser from "@/components/admin/new-user";
 import Checkbox from "@/components/ui/checkbox";
 import Image from "next/image";
-import { profileUrl } from "@/lib/helpers";
+import PasswordReset from "@/components/auth/password-reset";
+import DeleteAccount from "@/components/auth/delete-account";
 
 const sorts = [
   "ID",
@@ -20,6 +22,7 @@ const sorts = [
   "First name",
   "Middle name",
   "Role",
+  "Status",
 ];
 const types = ["All", ...roles.map((r) => r[0].toUpperCase() + r.slice(1))];
 
@@ -113,7 +116,7 @@ function Users({ users }: { users: UserType[] }) {
             return (
               <div
                 key={s}
-                className={`${i === 0 || i === 5 ? "flex-1" : "flex-2"} cursor-pointer font-bold px-4 py-2 hover:bg-zinc-200 dark:hover:bg-zinc-900 flex items-center gap-x-3`}
+                className={`${i === 0 || i === 5 ? "flex-1" : i === 6 ? "w-24" : "flex-2"} cursor-pointer font-bold px-4 py-2 hover:bg-zinc-200 dark:hover:bg-zinc-900 flex items-center gap-x-3`}
                 onClick={() =>
                   setSort({
                     ascending: sort.name === s ? !sort.ascending : false,
@@ -122,7 +125,7 @@ function Users({ users }: { users: UserType[] }) {
                 }
               >
                 {s}
-                {sort.name === s && (
+                {sort.name === s && i !== 6 && (
                   <FaCaretUp
                     size={15}
                     className={`transition-transform! ${sort.ascending && "rotate-180"}`}
@@ -138,7 +141,7 @@ function Users({ users }: { users: UserType[] }) {
               return (
                 <div
                   key={u.username}
-                  className="flex pl-4 gap-x-4 py-2 hover:bg-zinc-200 dark:hover:bg-zinc-900 cursor-pointer"
+                  className="flex items-center pl-4 gap-x-4 py-2 hover:bg-zinc-200 dark:hover:bg-zinc-900 cursor-pointer"
                 >
                   <Checkbox
                     text=""
@@ -176,6 +179,12 @@ function Users({ users }: { users: UserType[] }) {
                     <div className="flex-1 px-4">
                       {u.role[0].toUpperCase() + u.role?.slice(1)}
                     </div>
+                  </div>
+                  <div className="flex gap-x-2 w-20 px-4">
+                    {u.requesting && <PasswordReset username={u.username} />}
+                    {u.requestingDelete && (
+                      <DeleteAccount username={u.username} />
+                    )}
                   </div>
                 </div>
               );

@@ -30,7 +30,6 @@ function NewRuleModal({ existing, closeModal }: NewRuleModalProps) {
     const validated = newRulesSchema.safeParse(rules);
     if (validated.success) {
       setLoading(true);
-      console.log(validated.data);
       await fetch("/api/rules", {
         method: "POST",
         headers: {
@@ -128,7 +127,7 @@ function NewRuleModal({ existing, closeModal }: NewRuleModalProps) {
             <FaExclamationTriangle size={15} /> {error}
           </div>
         )}
-        <div className="flex gap-x-5">
+        <div className="flex gap-x-3">
           <Btn
             text={loading ? "Saving..." : "Save"}
             onclick={handleSave}

@@ -2,10 +2,12 @@
 
 import { type LoginType, loginSchema } from "@/lib/schemas";
 import { FaExclamationTriangle } from "react-icons/fa";
+import { AnimatePresence } from "framer-motion";
 import { useState } from "react";
 import Image from "next/image";
 import Input from "../ui/input";
 import Btn from "../ui/btn";
+import WarningModal from "../modals/warning";
 
 const labelStyles =
   "text-black dark:text-zinc-300 text-sm flex flex-col gap-y-1 w-full";
@@ -17,6 +19,8 @@ function LoginForm() {
   });
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
+  const [requesting, setRequesting] = useState<boolean>(false);
+  const [requestError, setRequestError] = useState<string | null>(null);
 
   async function handleSubmit(e: React.SubmitEvent) {
     e.preventDefault();
@@ -41,6 +45,23 @@ function LoginForm() {
       setError(validated.error.issues[0].message);
     }
     setLoading(false);
+  }
+
+  async function handleRequest() {
+    setRequestError(null);
+    const username = userData.username.trim();
+    if (username.length > 0) {
+      const res = await fetch(`/api/users/${username}/request`, {
+        method: "POST",
+      });
+      if (res.ok) {
+        setRequesting(false);
+      } else {
+        setRequestError("Something went wrong, please try again");
+      }
+    } else {
+      setRequestError("Please enter a valid username");
+    }
   }
 
   return (
@@ -74,6 +95,15 @@ function LoginForm() {
             type="password"
           />
         </label>
+        <div
+          onClick={() => {
+            setRequesting(true);
+            setRequestError(null);
+          }}
+          className="text-zinc-700 dark:text-zinc-300 text-sm cursor-pointer hover:underline w-fit"
+        >
+          Forgot your password?
+        </div>
         {error && (
           <div className="text-red-500 text-sm flex gap-x-3 items-center">
             <FaExclamationTriangle size={15} /> {error}
@@ -81,6 +111,17 @@ function LoginForm() {
         )}
         <Btn text={loading ? "Loading..." : "Log in"} primary />
       </form>
+      <AnimatePresence>
+        {requesting && (
+          <WarningModal
+            closeModal={() => setRequesting(false)}
+            title="Request password reset"
+            description={`If you forgot your password, you cannot reset it yourself due to security reasons. Click on the confirm button below to notify an admin to reset your account's password. (username: ${userData.username})`}
+            confirm={handleRequest}
+            error={requestError || undefined}
+          />
+        )}
+      </AnimatePresence>
     </div>
   );
 }

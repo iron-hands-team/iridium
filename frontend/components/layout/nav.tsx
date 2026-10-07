@@ -46,6 +46,7 @@ async function Nav() {
         <Link href="/clubs" className="px-3 py-1.5">
           Clubs
         </Link>
+        {/* TODO: add a page for chats? like club chats, teacher emails, etc. */}
         <NavUser user={user} />
       </nav>
     </div>

@@ -74,7 +74,7 @@ function UserModal({ user, closeModal }: UserModalProps) {
           <Btn
             text="Delete"
             onclick={() => setDeleting(false)}
-            styles="text-sm"
+            styles="text-sm bg-red-500! border-red-500!"
           />
         </div>
       </div>

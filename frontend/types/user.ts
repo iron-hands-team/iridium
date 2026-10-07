@@ -6,6 +6,8 @@ export interface UserType {
   middleName?: string;
   role: RoleType;
   image?: boolean;
+  requesting?: boolean;
+  requestingDelete?: boolean;
 }
 
 export interface UserResponse {
@@ -16,6 +18,8 @@ export interface UserResponse {
   middle_name: string;
   role: RoleType;
   image: boolean;
+  requesting?: boolean;
+  requesting_delete?: boolean;
 }
 
 export type RoleType = "student" | "teacher" | "admin";
