@@ -93,7 +93,7 @@ async function Page() {
             </Link>
           </div>
           <div className="flex w-[50%] flex-col gap-y-3">
-            <Link href="/profile" className={linkStyles}>
+            <Link href={`/profile/${user.username}`} className={linkStyles}>
               Profile
             </Link>
           </div>
