@@ -121,7 +121,7 @@ export default function ScheduleManager() {
   async function deleteItem(itemId: number) {
     try {
         setError(null);
-        await api('/schedule/${itemId}', {method:"DELETE"});
+        await api(`/schedule/${itemId}`, { method: "DELETE" });
         setSchedule((prev) => prev.filter((item) => item.id !== itemId));
     } catch (e) {
         setError(
