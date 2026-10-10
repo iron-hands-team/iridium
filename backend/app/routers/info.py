@@ -1,9 +1,16 @@
 from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
+from sqlalchemy import or_, func
 
 from app.database import get_db
-from app.models import MapItem, User, Rule
-from app.schemas import MapUploadResponse, AddMapItemsRequest, MapResponse, RuleResponse
+from app.models import MapItem, User, Rule, Announcement, Event, Club
+from app.schemas import (
+    MapUploadResponse,
+    AddMapItemsRequest,
+    MapResponse,
+    RuleResponse,
+    SearchResponse,
+)
 from app.dependencies import require_admin, manager
 from app.s3 import s3_client, s3_internal, BUCKET_NAME, ENDPOINT
 
@@ -80,3 +87,75 @@ def create_rules(
 
     db.add_all(new_items)
     db.commit()
+
+
+@router.get("/search", response_model=SearchResponse)
+def get_search(
+    q: str = "",
+    l: int = 5,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(manager),
+):
+    if l == 0 or q == "":
+        raise HTTPException(
+            status_code=501, detail="Please provide a valid seaarch query and limit"
+        )
+    limit = 20 if l > 20 else l
+    query = f"%{q}%"
+    users = (
+        db.query(User)
+        .filter(
+            or_(
+                User.username.ilike(query),
+                User.first_name.ilike(query),
+                User.last_name.ilike(query),
+                User.title.ilike(query),
+            )
+        )
+        .limit(l)
+        .all()
+    )
+    announcements = (
+        db.query(Announcement)
+        .filter(
+            Announcement.archived == False,
+            or_(
+                current_user.role == "admin",
+                Announcement.role == current_user.role,
+                Announcement.role == "all",
+            ),
+            or_(
+                Announcement.title.ilike(query),
+                Announcement.content.ilike(query),
+            ),
+        )
+        .limit(l)
+        .all()
+    )
+    events = (
+        db.query(Event)
+        .filter(or_(Event.title.ilike(query), Event.description.ilike(query)))
+        .limit(l)
+        .all()
+    )
+    clubs = (
+        db.query(Club)
+        .filter(
+            or_(
+                Club.name.ilike(query),
+                Club.description.ilike(query),
+                func.array_to_string(Club.categories, " ").ilike(query),
+            )
+        )
+        .limit(l)
+        .all()
+    )
+
+    # TODO: add more search types
+
+    return {
+        "users": users,
+        "announcements": announcements,
+        "events": events,
+        "clubs": clubs,
+    }

@@ -14,6 +14,7 @@ class UserCreateRequest(BaseModel):
     first_name: str
     last_name: str
     middle_name: str | None = None
+    title: str
 
 class UserResponse(BaseModel):
     id: int
@@ -25,9 +26,19 @@ class UserResponse(BaseModel):
     requesting: bool | None = None
     requesting_delete: bool | None = None
     role: UserRole
+    title: str
 
     class Config:
         from_attributes = True
+
+class StaffResponse(BaseModel):
+    id: int
+    username: str
+    last_name: str
+    first_name: str
+    role: UserRole
+    title: str
+    image: bool | None = None
 
 class UserUpdateRequest(BaseModel):
     first_name: str | None = None
@@ -36,6 +47,7 @@ class UserUpdateRequest(BaseModel):
     role: UserRole | None = None
     image: bool | None = None
     requesting: bool | None = None
+    title: str | None = None
 
 class ResetPasswordRequest(BaseModel):
     password: str | None = None
@@ -235,3 +247,12 @@ class RuleResponse(BaseModel):
     id: int
     name: str
     description: str | None = None
+
+class SearchResponse(BaseModel):
+    users: list[StaffResponse]
+    announcements: list[AnnouncementResponse]
+    events: list[EventResponse]
+    clubs: list[ClubResponse]
+
+    class Config:
+        from_attributes = True

@@ -5,6 +5,7 @@ import CalendarGrid from "@/components/calendar/calendar-grid";
 import NewEvent from "@/components/admin/new-event";
 
 async function Page() {
+  //TODO: search params to directly navigate to date
   const { user, cookie } = await getSession();
   if (!user) redirect("/");
 

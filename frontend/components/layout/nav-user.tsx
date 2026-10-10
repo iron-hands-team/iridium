@@ -52,7 +52,7 @@ function NavUser({ user }: { user: UserType }) {
   }, [pathname]);
 
   return (
-    <div className="flex items-center gap-x-5 absolute right-50" ref={menuRef}>
+    <div className="flex items-center gap-x-5" ref={menuRef}>
       <div className="relative">
         <div
           className="border border-zinc-800 hover:bg-zinc-200/85 dark:hover:bg-zinc-900/50 cursor-pointer flex items-center px-3 p-1 gap-x-3"
@@ -87,7 +87,9 @@ function NavUser({ user }: { user: UserType }) {
               </Link>
               <div
                 className={optionStyles}
-                onClick={() => setTheme(theme !== "light" ? "light" : "dark")}
+                onMouseDown={() =>
+                  setTheme(theme !== "light" ? "light" : "dark")
+                }
               >
                 {theme !== "light" ? (
                   <FaSun size={20} className={iconStyles} />

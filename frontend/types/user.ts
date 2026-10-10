@@ -8,6 +8,7 @@ export interface UserType {
   image?: boolean;
   requesting?: boolean;
   requestingDelete?: boolean;
+  title: string;
 }
 
 export interface UserResponse {
@@ -20,6 +21,7 @@ export interface UserResponse {
   image: boolean;
   requesting?: boolean;
   requesting_delete?: boolean;
+  title: string;
 }
 
 export type RoleType = "student" | "teacher" | "admin";
