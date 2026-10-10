@@ -4,7 +4,6 @@ import { getSession } from "@/lib/auth";
 import { ThemeProvider } from "next-themes";
 import LoginForm from "@/components/auth/login-form";
 import Nav from "@/components/layout/nav";
-import ClassBody from "@/components/layout/BodyClassTeacher";
 import "./globals.css";
 
 const inter = Inter({
@@ -19,13 +18,6 @@ export const metadata: Metadata = {
 export default async function RootLayout({ children }: LayoutProps<"/">) {
   const { user } = await getSession();
 
-  return (
-    <html>
-      <body>
-        <ClassBody/>
-      </body>
-    </html>
-  )
   return (
     <html
       lang="en"

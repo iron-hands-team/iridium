@@ -10,7 +10,7 @@ type Test = {
 };
 
 type Class = {
-	
+
  id: number;
  className: string;
  students: Test[];
@@ -58,9 +58,9 @@ type ClassStore = {
 	addClassQuiz: (classTargetIndex:number)=>void;
 	deleteClassQuiz: (classTargetIndex:number, quizIndex:number) =>void;
 	setClassQuiz: <T>(classTargetIndex:number, quizIndex:number, value:T, variableName:string)=>void;
-	
+
 	addQuizQuestion: (classTargetIndex:number, quizTargetIndex:number)=>void;
-	deleteQuizQuestion: (classTargetIndex:number, quizTargetIndex:number, quizQuestionTargetIndex:number)=>void;
+	deleteQuizQuestion: (classTargetIndex:number, quizTargetIndex:number, quizQuestionTargetIndex:number) =>void;
 	setQuizQuestion: <T>(classTargetindex:number, quizTargetIndex:number, quizQuestionTargetIndex:number, value:T, variableName:string)=>void;
 
  // settings stuff
@@ -91,10 +91,10 @@ type ClassStore = {
 
  setClasses: (classes: Class[]) => void;
  addClass: () => void;
-	
+
  addStudent: (students : Test[], classIndex: number) => void;
 	subAddStudent: (students: Test[]) => Test[];
-	deleteStudent: (classIndex : number, studentIndex : number) => void; 
+	deleteStudent: (classIndex : number, studentIndex : number) => void;
 	setStudentName: <T>(index:number, studentIndex:number, text:T, variableName:string) =>void;
 
 	addAssignments: (classIndex : number, studentIndex : number, untitledCount : number) => void;
@@ -139,8 +139,8 @@ export const cs = create<ClassStore>((set) => ({
 
 				//quiz question
 				addClassQuiz: (classTargetIndex) => set((state) => ({
-					classes: state.classes.map((classItem, classIndex) => 
-						classIndex == classTargetIndex ? {...classItem, quizzes: 
+					classes: state.classes.map((classItem, classIndex) =>
+						classIndex == classTargetIndex ? {...classItem, quizzes:
 							[...classItem.quizzes, {
 								id: 0,
 								name: "",
@@ -151,19 +151,19 @@ export const cs = create<ClassStore>((set) => ({
 				})),
 
 				deleteClassQuiz: (classTargetIndex, quizIndex) => set((state) => ({
-					classes: state.classes.map((classItem, classIndex) => 
-					classIndex === classTargetIndex ? {...classItem, quizzes: classItem.quizzes.filter((_,i) => i !== quizIndex)}: classItem) 
+					classes: state.classes.map((classItem, classIndex) =>
+					classIndex === classTargetIndex ? {...classItem, quizzes: classItem.quizzes.filter((_,i) => i !== quizIndex)}: classItem)
 				})),
 
 				setClassQuiz: (classTargetIndex, quizTargetIndex, value, variableName) => set((state)=> ({
-					classes: state.classes.map((classItem, classIndex) => 
+					classes: state.classes.map((classItem, classIndex) =>
 					classIndex === classTargetIndex ? {...classItem, quizzes: classItem.quizzes.map((quizItem, quizIndex) => ( quizIndex === quizTargetIndex ? { ...quizItem, [variableName]: value}:quizItem))} : classItem
 				)
 				})),
 
 
 				addQuizQuestion: (classTargetIndex, quizTargetIndex) => set((state) => ({
-					classes: state.classes.map((classItem, classIndex) => 
+					classes: state.classes.map((classItem, classIndex) =>
 						classIndex === classTargetIndex ? {...classItem, quizzes: classItem.quizzes.map((quizItem, quizIndex) => ( quizIndex === quizTargetIndex ? { ...quizItem, questions: [...quizItem.questions, {id:0,question:"",choices: [], answers: []}]}:quizItem))} : classItem
 					)
 				})),
@@ -172,16 +172,20 @@ export const cs = create<ClassStore>((set) => ({
 					classes: state.classes.map((classItem, classIndex) =>  classIndex === classTargetIndex ? {...classItem, quizzes: classItem.quizzes.map((quizItem, quizIndex) => quizIndex === quizTargetIndex ? {...quizItem, questions: quizItem.questions.filter((_,i) => i !== quizQuestionTargetIndex)} : quizItem)} : classItem)
 				})),
 
+			// FIX: this used to match on questionItem.id, but every question is created with
+			// id hardcoded to 0 (see addQuizQuestion above), so this only ever matched the
+			// first question in a quiz. Match on the array index instead, same as
+			// deleteQuizQuestion already does.
 			setQuizQuestion: (classTargetIndex, quizTargetIndex, quizQuestionTargetIndex, value, variableName) => set((state) => ({
-					classes: state.classes.map((classItem, classIndex) =>  classIndex === classTargetIndex ? {...classItem, quizzes: classItem.quizzes.map((quizItem, quizIndex) => quizIndex === quizTargetIndex ? {...quizItem, questions: quizItem.questions.map((questionItem, questionIndex) => questionItem.id === quizQuestionTargetIndex ? {...questionItem, [variableName]: value} : questionItem)} : quizItem)} : classItem)
+					classes: state.classes.map((classItem, classIndex) =>  classIndex === classTargetIndex ? {...classItem, quizzes: classItem.quizzes.map((quizItem, quizIndex) => quizIndex === quizTargetIndex ? {...quizItem, questions: quizItem.questions.map((questionItem, questionIndex) => questionIndex === quizQuestionTargetIndex ? {...questionItem, [variableName]: value} : questionItem)} : quizItem)} : classItem)
 				})),
 
     settingsPopup: false,
     setSettingsPopup: (settingsPopup) => set({settingsPopup}),
-    
+
     settingsClassIndex: 0,
     setSettingsClassIndex: (settingsClassIndex) => set({settingsClassIndex}),
-    
+
     studentsPopup: false,
     setStudentsPopup: (studentsPopup) => set({studentsPopup}),
     settingsStudentsIndex: 0,
@@ -196,13 +200,13 @@ export const cs = create<ClassStore>((set) => ({
     setMessagePopup: (messagePopup) => set({messagePopup}),
 
     announcementInput: "",
-				setAnnouncementInput: (annoucementInput) => set({annoucementInput}),
+				setAnnouncementInput: (announcementInput) => set({announcementInput}),
 
     setClasses: (classes) => set({ classes }),
 
     addClass: () =>
      set((state) => ({
-         classes: [...state.classes, 
+         classes: [...state.classes,
         	{
 						id: state.classes.length,
 						className: "Untitled",
@@ -230,18 +234,18 @@ export const cs = create<ClassStore>((set) => ({
 								grade: "",
 								assignments: [],
 								announcements: [],
-								
+
 							}
 						]
 				},
 
 				updateCanShowStudents:(classIndex, canShow) => set((state)=>(
 						{
-							
-												classes: state.classes.map((item, i) => 
+
+												classes: state.classes.map((item, i) =>
 					i === classIndex ? { ...item, canShow : canShow} : item)
 						}
-			
+
 				)),
 				setClassName: (classIndex, className, variableName) =>
     set((state) => ({
@@ -256,7 +260,7 @@ export const cs = create<ClassStore>((set) => ({
 						({
 							classes: state.classes.map((item, i) =>
 										i === classIndex
-												? 
+												?
 							{...item, students : [							...students,
 							{
 									id: students.length,
@@ -272,15 +276,19 @@ export const cs = create<ClassStore>((set) => ({
 						})
 		 	),
 
+				// FIX: filter's callback already receives (element, index, array) itself — the
+				// extra studentIndex argument here was being passed as filter's thisArg, which
+				// does nothing for an arrow function (arrow functions ignore thisArg entirely).
+				// Leftover from the old non-API-backed mock; dropped since it had no effect.
 				deleteStudent: (classIndex, studentIndex) => set((state) => ({
 						classes: state.classes.map((item, i)=>
-						i===classIndex ? 
+						i===classIndex ?
 					{
-						...item, students : item.students.filter((_, j)=> j !== studentIndex, studentIndex)} : item
+						...item, students : item.students.filter((_, j)=> j !== studentIndex)} : item
 					)
 				})),
 
-				
+
 
     addAssignments: (classIndex, studentIndex, untitledCount) => set((state)=> ({
 					classes: 			state.classes.map((item, i) =>
@@ -444,7 +452,7 @@ export const cs = create<ClassStore>((set) => ({
 					: item
 			)
 					})),
-					
+
 					setAssignmentClass: (classIndex, assignmentIndex, assignmentName, assignmentVariableName) => set((state)=>({
 						classes: state.classes.map((classItem, i) =>
 				i === classIndex
@@ -561,6 +569,12 @@ export const cs = create<ClassStore>((set) => ({
 			)
 					})),
 
+					// FIX: `assignmentName += untitledCount` mutated the closure variable itself
+					// (not just the field being written), so if more than one assignment in the
+					// list matched the duplicate-name check, each later match appended
+					// untitledCount onto the already-mutated string from the previous match
+					// (e.g. "HW3" -> "HW33" -> "HW333") instead of the original name. Build the
+					// new name into its own local instead of reassigning the parameter.
 					checkClassAssignmentName: (classIndex, targetAssignmentName, targetindex, assignmentName, untitledCount) =>set((state)=>({
 						classes: state.classes.map((classItem, i) =>
 				i === classIndex
@@ -568,7 +582,7 @@ export const cs = create<ClassStore>((set) => ({
 						...classItem,
 						assignments: classItem.assignments.map((assignment, j) =>
 							assignment.name === targetAssignmentName && j !== targetindex
-								? { ...assignment, name: assignmentName += untitledCount }
+								? { ...assignment, name: `${assignmentName}${untitledCount}` }
 								: assignment
 						)
 					}
@@ -581,14 +595,14 @@ export const cs = create<ClassStore>((set) => ({
 					})),
 
 					setCanShowStudents: (index, canShow) => set((state)=> ({
-						classes: state.classes.map((item, i) => 
+						classes: state.classes.map((item, i) =>
 					i === index ? { ...item, canShow : canShow} : item
 			)
 					})),
 					setStudentName: (index, studentIndex, text,variableName) => set((state)=> ({
 						classes: state.classes.map((item, i) =>
         i === index
-          ? 
+          ?
 					{...item, students : item.students.map((student, i) =>
 					i === studentIndex
 							? { ...student, [variableName] : text }
