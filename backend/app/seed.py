@@ -18,6 +18,7 @@ def init_db_and_seed_admin():
                 first_name="admin",
                 last_name="admin",
                 role=UserRole.admin,
+                title="Head Administrator"
             )
             db.add(admin)
             db.commit()
@@ -29,6 +30,7 @@ def init_db_and_seed_admin():
                 first_name="teacher",
                 last_name="teacher",
                 role=UserRole.teacher,
+                title="AP Calculus BC Teacher"
             )
             db.add(teacher)
             db.commit()
@@ -40,6 +42,7 @@ def init_db_and_seed_admin():
                 first_name="student",
                 last_name="student",
                 role=UserRole.student,
+                title="Sophomore"
             )
             db.add(student)
             db.commit()

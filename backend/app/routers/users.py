@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 
 from app.database import get_db
 from app.models import User, UserRole
-from app.schemas import UserResponse, UserUpdateRequest, UploadResponse, ResetPasswordRequest
+from app.schemas import UserResponse, UserUpdateRequest, UploadResponse, ResetPasswordRequest, StaffResponse
 from app.dependencies import require_admin, manager
 from app.s3 import s3_client, s3_internal, BUCKET_NAME, ENDPOINT
 from app.auth import hash_password
@@ -23,6 +23,14 @@ def list_users(
         query = query.filter(User.role == UserRole.teacher)
     elif role == "admin":
         query = query.filter(User.role == UserRole.admin)
+    return query.order_by(User.last_name, User.first_name).all()
+
+@router.get("/users/staff", response_model=list[StaffResponse])
+def list_users(
+    db: Session = Depends(get_db),
+    _current_user: User = Depends(manager),
+):
+    query = db.query(User).filter(User.role != UserRole.student)
     return query.order_by(User.last_name, User.first_name).all()
 
 @router.get("/users/{username}", response_model=UserResponse)

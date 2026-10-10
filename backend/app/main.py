@@ -90,6 +90,7 @@ def create_user(
         first_name=new_user.first_name,
         last_name=new_user.last_name,
         middle_name=new_user.middle_name,
+        title=new_user.title,
     )
     db.add(user)
     db.commit()

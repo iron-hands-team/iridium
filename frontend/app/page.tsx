@@ -91,6 +91,9 @@ async function Page() {
             <Link href="/rules" className={linkStyles}>
               School rules
             </Link>
+            <Link href="/staff" className={linkStyles}>
+              Staff directory
+            </Link>
           </div>
           <div className="flex w-[50%] flex-col gap-y-3">
             <Link href={`/profile/${user.username}`} className={linkStyles}>

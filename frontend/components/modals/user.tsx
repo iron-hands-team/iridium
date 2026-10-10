@@ -4,11 +4,13 @@ import type { UserType } from "@/types/user";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { AnimatePresence } from "framer-motion";
-import { FaExclamationTriangle } from "react-icons/fa";
+import { FaExclamationTriangle, FaUserCircle } from "react-icons/fa";
+import { profileUrl } from "@/lib/helpers";
 import WarningModal from "./warning";
 import NewUserModal from "./new-user";
 import Modal from "../ui/modal";
 import Btn from "../ui/btn";
+import Image from "next/image";
 
 interface UserModalProps {
   user: UserType;
@@ -44,6 +46,16 @@ function UserModal({ user, closeModal }: UserModalProps) {
   return (
     <Modal closeModal={closeModal}>
       <div className="flex flex-col gap-y-5 p-5">
+        {user.image ? (
+          <Image
+            src={profileUrl(user.username)}
+            alt="User avatar"
+            width={100}
+            height={100}
+          />
+        ) : (
+          <FaUserCircle size={100} />
+        )}
         <h2 className="text-xl font-bold">
           {user.firstName + " " + user.lastName}
         </h2>
@@ -53,13 +65,14 @@ function UserModal({ user, closeModal }: UserModalProps) {
           {user.middleName && <div>Middle name: {user.middleName}</div>}
           <div>Last name: {user.lastName}</div>
           <div>Role: {user.role[0].toUpperCase() + user.role.slice(1)}</div>
+          <div>Title: {user.title}</div>
         </div>
         {error && (
           <div className="text-red-500 text-sm flex gap-x-3 items-center">
             <FaExclamationTriangle size={15} /> {error}
           </div>
         )}
-        <div className="flex gap-x-3">
+        <div className="flex gap-x-3 mt-3">
           <Btn
             text="Edit"
             onclick={() => setEditing(true)}

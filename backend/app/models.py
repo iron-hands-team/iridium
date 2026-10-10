@@ -24,6 +24,7 @@ class User(Base):
     image = Column(Boolean, nullable=True)
     hashed_password = Column(String, nullable=False)
     role = Column(Enum(UserRole), default=UserRole.student, nullable=False)
+    title = Column(String, nullable=False)
     requesting = Column(Boolean, nullable=True)
     requesting_delete = Column(Boolean, nullable=True)
 
