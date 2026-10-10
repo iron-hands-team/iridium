@@ -247,3 +247,12 @@ class RuleResponse(BaseModel):
     id: int
     name: str
     description: str | None = None
+
+class SearchResponse(BaseModel):
+    users: list[StaffResponse]
+    announcements: list[AnnouncementResponse]
+    events: list[EventResponse]
+    clubs: list[ClubResponse]
+
+    class Config:
+        from_attributes = True

@@ -38,6 +38,7 @@ class User(Base):
     announcement_likes = relationship("AnnouncementLike", back_populates="user")
     event_rsvps = relationship("EventRSVP", back_populates="user")
     grades = relationship("Grade", back_populates="student")
+    reports = relationship("Report", back_populates="user")
 
 class Announcement(Base):
     __tablename__ = "announcements"
@@ -184,3 +185,15 @@ class Rule(Base):
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String, nullable=False)
     description = Column(String, nullable=True)
+
+class Report(Base):
+    __tablename__ = "reports"
+    id = Column(Integer, primary_key=True, index=True)
+    title = Column(String, nullable=False)
+    description = Column(String, nullable=False)
+    anonymous = Column(Boolean, nullable=False, default=True)
+    type = Column(String, nullable=False)
+    role = Column(String, nullable=True)
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=True)
+
+    user = relationship("User", back_populates="reports",)
