@@ -6,9 +6,11 @@ import {
   FaSearch,
   FaTrash,
   FaPen,
+  FaCheckCircle,
 } from "react-icons/fa";
 import Btn from "@/components/ui/btn";
 import Input from "@/components/ui/input";
+import Checkbox from "@/components/ui/checkbox";
 
 interface FoundUser {
   id: number;
@@ -70,6 +72,11 @@ export default function ScheduleManager() {
   const [editEndTime, setEditEndTime] = useState("");
   const [saving, setSaving] = useState(false);
 
+  const [copyUsername, setCopyUsername] = useState("");
+  const [copyOverwrite, setCopyOverwrite] = useState(false);
+  const [copying, setCopying] = useState(false);
+  const [copySuccess, setCopySuccess] = useState<string | null>(null);
+
   async function searchStudent() {
     const username = usernameSearch.trim();
     if (!username) return;
@@ -78,6 +85,7 @@ export default function ScheduleManager() {
     setStudent(null);
     setSchedule([]);
     setEditingId(null);
+    setCopySuccess(null);
     try {
       const user: FoundUser = await api(`/users/${username}`);
       setStudent(user);
@@ -189,6 +197,43 @@ export default function ScheduleManager() {
     }
   }
 
+  async function copySchedule() {
+    if (!student) return;
+    const destUsername = copyUsername.trim();
+    if (!destUsername) {
+      setError("Enter a username to copy this schedule to.");
+      return;
+    }
+    if (destUsername.toLowerCase() === student.username.toLowerCase()) {
+      setError("That's the same user you're already viewing.");
+      return;
+    }
+    setCopying(true);
+    setCopySuccess(null);
+    try {
+      setError(null);
+      const destUser: FoundUser = await api(`/users/${destUsername}`);
+      const copied: ScheduleItem[] = await api("/schedule/copy", {
+        method: "POST",
+        body: JSON.stringify({
+          from_user_id: student.id,
+          to_user_id: destUser.id,
+          overwrite: copyOverwrite,
+        }),
+      });
+      setCopySuccess(
+        `Copied ${copied.length} period${copied.length === 1 ? "" : "s"} to ${destUser.first_name} ${destUser.last_name} (@${destUser.username}).`,
+      );
+      setCopyUsername("");
+    } catch (e) {
+      setError(
+        e instanceof Error ? e.message : "Failed to copy schedule.",
+      );
+    } finally {
+      setCopying(false);
+    }
+  }
+
   return (
     <div className="flex flex-col gap-y-5">
       <div className="flex gap-x-3">
@@ -219,6 +264,30 @@ export default function ScheduleManager() {
             </span>
             <span className="text-zinc-500">@{student.username}</span>
           </div>
+
+          <div className="flex flex-wrap items-center gap-x-2 gap-y-2 border-b border-zinc-800 pb-4">
+            <Input
+              placeholder="Copy this schedule to username..."
+              value={copyUsername}
+              setValue={setCopyUsername}
+              styles="flex-1"
+            />
+            <Checkbox
+              text="Overwrite existing"
+              checked={copyOverwrite}
+              setChecked={setCopyOverwrite}
+            />
+            <Btn
+              text={copying ? "Copying..." : "Copy"}
+              onclick={copySchedule}
+            />
+          </div>
+
+          {copySuccess && (
+            <div className="text-green-500 text-sm flex gap-x-3 items-center">
+              <FaCheckCircle size={15} /> {copySuccess}
+            </div>
+          )}
 
           <div className="flex flex-wrap gap-x-2 gap-y-2">
             <Input
