@@ -5,6 +5,7 @@ import { FaExclamationTriangle, FaChevronDown, FaChevronRight } from "react-icon
 import Btn from "@/components/ui/btn";
 import Input from "@/components/ui/input";
 import Footer from "@/components/layout/footer";
+import {cs} from "@/lib/classStore";
 
 interface UserSummary {
   id: number;

@@ -140,7 +140,7 @@ function Clubs({ clubs }: { clubs: ClubType[] }) {
           ))
         ) : (
           <div className="py-10 text-center text-sm">
-            No clubs founds. Try a different search?
+            No clubs found. Try a different search?
           </div>
         )}
       </div>

@@ -39,6 +39,7 @@ async function Page({ params }: { params: Promise<{ username: string }> }) {
         <h1 className="text-black dark:text-white font-bold text-xl">
           {user.firstName} {user.middleName} {user.lastName}
         </h1>
+        <div>{user.title}</div>
         <div>Username: {user.username}</div>
         <div>Role: {user.role[0].toUpperCase() + user.role.slice(1)}</div>
         <div>ID: {user.id}</div>

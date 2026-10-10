@@ -20,7 +20,7 @@ const sorts = [
   "Username",
   "Last name",
   "First name",
-  "Middle name",
+  "Title",
   "Role",
   "Status",
 ];
@@ -37,7 +37,7 @@ function Users({ users }: { users: UserType[] }) {
   });
   const displayed = users
     .filter((u) =>
-      [u.lastName, u.firstName, u.middleName, u.username, u.id]
+      [u.lastName, u.firstName, u.middleName, u.username, u.id, u.title]
         .join(" ")
         .toLowerCase()
         .includes(search.trim().toLowerCase()),
@@ -66,7 +66,7 @@ function Users({ users }: { users: UserType[] }) {
           res = a.firstName.localeCompare(b.firstName);
           break;
         case sorts[4]:
-          res = (a.middleName || "z").localeCompare(b.middleName || "z");
+          res = a.title.localeCompare(b.title);
           break;
         case sorts[5]:
           res = a.role.localeCompare(b.role);
@@ -141,7 +141,7 @@ function Users({ users }: { users: UserType[] }) {
               return (
                 <div
                   key={u.username}
-                  className="flex items-center pl-4 gap-x-4 py-2 hover:bg-zinc-200 dark:hover:bg-zinc-900 cursor-pointer"
+                  className="flex items-center pl-4 gap-x-4 hover:bg-zinc-200 dark:hover:bg-zinc-900 cursor-pointer"
                 >
                   <Checkbox
                     text=""
@@ -154,7 +154,10 @@ function Users({ users }: { users: UserType[] }) {
                       )
                     }
                   />
-                  <div className="flex flex-1" onClick={() => setUser(u)}>
+                  <div
+                    className="flex flex-1 text-sm items-center py-2"
+                    onClick={() => setUser(u)}
+                  >
                     <div className="flex justify-center w-10">
                       {u.image ? (
                         <Image
@@ -175,7 +178,7 @@ function Users({ users }: { users: UserType[] }) {
                     </div>
                     <div className="flex-2 px-4">{u.lastName}</div>
                     <div className="flex-2 px-4">{u.firstName}</div>
-                    <div className="flex-2 px-4">{u.middleName || "-"}</div>
+                    <div className="flex-2 px-4">{u.title}</div>
                     <div className="flex-1 px-4">
                       {u.role[0].toUpperCase() + u.role?.slice(1)}
                     </div>

@@ -1,7 +1,13 @@
 "use client"
 import {cs} from "@/lib/classStore";
 import Btn from "@/components/ui/btn";
+
+import AssignmentsPopupClassTeacher from "./assignmentsPopupClassTeacher";
+
+import SettingsPopupClassTeacher from "./settingsPopupClassTeacher";
+import MessagePopupClassTeacher from "./messagesPopupClassTeacher";
 import "@/app/globals.css";
+import StudentsPopupClassTeacher from "@/components/layout/studentsPopupClassTeacher";
 
 export default function BodyClassTeacher() {
 	const settingsPopup = cs((state)=>state.settingsPopup);
@@ -50,9 +56,7 @@ export default function BodyClassTeacher() {
 		setMessagePopup(true);
 		setSettingsClassIndex(classIndex);
 	}
- function nothing() {
-  
- }
+ function nothing() {}
  
 
  return (
@@ -67,6 +71,12 @@ export default function BodyClassTeacher() {
           padding: 10,
         }}
       >
+
+						{studentsPopup && <StudentsPopupClassTeacher/>}
+						{messagePopup && <MessagePopupClassTeacher/>}
+						{settingsPopup && <SettingsPopupClassTeacher/>}
+						{assignmentsPopup && <AssignmentsPopupClassTeacher/>}
+
 				<div className="flex w-2/3">
 					<Btn text="Add Section" onclick={()=>addClass()} />
 				</div>
@@ -97,7 +107,7 @@ export default function BodyClassTeacher() {
 								}}
 							></textarea>
 							<div className="w-[100px] flex align-middle">
-								<Btn onclick={() => functionSetSettings(classes[i].id)} text="Settings"/>
+								<Btn onclick={() => functionSetSettings(i)} text="Settings"/>
 							</div>
 						</div>
 						<br></br>

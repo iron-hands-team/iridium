@@ -33,8 +33,6 @@ export default function assignmentsPopupClassTeacher() {
     <div className="fixed flex h-full w-full justify-center items-center bg-black/90 overflow-y-auto  flex-col flex-wrap" onClick={() => setAssignmentsPopup(false)}>
 					<div className="bg-black/90  z-10 h-2/3 w-2/3  flex justify-center items-center border-1 border-zinc-400 overflow-y-auto"  onClick={(e) => e.stopPropagation()}>
 						<div className=" h-[500px] w-3/4 bg-blue">
-
-
 							<div className="flex justify-end items-center">
 								<div className="w-1/5">
 								

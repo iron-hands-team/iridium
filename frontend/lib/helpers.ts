@@ -11,6 +11,7 @@ export function parseUser(user: UserResponse): UserType {
     image: user.image,
     requesting: user.requesting,
     requestingDelete: user.requesting_delete,
+    title: user.title,
   };
 }
 

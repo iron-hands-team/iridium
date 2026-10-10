@@ -13,6 +13,7 @@ import Dropdown from "../ui/dropdown";
 
 const displayRoles = roles.map((r) => r[0].toUpperCase() + r.slice(1));
 const labelStyles = "text-sm flex flex-col gap-y-1";
+const classes = ["Freshman", "Sophomore", "Junior", "Senior"];
 
 interface NewUserModalProps {
   closeModal: () => void;
@@ -29,6 +30,7 @@ function NewUserModal({ closeModal, existing }: NewUserModalProps) {
           firstName: "",
           lastName: "",
           role: roles[0],
+          title: "",
         },
   );
   const [loading, setLoading] = useState(false);
@@ -51,6 +53,7 @@ function NewUserModal({ closeModal, existing }: NewUserModalProps) {
             last_name: user.lastName,
             middle_name: user.middleName,
             role: user.role,
+            title: user.title,
           }),
         });
       } else {
@@ -65,6 +68,7 @@ function NewUserModal({ closeModal, existing }: NewUserModalProps) {
             middle_name: user.middleName,
             last_name: user.lastName,
             role: user.role,
+            title: user.title,
           }),
         });
       }
@@ -143,12 +147,37 @@ function NewUserModal({ closeModal, existing }: NewUserModalProps) {
               setUser({
                 ...user,
                 role: role.toLowerCase() as RoleType,
+                title: role === "Student" ? classes[0] : user.title,
               })
             }
             values={displayRoles}
             above
           />
         </div>
+        <label className={labelStyles}>
+          <div>
+            Title <span className="text-red-500">*</span>
+          </div>
+          {user.role === "student" ? (
+            <Dropdown
+              label="Graduation class"
+              value={user.title}
+              setValue={(title) =>
+                setUser({
+                  ...user,
+                  title,
+                })
+              }
+              values={classes}
+              above
+            />
+          ) : (
+            <Input
+              value={user.title}
+              setValue={(title) => setUser({ ...user, title })}
+            />
+          )}
+        </label>
         {error && (
           <div className="text-red-500 text-sm flex gap-x-3 items-center">
             <FaExclamationTriangle size={15} /> {error}

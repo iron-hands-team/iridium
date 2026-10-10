@@ -30,6 +30,7 @@ export const newUserSchema = z.object({
     "Password has to be either empty or at least 8 characters long",
   ),
   role: z.enum(roles, "Please assign a valid role"),
+  title: z.string().trim().min(1, "Please enter a title"),
 });
 
 export const newClubSchema = z.object({

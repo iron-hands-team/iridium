@@ -10,6 +10,7 @@ type Test = {
 };
 
 type Class = {
+	
  id: number;
  className: string;
  students: Test[];
@@ -17,9 +18,8 @@ type Class = {
  canShow : boolean;
  assignments: Assignment[];
  announcements: Announcement[];
+	quizzes: Quiz[];
 };
-
-
 
 type Assignment = {
 	id: number;
@@ -36,10 +36,32 @@ type Announcement = {
 	date: string;
 }
 
+type Quiz = {
+	id: number,
+	name: string,
+	questions: QuizQuestion[];
+}
+
+type QuizQuestion = {
+	id: number;
+	question: string,
+	choices: string[]
+	answers: string[],
+}
+
 
 type ClassStore = {
  classes: Class[];
 	annoucementInput: string;
+
+	// quiz
+	addClassQuiz: (classTargetIndex:number)=>void;
+	deleteClassQuiz: (classTargetIndex:number, quizIndex:number) =>void;
+	setClassQuiz: <T>(classTargetIndex:number, quizIndex:number, value:T, variableName:string)=>void;
+	
+	addQuizQuestion: (classTargetIndex:number, quizTargetIndex:number)=>void;
+	deleteQuizQuestion: (classTargetIndex:number, quizTargetIndex:number, quizQuestionTargetIndex:number)=>void;
+	setQuizQuestion: <T>(classTargetindex:number, quizTargetIndex:number, quizQuestionTargetIndex:number, value:T, variableName:string)=>void;
 
  // settings stuff
  settingsPopup: boolean;
@@ -115,6 +137,45 @@ export const cs = create<ClassStore>((set) => ({
 
 				annoucementInput: "",
 
+				//quiz question
+				addClassQuiz: (classTargetIndex) => set((state) => ({
+					classes: state.classes.map((classItem, classIndex) => 
+						classIndex == classTargetIndex ? {...classItem, quizzes: 
+							[...classItem.quizzes, {
+								id: 0,
+								name: "",
+								questions: []
+							}]
+						} : classItem
+					)
+				})),
+
+				deleteClassQuiz: (classTargetIndex, quizIndex) => set((state) => ({
+					classes: state.classes.map((classItem, classIndex) => 
+					classIndex === classTargetIndex ? {...classItem, quizzes: classItem.quizzes.filter((_,i) => i !== quizIndex)}: classItem) 
+				})),
+
+				setClassQuiz: (classTargetIndex, quizTargetIndex, value, variableName) => set((state)=> ({
+					classes: state.classes.map((classItem, classIndex) => 
+					classIndex === classTargetIndex ? {...classItem, quizzes: classItem.quizzes.map((quizItem, quizIndex) => ( quizIndex === quizTargetIndex ? { ...quizItem, [variableName]: value}:quizItem))} : classItem
+				)
+				})),
+
+
+				addQuizQuestion: (classTargetIndex, quizTargetIndex) => set((state) => ({
+					classes: state.classes.map((classItem, classIndex) => 
+						classIndex === classTargetIndex ? {...classItem, quizzes: classItem.quizzes.map((quizItem, quizIndex) => ( quizIndex === quizTargetIndex ? { ...quizItem, questions: [...quizItem.questions, {id:0,question:"",choices: [], answers: []}]}:quizItem))} : classItem
+					)
+				})),
+
+				deleteQuizQuestion: (classTargetIndex, quizTargetIndex, quizQuestionTargetIndex) => set((state) => ({
+					classes: state.classes.map((classItem, classIndex) =>  classIndex === classTargetIndex ? {...classItem, quizzes: classItem.quizzes.map((quizItem, quizIndex) => quizIndex === quizTargetIndex ? {...quizItem, questions: quizItem.questions.filter((_,i) => i !== quizQuestionTargetIndex)} : quizItem)} : classItem)
+				})),
+
+			setQuizQuestion: (classTargetIndex, quizTargetIndex, quizQuestionTargetIndex, value, variableName) => set((state) => ({
+					classes: state.classes.map((classItem, classIndex) =>  classIndex === classTargetIndex ? {...classItem, quizzes: classItem.quizzes.map((quizItem, quizIndex) => quizIndex === quizTargetIndex ? {...quizItem, questions: quizItem.questions.map((questionItem, questionIndex) => questionItem.id === quizQuestionTargetIndex ? {...questionItem, [variableName]: value} : questionItem)} : quizItem)} : classItem)
+				})),
+
     settingsPopup: false,
     setSettingsPopup: (settingsPopup) => set({settingsPopup}),
     
@@ -150,6 +211,7 @@ export const cs = create<ClassStore>((set) => ({
 						canShow: false,
 						assignments: [],
 						announcements: [],
+						quizzes: []
 					},
       ]
      })),
@@ -167,8 +229,8 @@ export const cs = create<ClassStore>((set) => ({
 								text: "",
 								grade: "",
 								assignments: [],
-								
 								announcements: [],
+								
 							}
 						]
 				},
@@ -202,8 +264,8 @@ export const cs = create<ClassStore>((set) => ({
 								text: "",
 								grade: "",
 								assignments: [],
-								
 								announcements: [],
+								quizzes: [],
 							}]}
 												: item
 								)
