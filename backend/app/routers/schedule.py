@@ -4,7 +4,11 @@ from sqlalchemy.orm import Session
 from app.database import get_db
 from app.auth import manager
 from app.models import ScheduleItem, User
-from app.schemas import ScheduleItemCreateRequest, ScheduleItemResponse
+from app.schemas import (
+    ScheduleItemCreateRequest,
+    ScheduleItemResponse,
+    ScheduleItemUpdateRequest,
+)
 from app.dependencies import require_staff
 
 router = APIRouter(prefix="/schedule", tags=["schedule"])
@@ -46,6 +50,24 @@ def create_schedule_item(
     db.refresh(item)
     return item
 
+@router.patch("/{item_id}", response_model=ScheduleItemResponse)
+def update_schedule_item(
+    item_id: int,
+    updates: ScheduleItemUpdateRequest,
+    db: Session = Depends(get_db),
+    _staff: User = Depends(require_staff),
+):
+    item = db.query(ScheduleItem).filter(ScheduleItem.id == item_id).first()
+    if item is None:
+        raise HTTPException(status_code=404, detail="Schedule item not found.")
+
+    for field, value in updates.model_dump(exclude_unset=True).items():
+        setattr(item, field, value)
+
+    db.commit()
+    db.refresh(item)
+    return item
+
 @router.delete("/{item_id}", status_code=204)
 def delete_schedule_item(
     item_id: int,
@@ -57,8 +79,3 @@ def delete_schedule_item(
         raise HTTPException(status_code=404, detail="Schedule item not found.")
     db.delete(item)
     db.commit()
-
-
-
-
-    

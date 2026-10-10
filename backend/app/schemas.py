@@ -150,6 +150,13 @@ class ScheduleItemResponse(BaseModel):
     start_time: time | None
     end_time: time | None
 
+class ScheduleItemUpdateRequest(BaseModel):
+    period: int | None = None
+    course_name: str | None = None
+    room: str | None = None
+    start_time: time | None = None
+    end_time: time | None = None
+
     class Config:
         from_attributes = True
 
