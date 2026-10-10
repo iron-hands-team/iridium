@@ -55,7 +55,7 @@ async function Page() {
       </div>
       <div className="flex-1 min-w-[40%] flex flex-col gap-y-5">
         <h2 className={headingStyles}>
-          <FaClock size={18} /> Schedule manahement
+          <FaClock size={18} /> Schedule management
         </h2>
         <div className="border-1 border-zinc-800 px-4 py-2 flex flex-col gap-y-2">
           <Btn text="Manage schedules" link="/admin/schedule" primary />

@@ -115,6 +115,7 @@ async function Page() {
                   <Image
                     src={mapUrl(i)}
                     alt="Map item"
+                    className="w-full"
                     width={500}
                     height={500}
                     unoptimized

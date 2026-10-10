@@ -3,13 +3,14 @@ from sqlalchemy.orm import Session
 from sqlalchemy import or_, func
 
 from app.database import get_db
-from app.models import MapItem, User, Rule, Announcement, Event, Club
+from app.models import MapItem, User, Rule, Announcement, Event, Club, Report
 from app.schemas import (
     MapUploadResponse,
     AddMapItemsRequest,
     MapResponse,
     RuleResponse,
     SearchResponse,
+    ReportResponse,
 )
 from app.dependencies import require_admin, manager
 from app.s3 import s3_client, s3_internal, BUCKET_NAME, ENDPOINT
@@ -159,3 +160,31 @@ def get_search(
         "events": events,
         "clubs": clubs,
     }
+
+
+@router.get("/reports", response_model=list[ReportResponse])
+def get_reports(
+    db: Session = Depends(get_db),
+    current_user: User = Depends(manager),
+):
+    if current_user.role == "student":
+        raise HTTPException(status_code=403, detail="Insufficient permission")
+    return db.query(Report).all()  # TODO: filter by target role (teacher or admin)
+
+
+@router.post("/reports", status_code=204)
+def submit_report(
+    report: ReportResponse,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(manager),
+):
+    new_report = Report(
+        title=report.title,
+        description=report.description,
+        anonymous=report.anonymous,
+        type=report.type,
+        role=report.role,
+        user_id=None if report.anonymous else current_user.id,
+    )
+    db.add(new_report)
+    db.commit()

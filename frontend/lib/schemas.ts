@@ -59,9 +59,44 @@ export const newRulesSchema = z.array(
   }),
 );
 
+export const newMessageSchema = z.object({
+  subject: z.string().trim().min(1, "Please enter a subject line"),
+  body: z.string().trim().min(1, "Please enter body text"),
+});
+
+export const reportTypes = z.enum([
+  "Discrimination",
+  "Harassment",
+  "Bullying",
+  "Safety",
+  "Crime",
+  "Health",
+  "Equipment",
+  "Transportation",
+  "Food",
+  "Attendance",
+  "Belongings",
+  "Bug",
+  "Feedback",
+  "Other",
+]);
+
+export const reportSchema = z.object({
+  type: reportTypes,
+  title: z.string().trim().min(1, "Please enter a title"),
+  description: z.string().trim().min(1, "Please enter a description"),
+  anonymous: z.boolean().default(true).optional(),
+  role: z.enum(["Admin", "Teacher"]).optional(),
+});
+
 export type LoginType = z.infer<typeof loginSchema>;
 export type PostType = z.infer<typeof postSchema>;
 export type NewUserType = z.infer<typeof newUserSchema>;
 export type NewClubType = z.infer<typeof newClubSchema>;
 export type NewEventType = z.infer<typeof newEventSchema>;
 export type RuleType = z.infer<typeof newRulesSchema.element>;
+export type NewMessageType = z.infer<typeof newMessageSchema>;
+export type ReportType = z.infer<typeof reportSchema>;
+export type ReportOptionType = z.infer<typeof reportTypes>;
+
+export const reportOptions = reportTypes.options;
