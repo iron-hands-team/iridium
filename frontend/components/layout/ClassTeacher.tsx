@@ -7,6 +7,26 @@ import Input from "@/components/ui/input";
 import Footer from "@/components/layout/footer";
 import {cs} from "@/lib/classStore";
 
+const ATTENDANCE_STATUSES = ["present", "absent", "tardy", "excused"] as const;
+
+const attendanceStatusStyles: Record<string, string> = {
+  present: "bg-green-600 text-white",
+  absent: "bg-red-600 text-white",
+  tardy: "bg-yellow-600 text-white",
+  excused: "bg-zinc-600 text-white"
+};
+
+function todayISO() {
+  return new Date().toISOString().slice(0,10);
+}
+
+interface AttendanceRecord {
+  id: number;
+  student: UserSummary;
+  date: string;
+  status: string;
+}
+
 interface UserSummary {
   id: number;
   username: string;
@@ -80,6 +100,14 @@ export default function ClassBody() {
     Record<number, string>
   >({});
   const [scoreDrafts, setScoreDrafts] = useState<Record<string, string>>({});
+
+  const [attendanceDate, setAttendanceDate] = useState(todayISO());
+  const [attendance, setAttendance] = useState<
+    Record<number, AttendanceRecord[]>
+  >({});
+  const [attendanceOpen, setAttendanceOpen] = useState<
+    Record<number, boolean>
+  >({});
 
   const loadClasses = useCallback(async () => {
     try {
@@ -277,6 +305,8 @@ export default function ClassBody() {
     }));
     if (!assignments[classId]) loadAssignments(classId);
   }
+
+  
 
   return (
     <div className="bg-[#131313] min-h-screen text-white">
