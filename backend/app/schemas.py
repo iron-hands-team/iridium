@@ -14,8 +14,23 @@ class UserCreateRequest(BaseModel):
     first_name: str
     last_name: str
     middle_name: str | None = None
+    title: str
 
 class UserResponse(BaseModel):
+    id: int
+    username: str
+    first_name: str
+    last_name: str
+    middle_name: str | None = None
+    image: bool | None = None
+    requesting: bool | None = None
+    requesting_delete: bool | None = None
+    role: UserRole
+
+    class Config:
+        from_attributes = True
+
+class StaffResponse(BaseModel):
     id: int
     username: str
     first_name: str
@@ -247,6 +262,17 @@ class RuleResponse(BaseModel):
     id: int
     name: str
     description: str | None = None
+
+class ReportResponse(BaseModel):
+    id: int | None = None
+    title: str
+    description: str
+    anonymous: bool = True
+    type: str
+    role: str | None = None
+
+    class Config:
+        from_attributes = True
 
 class SearchResponse(BaseModel):
     users: list[StaffResponse]

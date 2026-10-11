@@ -26,7 +26,7 @@ def list_users(
     return query.order_by(User.last_name, User.first_name).all()
 
 @router.get("/users/staff", response_model=list[StaffResponse])
-def list_users(
+def list_staff(
     db: Session = Depends(get_db),
     _current_user: User = Depends(manager),
 ):
