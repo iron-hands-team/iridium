@@ -28,18 +28,18 @@ class User(Base):
     requesting = Column(Boolean, nullable=True)
     requesting_delete = Column(Boolean, nullable=True)
 
-    announcements = relationship("Announcement", back_populates="author")
+    announcements = relationship("Announcement", back_populates="author", cascade="all, delete-orphan")
     clubs_sponsored = relationship("Club", back_populates="sponsor")
-    club_memberships = relationship("ClubMembership", back_populates="user")
-    events_created = relationship("Event", back_populates="created_by")
-    schedule_items = relationship("ScheduleItem", back_populates="user")
-    classes_taught = relationship("ClassSection", back_populates="teacher")
-    class_enrollments = relationship("ClassEnrollment", back_populates="student")
-    announcement_likes = relationship("AnnouncementLike", back_populates="user")
-    event_rsvps = relationship("EventRSVP", back_populates="user")
-    grades = relationship("Grade", back_populates="student")
+    club_memberships = relationship("ClubMembership", back_populates="user", cascade="all, delete-orphan")
+    events_created = relationship("Event", back_populates="created_by", cascade="all, delete-orphan")
+    schedule_items = relationship("ScheduleItem", back_populates="user", cascade="all, delete-orphan")
+    classes_taught = relationship("ClassSection", back_populates="teacher", cascade="all, delete-orphan")
+    class_enrollments = relationship("ClassEnrollment", back_populates="student", cascade="all, delete-orphan")
+    announcement_likes = relationship("AnnouncementLike", back_populates="user", cascade="all, delete-orphan")
+    event_rsvps = relationship("EventRSVP", back_populates="user", cascade="all, delete-orphan")
+    grades = relationship("Grade", back_populates="student", cascade="all, delete-orphan")
     reports = relationship("Report", back_populates="user")
-    attendance_records = relationship("AttendanceRecord", back_populates="student")
+    attendance_records = relationship("AttendanceRecord", back_populates="student", cascade="all, delete-orphan")
 
 class Announcement(Base):
     __tablename__ = "announcements"

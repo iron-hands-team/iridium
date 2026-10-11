@@ -27,7 +27,7 @@ def get_attendance(
     get_owned_class(class_id, db, current_user)
 
     enrolled_student_ids = [
-        row.student.id
+        row.student_id
         for row in db.query(ClassEnrollment)
         .filter(ClassEnrollment.class_id==class_id)
         .all()
@@ -37,7 +37,7 @@ def get_attendance(
         r.student_id
         for r in db.query(AttendanceRecord)
         .filter(AttendanceRecord.class_id==class_id, AttendanceRecord.date == for_date)
-        .all()
+        .all()  
     }
 
     for student_id in enrolled_student_ids:
@@ -105,7 +105,7 @@ def my_attendance(
 ):
     enrollments = (
         db.query(ClassEnrollment)
-        .filter(ClassEnrollment.student_id)
+        .filter(ClassEnrollment.student_id == current_user.id)
         .all()
     )
     result: list[StudentClassAttendance] = []
