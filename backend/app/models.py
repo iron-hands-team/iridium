@@ -182,7 +182,7 @@ class ClassEnrollment(Base):
 class AttendanceRecord(Base):
     __tablename__ = "attendance_records"
     __table_args__ = (
-        UniqueConstraint("class_id", "student_id", "date", name="uq_attendance_class_student_date")
+        UniqueConstraint("class_id", "student_id", "date", name="uq_attendance_class_student_date"),
     )
     id = Column(Integer, primary_key=True, index=True)
     class_id = Column(Integer, ForeignKey("class_sections.id"), nullable=False)

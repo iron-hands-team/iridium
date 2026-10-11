@@ -306,7 +306,55 @@ export default function ClassBody() {
     if (!assignments[classId]) loadAssignments(classId);
   }
 
-  
+  async function loadAttendance(classId: number, date: string) {
+    try {
+      setError(null);
+      const data: AttendanceRecord[] = await api(
+        `/classes/${classId}/attendance?date=${date}`,
+      );
+      setAttendance((prev) => ({ ...prev, [classId]: data }));
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Failed to load attendance.");
+    }
+  }
+
+  function toggleAttendance(classId: number) {
+    const next = !attendanceOpen[classId];
+    setAttendanceOpen((prev) => ({ ...prev, [classId]: next }));
+    if (next) loadAttendance(classId, attendanceDate);
+  }
+
+  function changeAttendanceDate(date: string) {
+    setAttendanceDate(date);
+    Object.keys(attendanceOpen).forEach((key) => {
+      const classId = Number(key);
+      if (attendanceOpen[classId]) loadAttendance(classId, date);
+    });
+  }
+
+  async function setAttendanceStatus(
+    classId: number,
+    studentId: number,
+    status: string,
+  ) {
+    try {
+      setError(null);
+      await api(
+        `/classes/${classId}/attendance/${studentId}?date=${attendanceDate}`,
+        { method: "PATCH", body: JSON.stringify({ status }) },
+      );
+      setAttendance((prev) => ({
+        ...prev,
+        [classId]: (prev[classId] || []).map((r) =>
+          r.student.id === studentId ? { ...r, status } : r,
+        ),
+      }));
+    } catch (e) {
+      setError(
+        e instanceof Error ? e.message : "Failed to update attendance.",
+      );
+    }
+  }
 
   return (
     <div className="bg-[#131313] min-h-screen text-white">
@@ -590,6 +638,66 @@ export default function ClassBody() {
                         );
                       })}
                     </div>
+                  )}
+
+                  <div className="flex items-center justify-between mt-4">
+                    <p className="font-bold text-sm">Attendance</p>
+                    <div className="flex items-center gap-x-2">
+                      <input
+                          type="date"
+                          value={attendanceDate}
+                          onChange={(e) => changeAttendanceDate(e.target.value)}
+                          className="bg-transparent border border-zinc-800 rounded px-2 py-1 text-xs"
+                       />
+                       <Btn
+                          text={attendanceOpen[section.id] ? "Hide" : "Take Attendance"}
+                          styles="text-xs"
+                          onclick={() => toggleAttendance(section.id)}
+                       />
+                    </div>
+                  </div>
+
+                  {attendanceOpen[section.id] && (
+                    (attendance[section.id] || []).length === 0 ? (
+                      <p className="text-sm text-zinc-500">
+                        No students enrolled to take attendance for.
+                      </p>
+                    ) : (
+                      <div className="flex flex-col gap-y-2">
+                        {attendance[section.id].map((record) => (
+                          <div
+                            key={record.id}
+                            className="flex justify-between items-center border-b border-zinc-800 pb-1"
+                          >
+                            <p className="text-sm">
+                              {record.student.first_name}{" "}
+                              {record.student.last_name}
+                            </p>
+                            <div className="flex gap-x-1">
+                              {ATTENDANCE_STATUSES.map((status) => (
+                                <button
+                                  key={status}
+                                  onClick={() =>
+                                    setAttendanceStatus(
+                                      section.id,
+                                      record.student.id,
+                                      status,
+                                    )
+                                  }
+                                  className={`text-xs px-2 py-1 rounded capitalize ${
+                                    record.status === status
+                                      ? attendanceStatusStyles[status]
+                                      : "border border-zinc-800 text-zinc-400"
+                                  }`}
+                                >
+                                  {status}
+                                </button>
+                              ))}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )
                   )}
                 </div>
               )}
