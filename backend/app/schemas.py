@@ -1,4 +1,4 @@
-from datetime import datetime, time
+from datetime import datetime, time, date
 
 from pydantic import BaseModel
 from app.models import UserRole
@@ -257,6 +257,27 @@ class StudentClassGrades(BaseModel):
     class_id: int
     class_name: str
     assignments: list[StudentAssignmentGrade]
+
+class AttendanceRecordResponse(BaseModel):
+    id: int
+    student: UserResponse
+    date: date
+    status: str
+
+    class Config:
+        from_attributes = True
+
+class AttendanceStatusUpdateRequest(BaseModel):
+    status: str
+
+class StudentAttendanceDay(BaseModel):
+    date: date
+    status: str
+
+class StudentClassAttendance(BaseModel):
+    class_id: int
+    class_name: str
+    records: list[StudentAttendanceDay]
 
 class RuleResponse(BaseModel):
     id: int

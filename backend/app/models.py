@@ -1,7 +1,7 @@
 import enum
 from datetime import datetime, timezone
 
-from sqlalchemy import Column, Integer, String, Enum, Text, DateTime, Time, Boolean, Float, ForeignKey
+from sqlalchemy import Column, Integer, String, Enum, Text, DateTime, Time, Boolean, Float, ForeignKey, Date, UniqueConstraint
 from sqlalchemy.dialects.postgresql import ARRAY
 from sqlalchemy.orm import relationship
 from app.database import Base
@@ -39,6 +39,7 @@ class User(Base):
     event_rsvps = relationship("EventRSVP", back_populates="user")
     grades = relationship("Grade", back_populates="student")
     reports = relationship("Report", back_populates="user")
+    attendance_records = relationship("AttendanceRecord", back_populates="student")
 
 class Announcement(Base):
     __tablename__ = "announcements"
@@ -142,6 +143,9 @@ class ClassSection(Base):
     assignments = relationship(
         "Assignment", back_populates="class_section", cascade="all, delete-orphan"
     )
+    attendance_records = relationship(
+        "AttendanceRecord", back_populates="class_section", cascade="all, delete-orphan"
+    )
 
 class Assignment(Base):
     __tablename__ = "assignments"
@@ -174,6 +178,17 @@ class ClassEnrollment(Base):
 
     class_section = relationship("ClassSection", back_populates="enrollments")
     student = relationship("User", back_populates="class_enrollments")
+
+class AttendanceRecord(Base):
+    __tablename__ = "attendance_records"
+    __table_args__ = (
+        UniqueConstraint("class_id", "student_id", "date", name="uq_attendance_class_student_date")
+    )
+    id = Column(Integer, primary_key=True, index=True)
+    class_id = Column(Integer, ForeignKey("class_sections.id"), nullable=False)
+    student_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    date = Column(Date, nullable=False)
+    status = Column(String, nullable=False, default="present")
 
 class MapItem(Base):
     __tablename__ = "map_items"
