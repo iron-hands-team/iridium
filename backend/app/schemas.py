@@ -291,6 +291,7 @@ class ReportResponse(BaseModel):
     anonymous: bool = True
     type: str
     role: str | None = None
+    reporter: UserResponse | None = None
 
     class Config:
         from_attributes = True

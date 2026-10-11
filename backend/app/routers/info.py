@@ -169,9 +169,40 @@ def get_reports(
 ):
     if current_user.role == "student":
         raise HTTPException(status_code=403, detail="Insufficient permission")
-    return db.query(Report).all()  # TODO: filter by target role (teacher or admin)
 
+    query = db.query(Report)
+    if current_user.role == "teacher":
+        query = query.filter(or_(Report.role == None, Report.role == "Teacher"))
 
+    reports = query.order_by(Report.id.desc()).all()
+    return [
+        ReportResponse(
+            id=r.id,
+            title=r.title,
+            description=r.description,
+            anonymous=r.anonymous,
+            type=r.type,
+            role=r.role,
+            reporter=r.user if (not r.anonymous and r.user is not None) else None,
+        )
+        for r in reports
+    ]
+
+@router.delete("/reports/{report_id}", status_code=204)
+def delete_report(
+    report_id: int,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(manager),
+):
+    if current_user.role == "student":
+        raise HTTPException(status_code=403, detail="Insufficient permission")
+
+    report =db.query(Report).filter(Report.id == report_id).first()
+    if report is None:
+        raise HTTPException(status_code=404, detail="Report not foind.")
+    db.delete(report)
+    db.commit()
+    
 @router.post("/reports", status_code=204)
 def submit_report(
     report: ReportResponse,

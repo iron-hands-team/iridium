@@ -47,6 +47,12 @@ async function Nav() {
             Attendance
           </Link>
         )}
+
+        {user.role === "teacher" && (
+          <Link href="/admin/reports" className="px-2 py-1.5">
+            Report
+          </Link>
+        )}
         
         <Link href="/calendar" className="px-2 py-1.5">
           Calendar
