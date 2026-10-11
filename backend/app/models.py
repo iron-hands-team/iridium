@@ -1,7 +1,7 @@
 import enum
 from datetime import datetime, timezone
 
-from sqlalchemy import Column, Integer, String, Enum, Text, DateTime, Time, Boolean, Float, ForeignKey, Date, UniqueConstraint
+from sqlalchemy import Column, Integer, String, Enum, Text, DateTime, Time, Date, Boolean, Float, ForeignKey, UniqueConstraint
 from sqlalchemy.dialects.postgresql import ARRAY
 from sqlalchemy.orm import relationship
 from app.database import Base
@@ -188,7 +188,10 @@ class AttendanceRecord(Base):
     class_id = Column(Integer, ForeignKey("class_sections.id"), nullable=False)
     student_id = Column(Integer, ForeignKey("users.id"), nullable=False)
     date = Column(Date, nullable=False)
-    status = Column(String, nullable=False, default="present")
+    status = Column(String, nullable=False, default="present")  # present | absent | tardy | excused
+
+    class_section = relationship("ClassSection", back_populates="attendance_records")
+    student = relationship("User", back_populates="attendance_records")
 
 class MapItem(Base):
     __tablename__ = "map_items"
