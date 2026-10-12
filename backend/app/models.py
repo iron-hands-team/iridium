@@ -40,6 +40,8 @@ class User(Base):
     grades = relationship("Grade", back_populates="student", cascade="all, delete-orphan")
     reports = relationship("Report", back_populates="user")
     attendance_records = relationship("AttendanceRecord", back_populates="student", cascade="all, delete-orphan")
+    messages_sent = relationship("Message", back_populates="sender", cascade="all, delete-orphan", foreign_keys="Message.sender_id")
+    messages_received = relationship("Message", back_populates="recipient", cascade="all, delete-orphan", foreign_keys="Message.recipient_id")
 
 class Announcement(Base):
     __tablename__ = "announcements"
@@ -197,6 +199,19 @@ class MapItem(Base):
     __tablename__ = "map_items"
     id = Column(Integer, primary_key=True, index=True)
     label = Column(String, nullable=True)
+
+class Message(Base):
+    __tablename__ = "messages"
+    id = Column(Integer, primary_key=True, index=True)
+    sender_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    recipient_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    subject = Column(String, nullable=False)
+    body = Column(Text, nullable=False)
+    created_at = Column(DateTime(timezone=True), default=utcnow, nullable=False)
+    read = Column(Boolean, nullable=False, default=False)
+
+    sender = relationship("User", back_populates="messages_sent", foreign_keys=[sender_id])
+    recipient = relationship("User", back_populates="messages_recieved", foreign_keys=[recipient_id])
 
 class Rule(Base):
     __tablename__ = "rules"

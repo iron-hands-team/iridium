@@ -279,6 +279,23 @@ class StudentClassAttendance(BaseModel):
     class_name: str
     records: list[StudentAttendanceDay]
 
+class MessageCreateRequest(BaseModel):
+    recipient_username: str
+    subject: str
+    body: str
+
+class MessageResponse(BaseModel):
+    id: int
+    subject: str
+    body: str
+    created_at: datetime
+    read: bool
+    sender: UserResponse
+    recipient: UserResponse
+
+    class Config:
+        from_attributes = True
+
 class RuleResponse(BaseModel):
     id: int
     name: str

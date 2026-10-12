@@ -11,7 +11,7 @@ from app.models import User, UserRole
 from app.schemas import LoginRequest, UserCreateRequest, UserResponse, TokenResponse
 from app.dependencies import require_admin
 from app.seed import init_db_and_seed_admin
-from app.routers import users, announcements, clubs, events, schedule, classes, info, grades, attendance
+from app.routers import users, announcements, clubs, events, schedule, classes, info, grades, attendance, messages
 
 IS_PROD = os.getenv("ENVIRONMENT", "development") == "production"
 FRONTEND_URL = os.getenv("FRONTEND_URL", "http://localhost:3000")

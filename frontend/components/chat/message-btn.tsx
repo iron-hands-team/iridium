@@ -1,5 +1,5 @@
 "use client";
-
+ 
 import { MdMail } from "react-icons/md";
 import { AnimatePresence } from "framer-motion";
 import { useState } from "react";
@@ -9,33 +9,49 @@ import Input from "../ui/input";
 import Textarea from "../ui/textarea";
 import Btn from "../ui/btn";
 import { FaExclamationTriangle } from "react-icons/fa";
-
+ 
 const labelStyles =
   "text-black dark:text-zinc-300 text-sm flex flex-col gap-y-1 w-full";
 const emptyMessage = {
   subject: "",
   body: "",
 };
-
+ 
 interface MessageBtnProps {
   username: string;
   children?: React.ReactNode;
+  onSent?: () => void;
 }
-
-function MessageBtn({ username, children }: MessageBtnProps) {
+ 
+function MessageBtn({ username, children, onSent }: MessageBtnProps) {
   const [messaging, setMessaging] = useState<boolean>(false);
   const [message, setMessage] = useState<NewMessageType>(emptyMessage);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
-
+ 
   async function handleSend() {
     setLoading(true);
     setError(null);
     const validated = newMessageSchema.safeParse(message);
     if (validated.success) {
-      //TODO: send message
-      setMessage(emptyMessage);
-      setMessaging(false);
+      const res = await fetch("/api/messages", {
+        method: "POST",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          recipient_username: username,
+          subject: validated.data.subject,
+          body: validated.data.body,
+        }),
+      });
+      if (res.ok) {
+        setMessage(emptyMessage);
+        setMessaging(false);
+        onSent?.();
+      } else {
+        const body = await res.json().catch(() => null);
+        setError(body?.detail || "Something went wrong. Please try again.");
+      }
     } else {
       setError(validated.error.issues[0].message);
     }
