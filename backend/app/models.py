@@ -211,7 +211,7 @@ class Message(Base):
     read = Column(Boolean, nullable=False, default=False)
 
     sender = relationship("User", back_populates="messages_sent", foreign_keys=[sender_id])
-    recipient = relationship("User", back_populates="messages_recieved", foreign_keys=[recipient_id])
+    recipient = relationship("User", back_populates="messages_received", foreign_keys=[recipient_id])
 
 class Rule(Base):
     __tablename__ = "rules"

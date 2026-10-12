@@ -42,6 +42,18 @@ def get_inbox(
 ):
     return (
         db.query(Message)
+        .filter(Message.recipient_id == current_user.id)
+        .order_by(Message.created_at.desc())
+        .all()
+    )
+
+@router.get("/messages/sent", response_model=list[MessageResponse])
+def get_sent(
+    db: Session = Depends(get_db),
+    current_user: User = Depends(manager),
+):
+    return (
+        db.query(Message)
         .filter(Message.sender_id == current_user.id)
         .order_by(Message.created_at.desc())
         .all()

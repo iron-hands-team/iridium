@@ -35,6 +35,8 @@ app.include_router(classes.router)
 app.include_router(info.router)
 app.include_router(grades.router)
 app.include_router(attendance.router)
+app.include_router(attendance.router)
+app.include_router(messages.router)
 
 @app.get("/")
 def root():
