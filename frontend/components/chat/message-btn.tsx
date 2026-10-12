@@ -1,5 +1,5 @@
 "use client";
- 
+
 import { MdMail } from "react-icons/md";
 import { AnimatePresence } from "framer-motion";
 import { useState } from "react";
@@ -9,26 +9,26 @@ import Input from "../ui/input";
 import Textarea from "../ui/textarea";
 import Btn from "../ui/btn";
 import { FaExclamationTriangle } from "react-icons/fa";
- 
+
 const labelStyles =
   "text-black dark:text-zinc-300 text-sm flex flex-col gap-y-1 w-full";
 const emptyMessage = {
   subject: "",
   body: "",
 };
- 
+
 interface MessageBtnProps {
   username: string;
   children?: React.ReactNode;
   onSent?: () => void;
 }
- 
+
 function MessageBtn({ username, children, onSent }: MessageBtnProps) {
   const [messaging, setMessaging] = useState<boolean>(false);
   const [message, setMessage] = useState<NewMessageType>(emptyMessage);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
- 
+
   async function handleSend() {
     setLoading(true);
     setError(null);
@@ -60,7 +60,9 @@ function MessageBtn({ username, children, onSent }: MessageBtnProps) {
 
   return (
     <>
-      {children || (
+      {children ? (
+        <div onClick={() => setMessaging(true)}>{children}</div>
+      ) : (
         <MdMail
           size={18}
           title="Message user"

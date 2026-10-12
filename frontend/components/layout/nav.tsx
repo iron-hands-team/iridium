@@ -5,7 +5,22 @@ import Link from "next/link";
 import Image from "next/image";
 
 async function Nav() {
-  const { user } = await getSession();
+  const { user, cookie } = await getSession();
+
+  const unreadCount =
+    user && cookie
+      ? await fetch(`${process.env.INTERNAL_API_URL}/messages/unread-count`, {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${cookie.value}`,
+            "Content-Type": "application/json",
+          },
+          cache: "no-store",
+        })
+          .then((res) => res.json())
+          .then((data) => data.count as number)
+          .catch(() => 0)
+      : 0;
 
   return (
     <div className="sticky top-0 z-10 bg-zinc-100 dark:bg-zinc-950 border-b-1 border-zinc-800">
@@ -60,7 +75,14 @@ async function Nav() {
         <Link href="/clubs" className="px-2 py-1.5">
           Clubs
         </Link>
-        {/* TODO: add a page for chats? like club chats, teacher emails, etc. */}
+        <Link href="/messages" className="px-2 py-1.5 flex items-center gap-x-1">
+          Messages
+          {unreadCount > 0 && (
+            <span className="text-xs bg-red-500 text-white rounded-full px-1.5">
+              {unreadCount}
+            </span>
+          )}
+        </Link>
         <NavUser user={user} />
       </nav>
     </div>
@@ -68,4 +90,3 @@ async function Nav() {
 }
 
 export default Nav;
-
