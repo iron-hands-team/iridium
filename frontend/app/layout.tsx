@@ -18,6 +18,13 @@ export const metadata: Metadata = {
 export default async function RootLayout({ children }: LayoutProps<"/">) {
   const { user } = await getSession();
 
+  // return (
+  //   <html>
+  //     <body>
+  //       <ClassBody/>
+  //     </body>
+  //   </html>
+  // )
   return (
     <html
       lang="en"

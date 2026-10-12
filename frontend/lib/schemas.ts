@@ -89,6 +89,14 @@ export const reportSchema = z.object({
   role: z.enum(["Admin", "Teacher"]).optional(),
 });
 
+export const channelSchema = z.object({
+  id: z.number().optional(),
+  name: z.string().trim().lowercase().min(1, "Please enter a name"),
+  description: z.string().optional().nullable(),
+  role: z.enum(["All", ...roles], "Please assign a valid role"),
+  club: z.number().optional().nullable(),
+});
+
 export type LoginType = z.infer<typeof loginSchema>;
 export type PostType = z.infer<typeof postSchema>;
 export type NewUserType = z.infer<typeof newUserSchema>;
@@ -98,5 +106,6 @@ export type RuleType = z.infer<typeof newRulesSchema.element>;
 export type NewMessageType = z.infer<typeof newMessageSchema>;
 export type ReportType = z.infer<typeof reportSchema>;
 export type ReportOptionType = z.infer<typeof reportTypes>;
+export type ChannelType = z.infer<typeof channelSchema>;
 
 export const reportOptions = reportTypes.options;

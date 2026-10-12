@@ -321,3 +321,33 @@ class SearchResponse(BaseModel):
 
     class Config:
         from_attributes = True
+
+class ReportResponse(BaseModel):
+    type: str
+    title: str
+    description: str
+    anonymous: bool
+    role: str | None = None
+    user: UserResponse | None = None
+
+    class Config:
+        from_attributes = True
+
+class ChannelCreateRequest(BaseModel):
+    name: str
+    description: str | None = None
+    role: str
+    club: int | None = None
+
+class ChannelResponse(BaseModel):
+    id: int
+    name: str
+    description: str | None = None
+    role: str
+    club: ClubResponse | None = None
+
+    class Config:
+        from_attributes = True
+
+class ChannelCreateResponse(BaseModel):
+    id: int

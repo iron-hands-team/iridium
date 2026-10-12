@@ -82,6 +82,7 @@ class Club(Base):
 
     sponsor = relationship("User", back_populates="clubs_sponsored")
     members = relationship("ClubMembership", back_populates="club")
+    channel = relationship("Channel", back_populates="club", uselist=False)
 
 class ClubMembership(Base):
     __tablename__ = "club_memberships"
@@ -227,6 +228,16 @@ class Report(Base):
     anonymous = Column(Boolean, nullable=False, default=True)
     type = Column(String, nullable=False)
     role = Column(String, nullable=True)
-    user_id = Column(Integer, ForeignKey("users.id"), nullable=True)
 
-    user = relationship("User", back_populates="reports",)
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=True)
+    user = relationship("User", back_populates="reports")
+
+class Channel(Base):
+    __tablename__ = "channels"
+    id = Column(Integer, primary_key=True, index=True)
+    name = Column(String, nullable=False, unique=True)
+    description = Column(String, nullable=True)
+    role = Column(String, nullable=False)
+
+    club_id = Column(Integer, ForeignKey("clubs.id"),nullable=True, unique=True)
+    club = relationship("Club", back_populates="channel")

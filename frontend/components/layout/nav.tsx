@@ -68,20 +68,27 @@ async function Nav() {
             Report
           </Link>
         )}
-        
+
         <Link href="/calendar" className="px-2 py-1.5">
           Calendar
         </Link>
         <Link href="/clubs" className="px-2 py-1.5">
           Clubs
         </Link>
-        <Link href="/messages" className="px-2 py-1.5 flex items-center gap-x-1">
+        <Link
+          href="/messages"
+          className="px-2 py-1.5 flex items-center gap-x-1"
+        >
           Messages
           {unreadCount > 0 && (
             <span className="text-xs bg-red-500 text-white rounded-full px-1.5">
               {unreadCount}
             </span>
           )}
+        </Link>
+        <Link href="/chat/1" className="px-2 py-1.5">
+          {/* TODO: change back to /chat */}
+          Chat
         </Link>
         <NavUser user={user} />
       </nav>
