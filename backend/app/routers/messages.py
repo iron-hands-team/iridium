@@ -71,6 +71,17 @@ def get_unread_count(
     )
     return {"count": count}
 
+@router.patch("/messages/read-all")
+def mark_all_read(
+    db: Session = Depends(get_db),
+    current_user: User = Depends(manager),
+):
+    db.query(Message).filter(
+        Message.recipient_id == current_user.id, Message.read == False
+    ).update({"read": True})
+    db.commit()
+    return {"message": "All messages marked as read."}
+
 @router.patch("/messages/{message_id}/read", response_model=MessageResponse)
 def mark_read(
     message_id: int,

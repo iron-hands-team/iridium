@@ -13,12 +13,24 @@ import Modal from "@/components/ui/modal";
 import Input from "@/components/ui/input";
 import Textarea from "@/components/ui/textarea";
 import Dropdown from "@/components/ui/dropdown";
+import { time } from "console";
+import { button } from "framer-motion/m";
 
 const emptyMessage = { subject: "", body: "" };
 const labelStyles =
   "text-black dark:text-zinc-300 text-sm flex flex-col gap-y-1 w-full";
 
-function timeAgo
+function timeAgo(iso: string): string {
+  const diffMs = Date.now() - new Date(iso).getTime();
+  const minutes = Math.floor(diffMs/60000);
+  if (minutes < 1) return "Just now";
+  if (minutes < 60) return `${minutes}m ago`;
+  const hours = Math.floor(minutes/60);
+  if (hours<24) return `${hours}h ago`;
+  const days = Math.floor(hours/24);
+  if (days < 7) return `${days}d ago`;
+  return new Date(iso).toLocaleDateString();
+}
 
 function Messages({
   inbox,
@@ -109,6 +121,14 @@ function Messages({
     }
   }
 
+  async function markAllRead() {
+    await fetch("/api/messages/read-all", {
+      method: "PATCH",
+      credentials: "include",
+    });
+    router.refresh();
+  }
+
   return (
     <div className="flex flex-col gap-y-5">
       <div className="flex justify-between items-center gap-x-3 border-b border-zinc-800">
@@ -128,6 +148,14 @@ function Messages({
             </span>
           )}
         </button>
+         {tab === "inbox" && unread > 0 && (
+          <button
+            className="px-2 text-xs text-zinc-500 hover:text-black dark:hover:text-zinc-300 self-center"
+            onClick={markAllRead}
+          >
+            Mark all read
+          </button>
+        )}
         <button
           className={`px-4 py-2 font-bold ${
             tab === "sent"
@@ -175,8 +203,8 @@ function Messages({
                       {other.lastName} (@{other.username})
                     </span>
                   </div>
-                  <span className="text-xs text-zinc-500">
-                    {new Date(m.createdAt).toLocaleString()}
+                  <span className="text-xs text-zinc-500" title={new Date(m.createdAt).toLocaleString()}>
+                    {timeAgo(m.createdAt)}
                   </span>
                 </div>
                 <p className={unreadInbox ? "text-sm font-bold" : "text-sm"}>
