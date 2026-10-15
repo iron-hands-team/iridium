@@ -351,3 +351,20 @@ class ChannelResponse(BaseModel):
 
 class ChannelCreateResponse(BaseModel):
     id: int
+
+class MessageSendRequest(BaseModel):
+    message: str
+    channel_id: int
+
+class ChatMessageResponse(BaseModel):
+    id: int
+    text: str
+    created_at: datetime
+    replying_to: int | None = None
+    edited: bool
+    user_id: int
+    user: UserResponse
+    channel_id: int
+
+    class Config:
+        from_attributes = True

@@ -42,6 +42,7 @@ class User(Base):
     attendance_records = relationship("AttendanceRecord", back_populates="student", cascade="all, delete-orphan")
     messages_sent = relationship("Message", back_populates="sender", cascade="all, delete-orphan", foreign_keys="Message.sender_id")
     messages_received = relationship("Message", back_populates="recipient", cascade="all, delete-orphan", foreign_keys="Message.recipient_id")
+    chat_messages = relationship("ChatMessage", back_populates="user")
 
 class Announcement(Base):
     __tablename__ = "announcements"
@@ -241,3 +242,17 @@ class Channel(Base):
 
     club_id = Column(Integer, ForeignKey("clubs.id"),nullable=True, unique=True)
     club = relationship("Club", back_populates="channel")
+    messages = relationship("ChatMessage", back_populates="channel")
+
+class ChatMessage(Base):
+    __tablename__ = "chat_messages"
+    id = Column(Integer, primary_key=True, index=True)
+    text = Column(String, nullable=False)
+    created_at = Column(DateTime(timezone=True), default=utcnow, nullable=False)
+    replying_to = Column(Integer, nullable=True)
+    edited = Column(Boolean, default=False)
+
+    user_id = Column(Integer, ForeignKey("users.id"))
+    user = relationship("User", back_populates="chat_messages")
+    channel_id = Column(Integer, ForeignKey("channels.id"))
+    channel = relationship("Channel", back_populates="messages")

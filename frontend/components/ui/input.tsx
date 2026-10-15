@@ -11,6 +11,7 @@ interface InputProps {
   type?: string;
   styles?: string;
   clear?: boolean;
+  full?: boolean;
 }
 
 function Input({
@@ -20,6 +21,7 @@ function Input({
   type,
   styles,
   clear,
+  full,
 }: InputProps) {
   const [viewing, setViewing] = useState<boolean>(false);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -39,7 +41,7 @@ function Input({
   }
 
   return (
-    <div className="relative flex items-center">
+    <div className={`relative flex items-center ${full && "flex-1"}`}>
       <input
         type={viewing ? "text" : type}
         placeholder={placeholder}
