@@ -8,18 +8,7 @@ import "@/app/globals.css";
 export default function header({headerText}: {headerText : React.ReactElement}) {
  return (
       <header
-        style={{
-          display: "flex",
-					flexDirection: "column",
-          gap: "20px",
-          height: "150px",
-          alignItems: "center",
-          padding: 10,
-          borderTop: "1px solid gray",
-          borderBottom: "1px solid gray",
-					justifyContent: "center"
-				
-        }}
+        className="flex flex-col gap-[10px] h-[150px] items-center p-10 border-t-[1px] border-b-[1px] border-gray-500 justify-center w-full bg-purple-400"
       >
 				{headerText}
       </header>

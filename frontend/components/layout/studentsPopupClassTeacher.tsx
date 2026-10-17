@@ -7,8 +7,10 @@ import Btn from "@/components/ui/btn";
 export default function SettingsPopupClassTeacher() {
 
 	const settingsClassIndex = cs((state)=> state.settingsClassIndex);
+	const setSettingsClassIndex = cs((state)=>state.setSettingsClassIndex);
 	const setStudentsPopup = cs((state)=>state.setStudentsPopup);
 	const settingsStudentsIndex= cs((state)=>state.settingsStudentsIndex);
+	const setSettingsStudentsIndex= cs((state)=>state.setSettingsStudentsIndex);
 	const classes = cs((state) => state.classes);
 
 	const deleteStudent = cs((state) => state.deleteStudent);
@@ -39,7 +41,8 @@ export default function SettingsPopupClassTeacher() {
 	};
 
  return (
-				<div className="fixed flex h-full w-full justify-center items-center bg-black/90" onClick={() => setStudentsPopup(false)}>
+		<div>
+							{settingsStudentsIndex != -1 && <div className="fixed flex h-full w-full justify-center items-center bg-black/90" onClick={() => setStudentsPopup(false)}>
 					<div className="bg-black  z-10 h-2/3 w-2/3  flex justify-center items-center border-1 border-zinc-400"  onClick={(e) => e.stopPropagation()}>
 						<div className=" h-[500px] w-3/4 bg-blue">
 							<p><b>{classes[settingsClassIndex].students[settingsStudentsIndex].name}'s</b> Stuff</p>			
@@ -89,12 +92,13 @@ export default function SettingsPopupClassTeacher() {
 							</div>
 							<br></br>
 							<div className="flex gap-[10px]">
-								<div className="flex w-1/3"><Btn text="Delete student" onclick={()=> deleteStudent(settingsClassIndex, settingsStudentsIndex)}/></div>
+								<div className="flex w-1/3"><Btn text="Delete student" onclick={()=> {deleteStudent(settingsClassIndex, settingsStudentsIndex); setSettingsClassIndex(-1); setSettingsStudentsIndex(-1)} }/></div>
 								<div className="flex w-2/3"><Btn text="Close" onclick={() => setStudentsPopup(false)}/></div>
 							</div>
 						</div>
 					</div>
-				</div>
+				</div>}
+		</div>
  );
 }
 // next time i will:

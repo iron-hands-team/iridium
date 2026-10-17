@@ -19,6 +19,8 @@ type Class = {
  assignments: Assignment[];
  announcements: Announcement[];
 	quizzes: Quiz[];
+	canShowQuizzes: boolean;
+	
 };
 
 type Assignment = {
@@ -40,6 +42,7 @@ type Quiz = {
 	id: number,
 	name: string,
 	questions: QuizQuestion[];
+	canShow: boolean;
 }
 
 type QuizQuestion = {
@@ -47,6 +50,7 @@ type QuizQuestion = {
 	question: string,
 	choices: string[]
 	answers: string[],
+	canShow: boolean
 }
 
 
@@ -54,14 +58,31 @@ type ClassStore = {
  classes: Class[];
 	annoucementInput: string;
 
+	aboutPopup: boolean;
+	setAboutPopup: (input:boolean)=>void;
+
 	// quiz
+	quizPopup: boolean;
+	setQuizPopup: (input:boolean)=>void;
+
 	addClassQuiz: (classTargetIndex:number)=>void;
 	deleteClassQuiz: (classTargetIndex:number, quizIndex:number) =>void;
 	setClassQuiz: <T>(classTargetIndex:number, quizIndex:number, value:T, variableName:string)=>void;
+
+	quizClassIndex: number;
+	setQuizClassIndex: (classIndex:number) => void;
 	
 	addQuizQuestion: (classTargetIndex:number, quizTargetIndex:number)=>void;
 	deleteQuizQuestion: (classTargetIndex:number, quizTargetIndex:number, quizQuestionTargetIndex:number)=>void;
 	setQuizQuestion: <T>(classTargetindex:number, quizTargetIndex:number, quizQuestionTargetIndex:number, value:T, variableName:string)=>void;
+
+	addQuizChoice: (choices:string[], choice:string)=>string[];
+	deleteQuizChoice: (choices:string[], choiceIndex:number)=>string[];
+	setQuizChoice: (choices:string[], choiceIndex:number, choice:string)=>string[];
+
+	addQuizAnswer: (answers:string[], answer:string) => string[];
+	deleteQuizAnswer: (answers:string[], answerIndex:number) => string[];
+	setQuizAnswer: (answers:string[], answerIndex:number, answer:string)=> string[];
 
  // settings stuff
  settingsPopup: boolean;
@@ -80,6 +101,8 @@ type ClassStore = {
  setAssignmentsPopup: (input:boolean) => void;
  untitledCount: number;
  setUntitledCount: (untitledCount:number)=>void;
+
+	update: () => void;
 
  //messaging info
  messagePopup: boolean;
@@ -132,11 +155,19 @@ type ClassStore = {
 	updateCanShowStudents: (classIndex:number,canShow:boolean)=>void;
 	deleteClass: (classIndex:number) => void;
 }
+
 export const cs = create<ClassStore>((set) => ({
     classes: [],
 
 				annoucementInput: "",
 
+				aboutPopup: false,
+
+				setAboutPopup: (aboutPopup)=> set({aboutPopup}),
+
+				update: () => set((state) => ({
+					classes: state.classes
+				})),
 				//quiz question
 				addClassQuiz: (classTargetIndex) => set((state) => ({
 					classes: state.classes.map((classItem, classIndex) => 
@@ -144,7 +175,8 @@ export const cs = create<ClassStore>((set) => ({
 							[...classItem.quizzes, {
 								id: 0,
 								name: "",
-								questions: []
+								questions: [],
+								canShow: true,
 							}]
 						} : classItem
 					)
@@ -164,7 +196,7 @@ export const cs = create<ClassStore>((set) => ({
 
 				addQuizQuestion: (classTargetIndex, quizTargetIndex) => set((state) => ({
 					classes: state.classes.map((classItem, classIndex) => 
-						classIndex === classTargetIndex ? {...classItem, quizzes: classItem.quizzes.map((quizItem, quizIndex) => ( quizIndex === quizTargetIndex ? { ...quizItem, questions: [...quizItem.questions, {id:0,question:"",choices: [], answers: []}]}:quizItem))} : classItem
+						classIndex === classTargetIndex ? {...classItem, quizzes: classItem.quizzes.map((quizItem, quizIndex) => ( quizIndex === quizTargetIndex ? { ...quizItem, questions: [...quizItem.questions, {id:0,question:"",choices: [], answers: [], canShow: true}]}:quizItem))} : classItem
 					)
 				})),
 
@@ -172,9 +204,60 @@ export const cs = create<ClassStore>((set) => ({
 					classes: state.classes.map((classItem, classIndex) =>  classIndex === classTargetIndex ? {...classItem, quizzes: classItem.quizzes.map((quizItem, quizIndex) => quizIndex === quizTargetIndex ? {...quizItem, questions: quizItem.questions.filter((_,i) => i !== quizQuestionTargetIndex)} : quizItem)} : classItem)
 				})),
 
-			setQuizQuestion: (classTargetIndex, quizTargetIndex, quizQuestionTargetIndex, value, variableName) => set((state) => ({
-					classes: state.classes.map((classItem, classIndex) =>  classIndex === classTargetIndex ? {...classItem, quizzes: classItem.quizzes.map((quizItem, quizIndex) => quizIndex === quizTargetIndex ? {...quizItem, questions: quizItem.questions.map((questionItem, questionIndex) => questionItem.id === quizQuestionTargetIndex ? {...questionItem, [variableName]: value} : questionItem)} : quizItem)} : classItem)
-				})),
+setQuizQuestion: (
+    classTargetIndex,
+    quizTargetIndex,
+    quizQuestionTargetIndex,
+    value,
+    variableName
+) => set((state) => ({
+    classes: state.classes.map((classItem, classIndex) =>
+        classIndex === classTargetIndex
+            ? {
+                ...classItem,
+                quizzes: classItem.quizzes.map((quizItem, quizIndex) =>
+                    quizIndex === quizTargetIndex
+                        ? {
+                            ...quizItem,
+                            questions: quizItem.questions.map((questionItem, questionIndex) =>
+                                questionIndex === quizQuestionTargetIndex
+                                    ? { ...questionItem, [variableName]: value }
+                                    : questionItem
+                            )
+                        }
+                        : quizItem
+                )
+            }
+            : classItem
+    )
+})),
+
+				quizClassIndex: 0,
+				quizPopup: false,
+
+				setQuizClassIndex: (quizClassIndex) => set({quizClassIndex}),
+				setQuizPopup: (quizPopup) => set({quizPopup}),
+
+
+addQuizChoice: (choices, choice) => {
+    return [...choices, choice];
+},
+				deleteQuizChoice: (choices, choiceIndex): string[] => {
+					return choices.filter((_, index) => index!== choiceIndex);
+				},
+				setQuizChoice: (choices, choiceIndex, choice): string[] => {
+					return choices.map((choiceItem, index) => index === choiceIndex ? choice : choiceItem);
+				},
+
+			addQuizAnswer: (answers, answer): string[] => {
+    return [...answers, answer];
+},
+				deleteQuizAnswer: (answers, answerIndex): string[] => {
+					return answers.filter((_, index) => index!== answerIndex);
+				},
+				setQuizAnswer: (answers, answerIndex, answer): string[] => {
+					return answers.map((answerItem, index) => index === answerIndex ? answer : answerItem);
+				},
 
     settingsPopup: false,
     setSettingsPopup: (settingsPopup) => set({settingsPopup}),
@@ -208,10 +291,11 @@ export const cs = create<ClassStore>((set) => ({
 						className: "Untitled",
 						students: [],
 						color: "border-zinc-500",
-						canShow: false,
+						canShow: true,
 						assignments: [],
 						announcements: [],
-						quizzes: []
+						quizzes: [],
+						canShowQuizzes: false
 					},
       ]
      })),
