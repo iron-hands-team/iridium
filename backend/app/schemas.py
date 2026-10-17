@@ -354,7 +354,7 @@ class ChannelCreateResponse(BaseModel):
 
 class MessageSendRequest(BaseModel):
     message: str
-    channel_id: int
+    channel_id: int | None = None
 
 class ChatMessageResponse(BaseModel):
     id: int

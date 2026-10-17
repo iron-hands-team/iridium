@@ -12,6 +12,7 @@ interface InputProps {
   styles?: string;
   clear?: boolean;
   full?: boolean;
+  onblur?: () => void;
 }
 
 function Input({
@@ -22,6 +23,7 @@ function Input({
   styles,
   clear,
   full,
+  onblur,
 }: InputProps) {
   const [viewing, setViewing] = useState<boolean>(false);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -48,6 +50,7 @@ function Input({
         value={value}
         ref={inputRef}
         onChange={(e) => setValue(e.target.value)}
+        onBlur={() => (onblur ? onblur() : null)}
         className={`w-full bg-zinc-200 dark:bg-zinc-900 px-3 py-1.5 text-black dark:text-zinc-300 outline-none text-base ${styles}`}
       />
       <div className="absolute right-3 flex gap-x-3">

@@ -5,10 +5,9 @@ import { getSession } from "@/lib/auth";
 import { parseUser } from "@/lib/helpers";
 import Channel from "@/components/chat/channel";
 import ChannelBtn from "@/components/chat/channel-btn";
-import MessageInput from "@/components/chat/message-input";
-import Message from "@/components/chat/message";
+import Messages from "@/components/chat/messages";
 
-type MessageType = MessageT & { user: UserResponse };
+type MessageType = MessageT & { user: UserResponse; created_at: string };
 
 async function Page({ params }: { params: Promise<{ id: number }> }) {
   const { id } = await params;
@@ -38,12 +37,16 @@ async function Page({ params }: { params: Promise<{ id: number }> }) {
   const channelMessages =
     channelMessage.length > 0
       ? channelMessage.map((m) => {
-          return { ...m, user: parseUser(m.user) };
+          return {
+            ...m,
+            user: parseUser(m.user),
+            createdAt: new Date(m.created_at),
+          };
         })
       : [];
 
   return (
-    <div className="flex gap-x-5 px-3 sm:px-10 lg:px-50 max-w-450 mx-auto">
+    <div className="flex px-3 sm:px-10 lg:px-50 max-w-450 mx-auto">
       <div className="w-60 py-3 pr-5 border-r border-zinc-800 flex flex-col gap-y-3 h-[calc(100vh-57px)] overflow-auto">
         <h2 className="font-bold text-lg px-4 my-2">Channels</h2>
         {channels.map((c) => (
@@ -55,12 +58,11 @@ async function Page({ params }: { params: Promise<{ id: number }> }) {
         ))}
         {user.role === "admin" && <ChannelBtn />}
       </div>
-      <div className="flex-1 flex flex-col gap-y-10 justify-center items-center">
-        {channelMessages.map((message) => (
-          <Message key={message.id} message={message} />
-        ))}
-        <MessageInput id={Number(id)} />
-      </div>
+      <Messages
+        messages={channelMessages}
+        id={id.toString()}
+        userId={user.id!}
+      />
     </div>
   );
 }

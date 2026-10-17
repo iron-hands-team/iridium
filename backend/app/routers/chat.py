@@ -56,7 +56,12 @@ def get_messages(
         raise HTTPException(
             status_code=404, detail=f"Channel with ID {channel_id} not found."
         )
-    messages = db.query(ChatMessage).filter(ChatMessage.channel_id == channel_id).all()
+    messages = (
+        db.query(ChatMessage)
+        .filter(ChatMessage.channel_id == channel_id)
+        .order_by(ChatMessage.created_at)
+        .all()
+    )
     return messages
 
 
@@ -70,4 +75,44 @@ def send_message(
         text=message.message, channel_id=message.channel_id, user_id=current_user.id
     )
     db.add(chat_message)
+    db.commit()
+
+
+@router.patch("/message/{message_id}", status_code=204)
+def edit_message(
+    message_id: int,
+    message: MessageSendRequest,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(manager),
+):
+    existing = db.query(ChatMessage).filter(ChatMessage.id == message_id).first()
+    if existing is None:
+        raise HTTPException(
+            status_code=404, detail=f"Chat message with ID {message_id} not found."
+        )
+    if existing.user_id != current_user.id:
+        raise HTTPException(
+            statuus_code=403, detail="You're not allowed to edit that message."
+        )
+    existing.text = message.message
+    existing.edited = True
+    db.commit()
+
+
+@router.delete("/message/{message_id}", status_code=204)
+def delete_message(
+    message_id: int,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(manager),
+):
+    existing = db.query(ChatMessage).filter(ChatMessage.id == message_id).first()
+    if existing is None:
+        raise HTTPException(
+            status_code=404, detail=f"Chat message with ID {message_id} not found."
+        )
+    if existing.user_id != current_user.id:
+        raise HTTPException(
+            status_code=403, detail="You're not allowed to delete that message."
+        )
+    db.delete(existing)
     db.commit()
