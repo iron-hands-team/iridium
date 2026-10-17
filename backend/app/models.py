@@ -1,7 +1,7 @@
 import enum
 from datetime import datetime, timezone
 
-from sqlalchemy import Column, Integer, String, Enum, Text, DateTime, Time, Boolean, Float, ForeignKey
+from sqlalchemy import Column, Integer, String, Enum, Text, DateTime, Time, Date, Boolean, Float, ForeignKey, UniqueConstraint
 from sqlalchemy.dialects.postgresql import ARRAY
 from sqlalchemy.orm import relationship
 from app.database import Base
@@ -28,16 +28,21 @@ class User(Base):
     requesting = Column(Boolean, nullable=True)
     requesting_delete = Column(Boolean, nullable=True)
 
-    announcements = relationship("Announcement", back_populates="author")
+    announcements = relationship("Announcement", back_populates="author", cascade="all, delete-orphan")
     clubs_sponsored = relationship("Club", back_populates="sponsor")
-    club_memberships = relationship("ClubMembership", back_populates="user")
-    events_created = relationship("Event", back_populates="created_by")
-    schedule_items = relationship("ScheduleItem", back_populates="user")
-    classes_taught = relationship("ClassSection", back_populates="teacher")
-    class_enrollments = relationship("ClassEnrollment", back_populates="student")
-    announcement_likes = relationship("AnnouncementLike", back_populates="user")
-    event_rsvps = relationship("EventRSVP", back_populates="user")
-    grades = relationship("Grade", back_populates="student")
+    club_memberships = relationship("ClubMembership", back_populates="user", cascade="all, delete-orphan")
+    events_created = relationship("Event", back_populates="created_by", cascade="all, delete-orphan")
+    schedule_items = relationship("ScheduleItem", back_populates="user", cascade="all, delete-orphan")
+    classes_taught = relationship("ClassSection", back_populates="teacher", cascade="all, delete-orphan")
+    class_enrollments = relationship("ClassEnrollment", back_populates="student", cascade="all, delete-orphan")
+    announcement_likes = relationship("AnnouncementLike", back_populates="user", cascade="all, delete-orphan")
+    event_rsvps = relationship("EventRSVP", back_populates="user", cascade="all, delete-orphan")
+    grades = relationship("Grade", back_populates="student", cascade="all, delete-orphan")
+    reports = relationship("Report", back_populates="user")
+    attendance_records = relationship("AttendanceRecord", back_populates="student", cascade="all, delete-orphan")
+    messages_sent = relationship("Message", back_populates="sender", cascade="all, delete-orphan", foreign_keys="Message.sender_id")
+    messages_received = relationship("Message", back_populates="recipient", cascade="all, delete-orphan", foreign_keys="Message.recipient_id")
+    chat_messages = relationship("ChatMessage", back_populates="user")
 
 class Announcement(Base):
     __tablename__ = "announcements"
@@ -78,6 +83,7 @@ class Club(Base):
 
     sponsor = relationship("User", back_populates="clubs_sponsored")
     members = relationship("ClubMembership", back_populates="club")
+    channel = relationship("Channel", back_populates="club", uselist=False)
 
 class ClubMembership(Base):
     __tablename__ = "club_memberships"
@@ -141,6 +147,9 @@ class ClassSection(Base):
     assignments = relationship(
         "Assignment", back_populates="class_section", cascade="all, delete-orphan"
     )
+    attendance_records = relationship(
+        "AttendanceRecord", back_populates="class_section", cascade="all, delete-orphan"
+    )
 
 class Assignment(Base):
     __tablename__ = "assignments"
@@ -174,13 +183,76 @@ class ClassEnrollment(Base):
     class_section = relationship("ClassSection", back_populates="enrollments")
     student = relationship("User", back_populates="class_enrollments")
 
+class AttendanceRecord(Base):
+    __tablename__ = "attendance_records"
+    __table_args__ = (
+        UniqueConstraint("class_id", "student_id", "date", name="uq_attendance_class_student_date"),
+    )
+    id = Column(Integer, primary_key=True, index=True)
+    class_id = Column(Integer, ForeignKey("class_sections.id"), nullable=False)
+    student_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    date = Column(Date, nullable=False)
+    status = Column(String, nullable=False, default="present")  # present | absent | tardy | excused
+
+    class_section = relationship("ClassSection", back_populates="attendance_records")
+    student = relationship("User", back_populates="attendance_records")
+
 class MapItem(Base):
     __tablename__ = "map_items"
     id = Column(Integer, primary_key=True, index=True)
     label = Column(String, nullable=True)
+
+class Message(Base):
+    __tablename__ = "messages"
+    id = Column(Integer, primary_key=True, index=True)
+    sender_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    recipient_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    subject = Column(String, nullable=False)
+    body = Column(Text, nullable=False)
+    created_at = Column(DateTime(timezone=True), default=utcnow, nullable=False)
+    read = Column(Boolean, nullable=False, default=False)
+
+    sender = relationship("User", back_populates="messages_sent", foreign_keys=[sender_id])
+    recipient = relationship("User", back_populates="messages_received", foreign_keys=[recipient_id])
 
 class Rule(Base):
     __tablename__ = "rules"
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String, nullable=False)
     description = Column(String, nullable=True)
+
+class Report(Base):
+    __tablename__ = "reports"
+    id = Column(Integer, primary_key=True, index=True)
+    title = Column(String, nullable=False)
+    description = Column(String, nullable=False)
+    anonymous = Column(Boolean, nullable=False, default=True)
+    type = Column(String, nullable=False)
+    role = Column(String, nullable=True)
+
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=True)
+    user = relationship("User", back_populates="reports")
+
+class Channel(Base):
+    __tablename__ = "channels"
+    id = Column(Integer, primary_key=True, index=True)
+    name = Column(String, nullable=False, unique=True)
+    description = Column(String, nullable=True)
+    role = Column(String, nullable=False)
+
+    club_id = Column(Integer, ForeignKey("clubs.id"),nullable=True, unique=True)
+    club = relationship("Club", back_populates="channel")
+    messages = relationship("ChatMessage", back_populates="channel")
+
+class ChatMessage(Base):
+    __tablename__ = "chat_messages"
+    id = Column(Integer, primary_key=True, index=True)
+    text = Column(String, nullable=False)
+    created_at = Column(DateTime(timezone=True), default=utcnow, nullable=False)
+    replying_to = Column(Integer, nullable=True)
+    edited = Column(Boolean, default=False)
+
+    user_id = Column(Integer, ForeignKey("users.id"))
+    user = relationship("User", back_populates="chat_messages")
+    channel_id = Column(Integer, ForeignKey("channels.id"))
+    channel = relationship("Channel", back_populates="messages")

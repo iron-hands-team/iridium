@@ -11,7 +11,7 @@ from app.models import User, UserRole
 from app.schemas import LoginRequest, UserCreateRequest, UserResponse, TokenResponse
 from app.dependencies import require_admin
 from app.seed import init_db_and_seed_admin
-from app.routers import users, announcements, clubs, events, schedule, classes, info, grades
+from app.routers import users, announcements, clubs, events, schedule, classes, info, grades, attendance, messages, chat
 
 IS_PROD = os.getenv("ENVIRONMENT", "development") == "production"
 FRONTEND_URL = os.getenv("FRONTEND_URL", "http://localhost:3000")
@@ -34,6 +34,10 @@ app.include_router(schedule.router)
 app.include_router(classes.router)
 app.include_router(info.router)
 app.include_router(grades.router)
+app.include_router(attendance.router)
+app.include_router(attendance.router)
+app.include_router(messages.router)
+app.include_router(chat.router)
 
 @app.get("/")
 def root():

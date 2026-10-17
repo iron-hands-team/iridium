@@ -4,6 +4,7 @@ import type { UserType } from "@/types/user";
 import { useState } from "react";
 import { profileUrl } from "@/lib/helpers";
 import { FaUserCircle } from "react-icons/fa";
+import MessageBtn from "@/components/chat/message-btn";
 import Input from "@/components/ui/input";
 import Image from "next/image";
 
@@ -34,6 +35,7 @@ function Staff({ users }: { users: UserType[] }) {
           <div className="flex-2 px-4">Name</div>
           <div className="flex-2 px-4">Title</div>
           <div className="flex-1 px-4">Role</div>
+          <div className="flex-1 px-4">Action</div>
         </div>
         {displayed.length > 0 ? (
           displayed.map((u) => (
@@ -64,6 +66,9 @@ function Staff({ users }: { users: UserType[] }) {
               <div className="flex-2 px-4">{u.title}</div>
               <div className="flex-1 px-4">
                 {u.role[0].toUpperCase() + u.role?.slice(1)}
+              </div>
+              <div className="flex-1 px-4">
+                <MessageBtn username={u.username} />
               </div>
             </div>
           ))

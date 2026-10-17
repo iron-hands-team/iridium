@@ -33,7 +33,7 @@ function Dropdown({ value, setValue, values, label, above }: DropdownProps) {
   }, []);
 
   return (
-    <div ref={menuRef} className="w-fit z-10 relative text-sm">
+    <div ref={menuRef} className="w-fit relative text-sm">
       <div
         onClick={() => setMenuOpen(!menuOpen)}
         className="cursor-pointer border border-zinc-800 hover:bg-zinc-200/85 dark:hover:bg-zinc-900/50 px-3 py-1.5"
@@ -46,7 +46,7 @@ function Dropdown({ value, setValue, values, label, above }: DropdownProps) {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className={`absolute left-0 min-w-35 bg-zinc-100 dark:bg-zinc-950 border border-zinc-800 p-2 ${above ? "bottom-[calc(100%+10px)]" : "top-[calc(100%+10px)]"}`}
+            className={`absolute left-0 min-w-35 z-10 bg-zinc-100 dark:bg-zinc-950 max-h-70 overflow-y-auto border border-zinc-800 p-2 ${above ? "bottom-[calc(100%+10px)]" : "top-[calc(100%+10px)]"}`}
           >
             {label && (
               <div className="text-center pb-2 text-zinc-700 dark:text-zinc-300">

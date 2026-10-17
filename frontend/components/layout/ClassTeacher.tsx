@@ -7,6 +7,26 @@ import Input from "@/components/ui/input";
 import Footer from "@/components/layout/footer";
 import {cs} from "@/lib/classStore";
 
+const ATTENDANCE_STATUSES = ["present", "absent", "tardy", "excused"] as const;
+
+const attendanceStatusStyles: Record<string, string> = {
+  present: "bg-green-600 text-white",
+  absent: "bg-red-600 text-white",
+  tardy: "bg-yellow-600 text-white",
+  excused: "bg-zinc-600 text-white"
+};
+
+function todayISO() {
+  return new Date().toISOString().slice(0,10);
+}
+
+interface AttendanceRecord {
+  id: number;
+  student: UserSummary;
+  date: string;
+  status: string;
+}
+
 interface UserSummary {
   id: number;
   username: string;
@@ -80,6 +100,14 @@ export default function ClassBody() {
     Record<number, string>
   >({});
   const [scoreDrafts, setScoreDrafts] = useState<Record<string, string>>({});
+
+  const [attendanceDate, setAttendanceDate] = useState(todayISO());
+  const [attendance, setAttendance] = useState<
+    Record<number, AttendanceRecord[]>
+  >({});
+  const [attendanceOpen, setAttendanceOpen] = useState<
+    Record<number, boolean>
+  >({});
 
   const loadClasses = useCallback(async () => {
     try {
@@ -276,6 +304,56 @@ export default function ClassBody() {
       [assignmentId]: !prev[assignmentId],
     }));
     if (!assignments[classId]) loadAssignments(classId);
+  }
+
+  async function loadAttendance(classId: number, date: string) {
+    try {
+      setError(null);
+      const data: AttendanceRecord[] = await api(
+        `/classes/${classId}/attendance?date=${date}`,
+      );
+      setAttendance((prev) => ({ ...prev, [classId]: data }));
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Failed to load attendance.");
+    }
+  }
+
+  function toggleAttendance(classId: number) {
+    const next = !attendanceOpen[classId];
+    setAttendanceOpen((prev) => ({ ...prev, [classId]: next }));
+    if (next) loadAttendance(classId, attendanceDate);
+  }
+
+  function changeAttendanceDate(date: string) {
+    setAttendanceDate(date);
+    Object.keys(attendanceOpen).forEach((key) => {
+      const classId = Number(key);
+      if (attendanceOpen[classId]) loadAttendance(classId, date);
+    });
+  }
+
+  async function setAttendanceStatus(
+    classId: number,
+    studentId: number,
+    status: string,
+  ) {
+    try {
+      setError(null);
+      await api(
+        `/classes/${classId}/attendance/${studentId}?date=${attendanceDate}`,
+        { method: "PATCH", body: JSON.stringify({ status }) },
+      );
+      setAttendance((prev) => ({
+        ...prev,
+        [classId]: (prev[classId] || []).map((r) =>
+          r.student.id === studentId ? { ...r, status } : r,
+        ),
+      }));
+    } catch (e) {
+      setError(
+        e instanceof Error ? e.message : "Failed to update attendance.",
+      );
+    }
   }
 
   return (
@@ -560,6 +638,66 @@ export default function ClassBody() {
                         );
                       })}
                     </div>
+                  )}
+
+                  <div className="flex items-center justify-between mt-4">
+                    <p className="font-bold text-sm">Attendance</p>
+                    <div className="flex items-center gap-x-2">
+                      <input
+                          type="date"
+                          value={attendanceDate}
+                          onChange={(e) => changeAttendanceDate(e.target.value)}
+                          className="bg-transparent border border-zinc-800 rounded px-2 py-1 text-xs"
+                       />
+                       <Btn
+                          text={attendanceOpen[section.id] ? "Hide" : "Take Attendance"}
+                          styles="text-xs"
+                          onclick={() => toggleAttendance(section.id)}
+                       />
+                    </div>
+                  </div>
+
+                  {attendanceOpen[section.id] && (
+                    (attendance[section.id] || []).length === 0 ? (
+                      <p className="text-sm text-zinc-500">
+                        No students enrolled to take attendance for.
+                      </p>
+                    ) : (
+                      <div className="flex flex-col gap-y-2">
+                        {attendance[section.id].map((record) => (
+                          <div
+                            key={record.id}
+                            className="flex justify-between items-center border-b border-zinc-800 pb-1"
+                          >
+                            <p className="text-sm">
+                              {record.student.first_name}{" "}
+                              {record.student.last_name}
+                            </p>
+                            <div className="flex gap-x-1">
+                              {ATTENDANCE_STATUSES.map((status) => (
+                                <button
+                                  key={status}
+                                  onClick={() =>
+                                    setAttendanceStatus(
+                                      section.id,
+                                      record.student.id,
+                                      status,
+                                    )
+                                  }
+                                  className={`text-xs px-2 py-1 rounded capitalize ${
+                                    record.status === status
+                                      ? attendanceStatusStyles[status]
+                                      : "border border-zinc-800 text-zinc-400"
+                                  }`}
+                                >
+                                  {status}
+                                </button>
+                              ))}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )
                   )}
                 </div>
               )}

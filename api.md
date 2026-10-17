@@ -181,3 +181,5 @@ Staff only. `204` on success, `404` if not found.
 There's also no password-reset endpoint (`/reset` is a frontend-only
 dead link right now) and no self-service "update your own profile"
 route — `PATCH /users/{username}` is admin-only.
+
+<!-- TODO: this file needs a lot of updating -->

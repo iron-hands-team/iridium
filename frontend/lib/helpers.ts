@@ -22,3 +22,10 @@ export function profileUrl(username: string) {
 export function mapUrl(index: number) {
   return `/s3/files/map/${index}?t=${new Date().getTime()}`;
 }
+
+export function getTime(time: Date) {
+  const now = new Date();
+  return time.getTime() > new Date(now.toLocaleDateString()).getTime()
+    ? time.toLocaleTimeString([], { hour: "numeric", minute: "2-digit" })
+    : time.toLocaleDateString();
+}

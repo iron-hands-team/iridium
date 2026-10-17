@@ -1,4 +1,4 @@
-from datetime import datetime, time
+from datetime import datetime, time, date
 
 from pydantic import BaseModel
 from app.models import UserRole
@@ -26,7 +26,6 @@ class UserResponse(BaseModel):
     requesting: bool | None = None
     requesting_delete: bool | None = None
     role: UserRole
-    title: str
 
     class Config:
         from_attributes = True
@@ -34,11 +33,16 @@ class UserResponse(BaseModel):
 class StaffResponse(BaseModel):
     id: int
     username: str
-    last_name: str
     first_name: str
-    role: UserRole
-    title: str
+    last_name: str
+    middle_name: str | None = None
     image: bool | None = None
+    requesting: bool | None = None
+    requesting_delete: bool | None = None
+    role: UserRole
+
+    class Config:
+        from_attributes = True
 
 class UserUpdateRequest(BaseModel):
     first_name: str | None = None
@@ -47,7 +51,6 @@ class UserUpdateRequest(BaseModel):
     role: UserRole | None = None
     image: bool | None = None
     requesting: bool | None = None
-    title: str | None = None
 
 class ResetPasswordRequest(BaseModel):
     password: str | None = None
@@ -162,6 +165,18 @@ class ScheduleItemResponse(BaseModel):
     start_time: time | None
     end_time: time | None
 
+class ScheduleItemUpdateRequest(BaseModel):
+    period: int | None = None
+    course_name: str | None = None
+    room: str | None = None
+    start_time: time | None = None
+    end_time: time | None = None
+
+class ScheduleCopyRequest(BaseModel):
+    from_user_id: int
+    to_user_id: int
+    overwrite: bool = False
+
     class Config:
         from_attributes = True
 
@@ -243,16 +258,113 @@ class StudentClassGrades(BaseModel):
     class_name: str
     assignments: list[StudentAssignmentGrade]
 
+class AttendanceRecordResponse(BaseModel):
+    id: int
+    student: UserResponse
+    date: date
+    status: str
+
+    class Config:
+        from_attributes = True
+
+class AttendanceStatusUpdateRequest(BaseModel):
+    status: str
+
+class StudentAttendanceDay(BaseModel):
+    date: date
+    status: str
+
+class StudentClassAttendance(BaseModel):
+    class_id: int
+    class_name: str
+    records: list[StudentAttendanceDay]
+
+class MessageCreateRequest(BaseModel):
+    recipient_username: str
+    subject: str
+    body: str
+
+class MessageResponse(BaseModel):
+    id: int
+    subject: str
+    body: str
+    created_at: datetime
+    read: bool
+    sender: UserResponse
+    recipient: UserResponse
+
+    class Config:
+        from_attributes = True
+
 class RuleResponse(BaseModel):
     id: int
     name: str
     description: str | None = None
+
+class ReportResponse(BaseModel):
+    id: int | None = None
+    title: str
+    description: str
+    anonymous: bool = True
+    type: str
+    role: str | None = None
+    reporter: UserResponse | None = None
+
+    class Config:
+        from_attributes = True
 
 class SearchResponse(BaseModel):
     users: list[StaffResponse]
     announcements: list[AnnouncementResponse]
     events: list[EventResponse]
     clubs: list[ClubResponse]
+
+    class Config:
+        from_attributes = True
+
+class ReportResponse(BaseModel):
+    type: str
+    title: str
+    description: str
+    anonymous: bool
+    role: str | None = None
+    user: UserResponse | None = None
+
+    class Config:
+        from_attributes = True
+
+class ChannelCreateRequest(BaseModel):
+    name: str
+    description: str | None = None
+    role: str
+    club: int | None = None
+
+class ChannelResponse(BaseModel):
+    id: int
+    name: str
+    description: str | None = None
+    role: str
+    club: ClubResponse | None = None
+
+    class Config:
+        from_attributes = True
+
+class ChannelCreateResponse(BaseModel):
+    id: int
+
+class MessageSendRequest(BaseModel):
+    message: str
+    channel_id: int | None = None
+
+class ChatMessageResponse(BaseModel):
+    id: int
+    text: str
+    created_at: datetime
+    replying_to: int | None = None
+    edited: bool
+    user_id: int
+    user: UserResponse
+    channel_id: int
 
     class Config:
         from_attributes = True
