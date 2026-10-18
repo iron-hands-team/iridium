@@ -1,8 +1,9 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
+from sqlalchemy import func, or_
 
 from app.database import get_db
-from app.models import Channel, User, ChatMessage
+from app.models import Channel, User, ChatMessage, ClubMembership
 from app.schemas import (
     ChannelCreateRequest,
     ChannelResponse,
@@ -16,8 +17,26 @@ router = APIRouter(prefix="/chat", tags=["chat"])
 
 
 @router.get("/channels", response_model=list[ChannelResponse])
-def get_channels(db: Session = Depends(get_db), _current_user: User = Depends(manager)):
-    channels = db.query(Channel).all()
+def get_channels(db: Session = Depends(get_db), current_user: User = Depends(manager)):
+    query = db.query(Channel)
+
+    if current_user.role != "admin":
+        clubs = [
+            row[0]
+            for row in db.query(ClubMembership.club_id)
+            .filter(ClubMembership.user_id == current_user.id)
+            .all()
+        ]
+        query = query.filter(or_(Channel.club_id.is_(None), Channel.club_id.in_(clubs)))
+
+    channels = query.order_by(Channel.name).all()
+    for c in channels:
+        if c.club_id:
+            c.count = (
+                db.query(ClubMembership)
+                .filter(ClubMembership.club_id == c.club_id)
+                .count()
+            )
     return channels
 
 
@@ -72,7 +91,10 @@ def send_message(
     current_user: User = Depends(manager),
 ):
     chat_message = ChatMessage(
-        text=message.message, channel_id=message.channel_id, user_id=current_user.id
+        text=message.message,
+        channel_id=message.channel_id,
+        replying_to=message.replying,
+        user_id=current_user.id,
     )
     db.add(chat_message)
     db.commit()

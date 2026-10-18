@@ -160,6 +160,28 @@ Staff only. `204` on success, `404` if not found.
 
 ---
 
+## Chat
+
+Prefix: `/chat`
+
+### `GET /channels`
+
+Auth required (any role). General public channels and the current user's club channels.
+
+### `POST /channels`
+
+Admin only. Creates a new chat channel and returns the new channel ID on success, `403` if channel name already exists.
+
+### `GET /channel/{channel_id}`
+
+Auth required (any role). All channel message data (returning only a limited number of messages should be implemented)
+
+### `POST /send`
+
+Auth required (any role). Sends a message to the current channel, `204` on success.
+
+---
+
 ## Misc
 
 | Route            | Auth   | Notes                                     |

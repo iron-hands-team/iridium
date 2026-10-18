@@ -95,6 +95,8 @@ export const channelSchema = z.object({
   description: z.string().optional().nullable(),
   role: z.enum(["All", ...roles], "Please assign a valid role"),
   club: z.number().optional().nullable(),
+  clubName: z.string().optional().nullable(),
+  count: z.number().optional().nullable(),
 });
 
 export type LoginType = z.infer<typeof loginSchema>;
