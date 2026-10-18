@@ -14,6 +14,7 @@ import Input from "@/components/ui/input";
 import Textarea from "@/components/ui/textarea";
 import Dropdown from "@/components/ui/dropdown";
 import { input } from "zod";
+import WarningModal from "@/components/modals/warning";
 
 const emptyMessage = { subject: "", body: "" };
 const labelStyles =
@@ -48,10 +49,10 @@ function Messages({
   const [sending, setSending] = useState<boolean>(false);
   const [composeError, setComposeError] = useState<string | null>(null);
   const [search, setSearch] = useState<string>("");
-  const [deleting, setDeleting] = useState<Set<number>>(new Set());
-  const [selecting, setSelecting] = useState<boolean>(false);
-  const [confirming, setConfirming] = useState<boolean>(false);
-  const router = useRouter();
+  const [deleting, setDeleting] = useState<Set<number>>(new Set()); //actual set of message ids the user checked so far
+  const [selecting, setSelecting] = useState<boolean>(false); //is the checkbox ui on?
+  const [confirming, setConfirming] = useState<boolean>(false); //is the confirm delete dialogue on hte screen?
+  const router = useRouter(); 
 
   const messages = (tab === "inbox" ? inbox : sent).filter((m) => {
     const other = tab === "inbox" ? m.sender : m.recipient;
@@ -123,9 +124,9 @@ function Messages({
     }
   }
 
-  async function deleteMessage(m: MessageType) {
+  async function deleteMessage(id: number) {
     try {
-      await fetch(`/api/messages/${m.id}`, {
+      await fetch(`/api/messages/${id}`, {
       method: "DELETE",
       credentials: "include",
       });
@@ -134,6 +135,15 @@ function Messages({
     } catch(error) {
       console.error("Failed to delete message:", error)
     }
+  }
+
+  async function confirmBulkDelete() {
+    for (const id of deleting) {
+      await deleteMessage(id);
+    }
+    setConfirming(false);
+    setSelecting(false);
+    setDeleting(new Set());
   }
 
   function toggleSelected(id: number) {
@@ -319,16 +329,25 @@ function Messages({
           </Modal>
         )}
       </AnimatePresence>
+      <AnimatePresence>
+        {confirming && (
+            <WarningModal
+              title="Delete message(s) confirmation"
+              description={`Are you sure you want to delete the following message(s)? This will permanently delete all its data and information on Iridium. This action cannot be undone.`}
+              confirm={confirmBulkDelete}
+              closeModal={() => setSelecting(false)}
+            />
+          )}
+      </AnimatePresence>
       <button
-        className="fixed bottom-6 right-6 z-50 ..."
+        className="fixed bottom-6 right-6 z-50 bg-red-500 text-white p-4 rounded-full shadow-lg hover:bg-red-600"
         onClick={() => {
           if (!selecting) {
             setSelecting(true);
-
+          } else if (selecting === true && deleting.size > 0) {
+            setConfirming(true);
           }
-
         }}
-      >
         <FaTrash/>
       </button>
     </div>
