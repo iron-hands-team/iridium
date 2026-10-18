@@ -258,7 +258,7 @@ class ChatMessage(Base):
     channel_id = Column(Integer, ForeignKey("channels.id"))
     channel = relationship("Channel", back_populates="messages")
 
-class NotificationType(str.enum.Enum):
+class NotificationType(str, enum.Enum):
     message = "message"
     announcement = "announcement"
     grade = "grade"
