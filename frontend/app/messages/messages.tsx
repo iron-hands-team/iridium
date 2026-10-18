@@ -4,7 +4,7 @@ import type { MessageType } from "@/types/message";
 import type { UserType } from "@/types/user";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { AnimatePresence } from "framer-motion";
+import { AnimatePresence} from "framer-motion";
 import { FaEnvelopeOpen, FaEnvelope, FaExclamationTriangle, FaTrash } from "react-icons/fa";
 import { type NewMessageType, newMessageSchema } from "@/lib/schemas";
 import MessageBtn from "@/components/chat/message-btn";
@@ -13,8 +13,7 @@ import Modal from "@/components/ui/modal";
 import Input from "@/components/ui/input";
 import Textarea from "@/components/ui/textarea";
 import Dropdown from "@/components/ui/dropdown";
-import { time } from "console";
-import { button } from "framer-motion/m";
+import { input } from "zod";
 
 const emptyMessage = { subject: "", body: "" };
 const labelStyles =
@@ -49,6 +48,9 @@ function Messages({
   const [sending, setSending] = useState<boolean>(false);
   const [composeError, setComposeError] = useState<string | null>(null);
   const [search, setSearch] = useState<string>("");
+  const [deleting, setDeleting] = useState<Set<number>>(new Set());
+  const [selecting, setSelecting] = useState<boolean>(false);
+  const [confirming, setConfirming] = useState<boolean>(false);
   const router = useRouter();
 
   const messages = (tab === "inbox" ? inbox : sent).filter((m) => {
@@ -121,11 +123,29 @@ function Messages({
     }
   }
 
-  async function deleteMessage() {
-    await fetch(`/api/messages/message/${message}`, {
+  async function deleteMessage(m: MessageType) {
+    try {
+      await fetch(`/api/messages/${m.id}`, {
       method: "DELETE",
-    });
-    router.refresh();
+      credentials: "include",
+      });
+    
+      router.refresh();
+    } catch(error) {
+      console.error("Failed to delete message:", error)
+    }
+  }
+
+  function toggleSelected(id: number) {
+    const myset = new Set(deleting);
+
+    if (myset.has(id)) {
+      myset.delete(id);
+    } else {
+      myset.add(id);
+    }
+
+    setDeleting(myset);
   }
 
   async function markAllRead() {
@@ -199,6 +219,14 @@ function Messages({
               >
                 <div className="flex justify-between items-center gap-x-3">
                   <div className="flex items-center gap-x-2">
+                    {selecting && (
+                      <input
+                        type="checkbox"
+                        checked={deleting.has(m.id)}
+                        onChange={() => toggleSelected(m.id)}
+                        onClick={(e) => e.stopPropagation()}
+                      />
+                    )}
                     {tab === "inbox" &&
                       (m.read ? (
                         <FaEnvelopeOpen size={14} className="text-zinc-500" />
@@ -258,7 +286,7 @@ function Messages({
                   Subject <span className="text-red-500">*</span>
                 </div>
                 <Input
-                  placeholder="Change My Grade to an A Now"
+                  placeholder="Please Change My Grade to an A "
                   value={message.subject}
                   setValue={(subject) => setMessage({ ...message, subject })}
                 />
@@ -291,6 +319,18 @@ function Messages({
           </Modal>
         )}
       </AnimatePresence>
+      <button
+        className="fixed bottom-6 right-6 z-50 ..."
+        onClick={() => {
+          if (!selecting) {
+            setSelecting(true);
+
+          }
+
+        }}
+      >
+        <FaTrash/>
+      </button>
     </div>
   );
 }
