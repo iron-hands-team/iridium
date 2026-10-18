@@ -345,6 +345,7 @@ class ChannelResponse(BaseModel):
     description: str | None = None
     role: str
     club: ClubResponse | None = None
+    count: int | None = None
 
     class Config:
         from_attributes = True
@@ -355,6 +356,7 @@ class ChannelCreateResponse(BaseModel):
 class MessageSendRequest(BaseModel):
     message: str
     channel_id: int | None = None
+    replying: int | None = None
 
 class ChatMessageResponse(BaseModel):
     id: int

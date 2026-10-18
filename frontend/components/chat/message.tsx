@@ -1,27 +1,39 @@
 "use client";
 
-import type { MessageType } from "@/types/chat";
+import type { MessageType, ReplyType } from "@/types/chat";
 import { FaPen, FaReply, FaTrash, FaUserCircle } from "react-icons/fa";
 import { profileUrl, getTime } from "@/lib/helpers";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 import Input from "../ui/input";
+import { GoReply } from "react-icons/go";
 
 const optionStyles =
   "cursor-pointer hover:bg-zinc-300 dark:hover:bg-zinc-900 p-1";
 
 interface MessageProps {
   message: MessageType;
-  setReplying: React.Dispatch<React.SetStateAction<number | null>>;
+  setReplying: React.Dispatch<React.SetStateAction<ReplyType | null>>;
+  setHighlighted: React.Dispatch<React.SetStateAction<number | null>>;
   header: boolean;
   owned: boolean;
+  highlighted: boolean;
 }
 
-function Message({ message, setReplying, header, owned }: MessageProps) {
+function Message({
+  message,
+  setReplying,
+  setHighlighted,
+  header,
+  owned,
+  highlighted,
+}: MessageProps) {
   const [label, setLabel] = useState("");
   const [editing, setEditing] = useState<string | null>(null);
+  const messageRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
   const router = useRouter();
 
   async function handleEdit(e?: React.SubmitEvent) {
@@ -54,8 +66,41 @@ function Message({ message, setReplying, header, owned }: MessageProps) {
     setLabel(getTime(message.createdAt));
   }, [message]);
 
+  useEffect(() => {
+    if (highlighted)
+      messageRef.current!.scrollIntoView({
+        behavior: "smooth",
+        block: "center",
+      });
+  }, [highlighted]);
+
   return (
-    <div className="w-full hover:bg-zinc-300/50 dark:hover:bg-zinc-900/50 flex flex-col px-11 py-2.5 gap-y-2 group relative justify-center">
+    <div
+      className={`w-full hover:bg-zinc-300/50 dark:hover:bg-zinc-900/50 flex flex-col px-11 py-2.5 gap-y-2 group relative justify-center ${highlighted && "bg-zinc-300! dark:bg-zinc-900!"}`}
+      ref={messageRef}
+    >
+      {message.replyingTo && (
+        <div
+          className={`flex items-center gap-x-3 pl-2.5 w-fit text-xs text-zinc-700 dark:text-zinc-300 cursor-pointer ${message.replyingTo.deleted && "italic"}`}
+          onClick={() => setHighlighted(message.replyingTo!.id)}
+        >
+          <GoReply className="-scale-x-100" size={18} />
+          <div className="flex items-center gap-x-1">
+            {message.user.image ? (
+              <Image
+                src={profileUrl(message.user.username)}
+                alt="Avatar"
+                width={15}
+                height={15}
+              />
+            ) : (
+              <FaUserCircle size={15} />
+            )}
+            {message.user.firstName + " " + message.user.lastName}
+          </div>
+          {message.replyingTo.text}
+        </div>
+      )}
       {header && (
         <div className="flex items-center gap-x-7 text-sm text-zinc-700 dark:text-zinc-300 w-fit">
           <Link
@@ -95,10 +140,11 @@ function Message({ message, setReplying, header, owned }: MessageProps) {
             value={editing}
             setValue={(e) => setEditing(e)}
             onblur={() => handleEdit()}
+            ref={inputRef}
           />
         </form>
       ) : (
-        <p>
+        <p className="text-black! dark:text-white!">
           {message.text}{" "}
           {message.edited && (
             <span className="text-zinc-600 dark:text-zinc-400 text-xs pl-1">
@@ -113,7 +159,7 @@ function Message({ message, setReplying, header, owned }: MessageProps) {
             size={23}
             className={optionStyles}
             title="Reply to message"
-            onClick={() => setReplying(message.id)}
+            onClick={() => setReplying({ id: message.id, text: message.text })}
           />
           {owned && (
             <>
@@ -121,7 +167,12 @@ function Message({ message, setReplying, header, owned }: MessageProps) {
                 size={23}
                 className={optionStyles}
                 title="Edit message"
-                onClick={() => setEditing(message.text)}
+                onClick={() => {
+                  setEditing(message.text);
+                  setTimeout(() => {
+                    inputRef.current?.focus();
+                  }, 50);
+                }}
               />
               <FaTrash
                 size={23}

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { type Ref, useState, useRef } from "react";
 import { FaEye } from "react-icons/fa";
 import { FaXmark } from "react-icons/fa6";
 
@@ -13,6 +13,7 @@ interface InputProps {
   clear?: boolean;
   full?: boolean;
   onblur?: () => void;
+  ref?: Ref<HTMLInputElement>;
 }
 
 function Input({
@@ -24,6 +25,7 @@ function Input({
   clear,
   full,
   onblur,
+  ref,
 }: InputProps) {
   const [viewing, setViewing] = useState<boolean>(false);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -48,7 +50,7 @@ function Input({
         type={viewing ? "text" : type}
         placeholder={placeholder}
         value={value}
-        ref={inputRef}
+        ref={ref || inputRef}
         onChange={(e) => setValue(e.target.value)}
         onBlur={() => (onblur ? onblur() : null)}
         className={`w-full bg-zinc-200 dark:bg-zinc-900 px-3 py-1.5 text-black dark:text-zinc-300 outline-none text-base ${styles}`}
