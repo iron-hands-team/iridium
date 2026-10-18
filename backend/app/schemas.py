@@ -296,10 +296,21 @@ class MessageResponse(BaseModel):
     class Config:
         from_attributes = True
 
+class NotificationResponse(BaseModel):
+    id: int
+    type: str
+    body: str | None = None 
+    link: str | None = None
+    read: bool
+    created_at: datetime
+
+    class Config:
+        from_attributes = True
+
 class RuleResponse(BaseModel):
     id: int
     name: str
-    description: str | None = None
+    description: str | None=None
 
 class ReportResponse(BaseModel):
     id: int | None = None

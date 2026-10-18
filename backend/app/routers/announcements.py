@@ -3,9 +3,10 @@ from sqlalchemy.orm import Session
 
 from app.database import get_db
 from app.auth import manager
-from app.models import Announcement, AnnouncementLike, User, UserRole
+from app.models import Announcement, AnnouncementLike, User, UserRole, NotificationType
 from app.schemas import AnnouncementCreateRequest, AnnouncementUpdateRequest, AnnouncementResponse
 from app.dependencies import require_staff
+from app.notify import create_notification
 
 router = APIRouter(prefix="/announcements", tags=["announcements"])
 
@@ -36,6 +37,21 @@ def create_announcement(
         author_id=current_user.id,
     )
     db.add(announcement)
+
+    recipients_query = db.query(User)
+    if new_announcement.role != "all":
+        recipients_query = recipients_query.filter(User.role == new_announcement.role)
+    for recipient in recipients_query.all():
+        if recipient.id == current_user.id:
+            continue
+        create_notification(
+            db,
+            user_id=recipient.id,
+            type=NotificationType.announcement,
+            title=f"New announcement: {announcement.title}",
+            body=announcement.content[:140],
+            link="/",
+        )
     db.commit()
     db.refresh(announcement)
     return announcement

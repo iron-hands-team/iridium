@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 
 from app.database import get_db
 from app.auth import manager
-from app.models import Assignment, Grade, ClassEnrollment, User
+from app.models import Assignment, Grade, ClassEnrollment, User, NotificationType
 from app.schemas import (
     AssignmentCreateRequest,
     AssignmentResponse,
@@ -14,6 +14,7 @@ from app.schemas import (
 )
 from app.dependencies import require_staff
 from app.routers.classes import get_owned_class
+from app.notify import create_notification
 
 router = APIRouter(tags=["grades"])
 
@@ -98,6 +99,16 @@ def set_grade(
         db.add(grade)
     else:
         grade.score = updates.score
+
+    if updates.score is not None:
+        create_notification(
+            db, 
+            user_id=student_id,
+            type=NotificationType.grade,
+            title=f"New grade poster for {assignment.name}",
+            body=f"Score: {updates.score}/{assignment.max_score}",
+            link="/grades"
+        )
 
     db.commit()
     db.refresh(grade)

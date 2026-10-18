@@ -43,6 +43,7 @@ class User(Base):
     messages_sent = relationship("Message", back_populates="sender", cascade="all, delete-orphan", foreign_keys="Message.sender_id")
     messages_received = relationship("Message", back_populates="recipient", cascade="all, delete-orphan", foreign_keys="Message.recipient_id")
     chat_messages = relationship("ChatMessage", back_populates="user")
+    notifications = relationship("Notification", back_populates="user", cascade="all")
 
 class Announcement(Base):
     __tablename__ = "announcements"
@@ -256,3 +257,21 @@ class ChatMessage(Base):
     user = relationship("User", back_populates="chat_messages")
     channel_id = Column(Integer, ForeignKey("channels.id"))
     channel = relationship("Channel", back_populates="messages")
+
+class NotificationType(str.enum.Enum):
+    message = "message"
+    announcement = "announcement"
+    grade = "grade"
+
+class Notification(Base):
+    __tablename__ = "notifications"
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    type = Column(Enum(NotificationType), nullable=False)
+    title = Column(String, nullable=False)
+    body = Column(String, nullable=True)
+    link = Column(String, nullable=False)
+    read = Column(Boolean, nullable=False, default=False)
+    created_at = Column(DateTime(timezone=True))
+
+    user = relationship("User", back_populates="notifications")
