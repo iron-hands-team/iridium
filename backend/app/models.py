@@ -43,6 +43,7 @@ class User(Base):
     messages_sent = relationship("Message", back_populates="sender", cascade="all, delete-orphan", foreign_keys="Message.sender_id")
     messages_received = relationship("Message", back_populates="recipient", cascade="all, delete-orphan", foreign_keys="Message.recipient_id")
     chat_messages = relationship("ChatMessage", back_populates="user")
+    chat_reactions = relationship("ChatReaction", back_populates="user")
 
 class Announcement(Base):
     __tablename__ = "announcements"
@@ -256,3 +257,14 @@ class ChatMessage(Base):
     user = relationship("User", back_populates="chat_messages")
     channel_id = Column(Integer, ForeignKey("channels.id"))
     channel = relationship("Channel", back_populates="messages")
+    reactions = relationship("ChatReaction", back_populates="message")
+
+class ChatReaction(Base):
+    __tablename__ = "chat_reactions"
+    id = Column(Integer, primary_key=True, index=True)
+    emoji = Column(String, nullable=False)
+
+    user_id = Column(Integer, ForeignKey("users.id"))
+    user = relationship("User", back_populates="chat_reactions")
+    message_id = Column(Integer, ForeignKey("chat_messages.id"))
+    message = relationship("ChatMessage", back_populates="reactions")

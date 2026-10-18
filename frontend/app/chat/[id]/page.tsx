@@ -1,5 +1,5 @@
 import type { ChannelType } from "@/lib/schemas";
-import type { MessageType as MessageT } from "@/types/chat";
+import type { MessageType as MessageT, ReactionType } from "@/types/chat";
 import type { UserResponse } from "@/types/user";
 import { getSession } from "@/lib/auth";
 import { parseUser } from "@/lib/helpers";
@@ -12,6 +12,7 @@ type MessageType = MessageT & {
   user: UserResponse;
   created_at: string;
   replying_to?: number;
+  reaction_list: ReactionType[];
 };
 
 async function Page({ params }: { params: Promise<{ id: number }> }) {
@@ -69,6 +70,7 @@ async function Page({ params }: { params: Promise<{ id: number }> }) {
                   deleted: !reply,
                 }
               : undefined,
+            reactions: m.reaction_list,
           };
         })
       : [];

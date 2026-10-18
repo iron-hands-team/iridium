@@ -358,6 +358,13 @@ class MessageSendRequest(BaseModel):
     channel_id: int | None = None
     replying: int | None = None
 
+class ChatReactionRequest(BaseModel):
+    emoji: str
+
+class ChatReactionResponse(BaseModel):
+    emoji: str
+    users: list[int]
+
 class ChatMessageResponse(BaseModel):
     id: int
     text: str
@@ -367,6 +374,7 @@ class ChatMessageResponse(BaseModel):
     user_id: int
     user: UserResponse
     channel_id: int
+    reaction_list: list[ChatReactionResponse]
 
     class Config:
         from_attributes = True

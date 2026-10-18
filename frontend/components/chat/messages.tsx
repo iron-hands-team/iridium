@@ -41,10 +41,15 @@ function Messages({ channel, messages, id, userId, admin }: MessagesProps) {
           <FaHashtag size={18} />
           {channel.name}
         </div>
-        <div className="flex-1 text-sm text-zinc-700 dark:text-zinc-300">
-          Channel description coming soon!
-        </div>
-        {/* TODO: channel description */}
+        {channel.description && (
+          <div
+            className="flex-1 text-sm text-zinc-700 dark:text-zinc-300 cursor-pointer w-fit"
+            title="Channel description"
+          >
+            {channel.description.slice(0, 65) +
+              (channel.description.length > 65 ? "..." : "")}
+          </div>
+        )}
         {channel.clubName && (
           <>
             <Link
@@ -97,6 +102,7 @@ function Messages({ channel, messages, id, userId, admin }: MessagesProps) {
                   messages[i - 1].createdAt.toLocaleDateString() !==
                     message.createdAt.toLocaleDateString()
                 }
+                userId={userId}
                 owned={message.user.id === userId}
                 highlighted={highlighted === message.id}
                 admin={admin}

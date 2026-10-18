@@ -9,10 +9,16 @@ export interface MessageType {
   userId: number;
   user: UserType;
   channelId: number;
+  reactions: ReactionType[];
 }
 
 export interface ReplyType {
   id: number;
   text: string;
   deleted?: boolean;
+}
+
+export interface ReactionType {
+  emoji: string;
+  users: number[];
 }

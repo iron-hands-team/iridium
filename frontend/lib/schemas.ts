@@ -93,7 +93,7 @@ export const channelSchema = z.object({
   id: z.number().optional(),
   name: z.string().trim().lowercase().min(1, "Please enter a name"),
   description: z.string().optional().nullable(),
-  role: z.enum(["All", ...roles], "Please assign a valid role"),
+  role: z.enum(["all", ...roles], "Please assign a valid role"),
   club: z.number().optional().nullable(),
   clubName: z.string().optional().nullable(),
   count: z.number().optional().nullable(),
