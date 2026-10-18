@@ -179,6 +179,59 @@ Auth required (any role). All channel message data (returning only a limited num
 ### `POST /send`
 
 Auth required (any role). Sends a message to the current channel, `204` on success.
+Body: `{ message, channel_id, replying? }`.
+
+### `PATCH /message/{message_id}`
+
+Auth required (any role). Edits a message, `404` if message doesn't exist.
+Body (all optional): `{ message, channel_id, replying }`.
+
+### `DELETE /message/{message_id}`
+
+Auth required (any role). Deletes a message, `204` on success.
+
+---
+
+## School info
+
+### `GET /map`
+
+Auth required (any role). Returns school map images and labels.Post
+
+### `POST /map/upload`
+
+Admin only. Upload multiple map images to Garage storage and add image labels.
+Body: `{ labels }`
+
+### `DELETE /map/upload`
+
+Admin only. Deletes map items, images, and labels.
+
+### `GET /rules`
+
+Auth required (any role). Returns a list of school rules.
+
+### `POST /rules`
+
+Admin only. Adds school rules and descriptions.
+Body: `{ id, name, description? }[]`
+
+### `GET /search`
+
+Auth required (any role). Searches the database for users, announcements, events, and clubs matching the search query with limit (default `5`).
+
+### `GET /reports`
+
+Staff only. Fetches reports submitted by users, `403` if accessed by a student.
+
+### `POST /reports`
+
+Auth required (any role). Submits a report to teachers/admin, `204` on success.
+Body: `{ type, title, description, anonymous, role?, user? }`
+
+### `DELETE /reports/{report_id}`
+
+Staff only. Deletes specified report, `204` on success, `403` if accessed by a student.
 
 ---
 

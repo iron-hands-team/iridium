@@ -20,6 +20,7 @@ interface MessageProps {
   header: boolean;
   owned: boolean;
   highlighted: boolean;
+  admin?: boolean;
 }
 
 function Message({
@@ -29,6 +30,7 @@ function Message({
   header,
   owned,
   highlighted,
+  admin,
 }: MessageProps) {
   const [label, setLabel] = useState("");
   const [editing, setEditing] = useState<string | null>(null);
@@ -162,25 +164,25 @@ function Message({
             onClick={() => setReplying({ id: message.id, text: message.text })}
           />
           {owned && (
-            <>
-              <FaPen
-                size={23}
-                className={optionStyles}
-                title="Edit message"
-                onClick={() => {
-                  setEditing(message.text);
-                  setTimeout(() => {
-                    inputRef.current?.focus();
-                  }, 50);
-                }}
-              />
-              <FaTrash
-                size={23}
-                className={optionStyles + " text-red-500"}
-                title="Delete message"
-                onClick={handleDelete}
-              />
-            </>
+            <FaPen
+              size={23}
+              className={optionStyles}
+              title="Edit message"
+              onClick={() => {
+                setEditing(message.text);
+                setTimeout(() => {
+                  inputRef.current?.focus();
+                }, 50);
+              }}
+            />
+          )}
+          {(admin || owned) && (
+            <FaTrash
+              size={23}
+              className={optionStyles + " text-red-500"}
+              title="Delete message"
+              onClick={handleDelete}
+            />
           )}
         </div>
       )}

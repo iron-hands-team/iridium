@@ -14,9 +14,10 @@ interface MessagesProps {
   messages: MessageType[];
   id: string;
   userId: number;
+  admin: boolean;
 }
 
-function Messages({ channel, messages, id, userId }: MessagesProps) {
+function Messages({ channel, messages, id, userId, admin }: MessagesProps) {
   const [replying, setReplying] = useState<ReplyType | null>(null);
   const [highlighted, setHighlighted] = useState<number | null>(null);
   const messagesRef = useRef<HTMLDivElement>(null);
@@ -89,7 +90,7 @@ function Messages({ channel, messages, id, userId }: MessagesProps) {
                 header={
                   i === 0 ||
                   (message.replyingTo ? true : false) ||
-                  messages[i - 1].userId !== message.userId ||
+                  messages[i - 1].user.id !== message.user.id ||
                   message.createdAt.getTime() -
                     messages[i - 1].createdAt.getTime() >
                     600000 ||
@@ -98,6 +99,7 @@ function Messages({ channel, messages, id, userId }: MessagesProps) {
                 }
                 owned={message.user.id === userId}
                 highlighted={highlighted === message.id}
+                admin={admin}
               />
             </div>
           ))

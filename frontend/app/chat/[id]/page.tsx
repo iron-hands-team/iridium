@@ -101,6 +101,7 @@ async function Page({ params }: { params: Promise<{ id: number }> }) {
         messages={channelMessages}
         id={id.toString()}
         userId={user.id!}
+        admin={user.role === "admin"}
       />
     </div>
   );

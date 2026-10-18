@@ -132,7 +132,7 @@ def delete_message(
         raise HTTPException(
             status_code=404, detail=f"Chat message with ID {message_id} not found."
         )
-    if existing.user_id != current_user.id:
+    if current_user.role != "admin" and existing.user_id != current_user.id:
         raise HTTPException(
             status_code=403, detail="You're not allowed to delete that message."
         )
