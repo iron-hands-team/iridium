@@ -5,7 +5,7 @@ import type { UserType } from "@/types/user";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { AnimatePresence} from "framer-motion";
-import { FaEnvelopeOpen, FaEnvelope, FaExclamationTriangle, FaTrash } from "react-icons/fa";
+import { FaEnvelopeOpen, FaEnvelope, FaExclamationTriangle, FaTrash, FaTimes } from "react-icons/fa";
 import { type NewMessageType, newMessageSchema } from "@/lib/schemas";
 import MessageBtn from "@/components/chat/message-btn";
 import Btn from "@/components/ui/btn";
@@ -15,7 +15,6 @@ import Textarea from "@/components/ui/textarea";
 import Dropdown from "@/components/ui/dropdown";
 import { input } from "zod";
 import WarningModal from "@/components/modals/warning";
-import { button } from "framer-motion/m";
 
 const emptyMessage = { subject: "", body: "" };
 const labelStyles =
@@ -125,6 +124,14 @@ function Messages({
     }
   }
 
+  function forwardMessage(m: MessageType) {
+    setMessage({
+      subject: `Fwd: ${m.subject}`,
+      body: `\n\n\---- Forwarded message ----\nFrom: ${m.sender.firstName} ${m.sender.lastName} (@${m.sender.username})\n\n${m.body}`
+    });
+    setComposing(true);
+  }
+
   async function deleteMessage(id: number) {
     try {
       await fetch(`/api/messages/${id}`, {
@@ -212,6 +219,17 @@ function Messages({
             : "Select all"}
           </button>
         )}
+        {selecting && (
+          <button
+            className="fixed bottom-24 right-6 z-50 bg-zinc-600 text-white p-4 rounded-full shadow-lg hover:bg-zinc-700"
+            onClick={()=>{
+              setSelecting(false);
+              setDeleting(new Set());
+            }}
+          >
+            <FaTimes />
+          </button>
+        )}
         <button
           className={`px-4 py-2 font-bold ${
             tab === "sent"
@@ -278,13 +296,21 @@ function Messages({
                   <div className="flex flex-col gap-y-3 pt-2 border-t border-zinc-800">
                     <p className="text-sm whitespace-pre-wrap">{m.body}</p>
                     {tab === "inbox" && (
-                      <div onClick={(e) => e.stopPropagation()}>
+                      <div 
+                        onClick={(e) => e.stopPropagation()}
+                        className="flex gap-x-3"
+                      >
                         <MessageBtn
                           username={other.username}
                           onSent={() => router.refresh()}
                         >
                           <Btn text="Reply" styles="text-sm" />
                         </MessageBtn>
+                        <Btn
+                          text="Forward"
+                          styles="text-sm"
+                          onclick={()=>forwardMessage(m)}
+                        />
                       </div>
                     )}
                   </div>
