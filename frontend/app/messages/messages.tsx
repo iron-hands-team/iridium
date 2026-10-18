@@ -5,7 +5,7 @@ import type { UserType } from "@/types/user";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { AnimatePresence } from "framer-motion";
-import { FaEnvelopeOpen, FaEnvelope, FaExclamationTriangle } from "react-icons/fa";
+import { FaEnvelopeOpen, FaEnvelope, FaExclamationTriangle, FaTrash } from "react-icons/fa";
 import { type NewMessageType, newMessageSchema } from "@/lib/schemas";
 import MessageBtn from "@/components/chat/message-btn";
 import Btn from "@/components/ui/btn";
@@ -119,6 +119,13 @@ function Messages({
       });
       router.refresh();
     }
+  }
+
+  async function deleteMessage() {
+    await fetch(`/api/messages/message/${message}`, {
+      method: "DELETE",
+    });
+    router.refresh();
   }
 
   async function markAllRead() {

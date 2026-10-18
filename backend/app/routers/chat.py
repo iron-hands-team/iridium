@@ -92,7 +92,7 @@ def edit_message(
         )
     if existing.user_id != current_user.id:
         raise HTTPException(
-            statuus_code=403, detail="You're not allowed to edit that message."
+            status_code=403, detail="You're not allowed to edit that message."
         )
     existing.text = message.message
     existing.edited = True
