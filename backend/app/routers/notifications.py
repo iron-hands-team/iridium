@@ -38,9 +38,9 @@ def mark_all_read(
     db: Session = Depends(get_db),
     current_user: User = Depends(manager),
 ):
-    db.query(Notification.filter(
+    db.query(Notification).filter(
         Notification.user_id == current_user.id, Notification.read == False
-    )).update({"read": True})
+    ).update({"read": True})
     db.commit()
     return {"message": "All notifications marked as read."}
 

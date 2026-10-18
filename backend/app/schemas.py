@@ -299,6 +299,7 @@ class MessageResponse(BaseModel):
 class NotificationResponse(BaseModel):
     id: int
     type: str
+    title: str
     body: str | None = None 
     link: str | None = None
     read: bool

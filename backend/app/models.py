@@ -272,6 +272,6 @@ class Notification(Base):
     body = Column(String, nullable=True)
     link = Column(String, nullable=False)
     read = Column(Boolean, nullable=False, default=False)
-    created_at = Column(DateTime(timezone=True))
+    created_at = Column(DateTime(timezone=True), default=utcnow, nullable=False)
 
     user = relationship("User", back_populates="notifications")
