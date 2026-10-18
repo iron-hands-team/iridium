@@ -15,6 +15,7 @@ import Textarea from "@/components/ui/textarea";
 import Dropdown from "@/components/ui/dropdown";
 import { input } from "zod";
 import WarningModal from "@/components/modals/warning";
+import { button } from "framer-motion/m";
 
 const emptyMessage = { subject: "", body: "" };
 const labelStyles =
@@ -158,6 +159,14 @@ function Messages({
     setDeleting(myset);
   }
 
+  function toggleSelectAll() {
+    if (deleting.size === messages.length) {
+      setDeleting(new Set());
+    } else {
+      setDeleting(new Set(messages.map((m)=>m.id)));
+    }
+  }
+
   async function markAllRead() {
     await fetch("/api/messages/read-all", {
       method: "PATCH",
@@ -191,6 +200,16 @@ function Messages({
             onClick={markAllRead}
           >
             Mark all read
+          </button>
+        )}
+        {selecting &&  (
+          <button
+            className="px-2 text-xs text-zinc-500 hover:text-black dark:hover:text-zinc-300 self-center"
+            onClick={toggleSelectAll}
+          >
+            {deleting.size === messages.length && messages.length > 0
+            ? "Deselect all"
+            : "Select all"}
           </button>
         )}
         <button
@@ -335,7 +354,7 @@ function Messages({
               title="Delete message(s) confirmation"
               description={`Are you sure you want to delete the following message(s)? This will permanently delete all its data and information on Iridium. This action cannot be undone.`}
               confirm={confirmBulkDelete}
-              closeModal={() => setSelecting(false)}
+              closeModal={() => setConfirming(false)}
             />
           )}
       </AnimatePresence>
@@ -348,6 +367,7 @@ function Messages({
             setConfirming(true);
           }
         }}
+      >
         <FaTrash/>
       </button>
     </div>
