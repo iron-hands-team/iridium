@@ -334,6 +334,7 @@ class SearchResponse(BaseModel):
     announcements: list[AnnouncementResponse]
     events: list[EventResponse]
     clubs: list[ClubResponse]
+    classes: list[ClassSectionResponse]
 
     class Config:
         from_attributes = True
