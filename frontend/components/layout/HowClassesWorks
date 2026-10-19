@@ -1,0 +1,10 @@
+How the CLass Works:
+
+- It's all stored in a class(name) class(data).(For the teacher's account.)
+- The class will be pasted to the python database.
+- For the states, they are all stored in the zutand file.
+- THe class frontend is seperated into around 4 files. A main body and the rest being modals.
+- BodyClassTeacher.tsx, AssignmentsPopupClassTeaqcher.tsx, settingsPopupClassTeacher.tsx, QuizPopupTeacher.tsx, aboutPopup.tsx.
+- The BodyClassTeacher.tsx puts together the rest of the files and adds in the main body.
+- To find out how to use them, go to the aboutPOpup.tsx.
+- Im new to react, so I might have done inconventional ways to get around problems and tasks.

@@ -10,6 +10,7 @@ import MessagePopupClassTeacher from "./messagesPopupClassTeacher";
 import StudentsPopupClassTeacher from "@/components/layout/studentsPopupClassTeacher";
 import QuizPopup from "@/components/layout/quizPopupTeacher";
 
+import AboutPopup from "@/components/layout/aboutPopup";
 
 
 export default function BodyClassTeacher() {	
@@ -80,26 +81,21 @@ export default function BodyClassTeacher() {
 	}
 	function functionSetAbout() {
 		setAboutPopup(true);
+		
 	}
 
  function nothing() {}
  
 
  return (
-         <div
-
-        style={{
-          backgroundColor: "black",
-          display: "flex",
-          alignItems: "center",
-          flexDirection: "column",
-        }}
-      >
-						{quizPopup && <QuizPopup/>}
-						{studentsPopup && settingsStudentIndex != -1 && <StudentsPopupClassTeacher/>}
+  <div className="bg-black flex items-center flex-col">
 						{messagePopup && <MessagePopupClassTeacher/>}
 						{settingsPopup && <SettingsPopupClassTeacher/>}
 						{assignmentsPopup && <AssignmentsPopupClassTeacher/>}
+						{studentsPopup && settingsStudentIndex != -1 && <StudentsPopupClassTeacher/>}
+						{quizPopup && <QuizPopup/>}
+						{aboutPopup && <AboutPopup/>}
+
 						<Header headerText={
 							<p className="text-[30px]"><b>Welcome Back, Dih</b></p>
 						}/>

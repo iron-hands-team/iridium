@@ -4,7 +4,7 @@ import {useState} from "react";
 import {cs} from "@/lib/classStore";
 import Btn from "@/components/ui/btn";
 
-export default function SettingsPopupClassTeacher() {
+export default function StudentsPopupClassTeacher() {
 
 	const settingsClassIndex = cs((state)=> state.settingsClassIndex);
 	const setSettingsClassIndex = cs((state)=>state.setSettingsClassIndex);
@@ -42,7 +42,7 @@ export default function SettingsPopupClassTeacher() {
 
  return (
 		<div>
-							{settingsStudentsIndex != -1 && <div className="fixed flex h-full w-full justify-center items-center bg-black/90" onClick={() => setStudentsPopup(false)}>
+							{settingsStudentsIndex != -1 && <div className=" fixed inset-0 flex h-full w-full justify-center items-center bg-black/90" onClick={() => setStudentsPopup(false)}>
 					<div className="bg-black  z-10 h-2/3 w-2/3  flex justify-center items-center border-1 border-zinc-400"  onClick={(e) => e.stopPropagation()}>
 						<div className=" h-[500px] w-3/4 bg-blue">
 							<p><b>{classes[settingsClassIndex].students[settingsStudentsIndex].name}'s</b> Stuff</p>			
@@ -101,6 +101,3 @@ export default function SettingsPopupClassTeacher() {
 		</div>
  );
 }
-// next time i will:
-// link classes class with server, which is going to be easy.
-// 
