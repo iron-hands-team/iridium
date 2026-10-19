@@ -49,7 +49,7 @@ function Message({
         "Content-Type": "application/json",
       },
       body: JSON.stringify({ emoji }),
-    }); //TODO: remove reaction and finish reactions
+    }); 
     if (res.ok) router.refresh();
   }
 
@@ -176,6 +176,7 @@ function Message({
                 key={i}
                 className={`${r.users.includes(userId) ? "bg-zinc-400! dark:bg-zinc-800! font-bold" : ""} border border-zinc-800 cursor-pointer px-2 py-0.5 hover:bg-zinc-300 dark:hover:bg-zinc-900 flex items-center gap-x-2 text-sm w-fit`}
                 title={r.users.includes(userId) ? "You reacted" : "React"}
+                onClick={()=>handleReact(r.emoji)}
               >
                 <span className="text-base">{r.emoji}</span> {r.users.length}
               </span>
