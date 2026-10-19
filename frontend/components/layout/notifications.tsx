@@ -59,6 +59,55 @@ function Notifications({
                     </span>
                 )}
             </button>
+            {open && (
+                <>
+                    <div
+                        className="fixed inset-0 z-10"
+                        onClick={()=>setOpen(false)}
+                    />
+                    <div className="absolute right-0 mt-2 w-80 max-h-96 overflow-y-auto border border-zinc-800 bg-white dark:bg-zinc-950 shadow-lg z-20 flex flex-col">
+                        <div className="flex justify-between items-center p-3 border-b border-zinc-800 sticky top-0 bg-white dark:bg-zinc-950">
+                            <span className="font-bold text-sm">Notifications</span>
+                            {unreadCount > 0 && (
+                                <button
+                                    className="text-xs text-zinc-500 hover:text-black dark:hover:text-zinc-300"
+                                    onClick={markAllRead}
+                                >
+                                    Mark all read
+                                </button>
+                            )}
+                            {notifications.length === 0 ? (
+                                <div className="p-4 text-sm text-zinc-500 text-center">
+                                    No notifications yet.
+                                </div>
+                            ) : (
+                                notifications.map((n)=>(
+                                    <Link
+                                        key={n.id}
+                                        href={n.link || "#"}
+                                        onClick={()=>{
+                                            setOpen(false);
+                                            if (!n.read) markRead(n.id);
+                                        }}
+                                    >
+                                        <span>{n.title}</span>
+                                        {n.body && (
+                                            <span className="text-xs text-zinc-500 font-normal">
+                                                {n.body}
+                                            </span>
+                                        )}
+                                        <span className="text-xs text-zinc-500 font-normal">
+                                            {timeAgo(n.createdAt)}
+                                        </span>
+                                    </Link>
+                                ))
+                            )}
+                        </div>
+                    </div>
+                </>
+            )}
         </div>
-    )    
+    ) ;   
 }
+
+export default Notifications;
