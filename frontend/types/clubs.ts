@@ -6,6 +6,7 @@ export interface ClubType {
   description?: string;
   sponsor?: UserType;
   categories: string[];
+  favorites: string[];
 }
 
 export type ClubResponse = ClubType & { sponsor?: UserResponse };

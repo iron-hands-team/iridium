@@ -22,6 +22,7 @@ function ClubModal({ club, closeModal }: ClubModalProps) {
   const [editing, setEditing] = useState<boolean>(false);
   const [user, setUser] = useState<UserType>();
   const [members, setMembers] = useState<{ id: number; user: UserType }[]>([]);
+  const [favorited, setFavorited] = useState<boolean>(false);
   const router = useRouter();
   const joined = members.find((m) => m.user.id === user?.id);
 
@@ -66,7 +67,12 @@ function ClubModal({ club, closeModal }: ClubModalProps) {
   }
 
   async function handleFavorite() {
-    console.log("favorite");
+    const method = favorited ? "DELETE" : "POST";
+    await fetch(`/api/clubs/${club.id}/favorite`, {
+      method,
+      credentials: "include",
+    });
+    setFavorited(!favorited);
   }
 
   useEffect(() => {
@@ -76,6 +82,7 @@ function ClubModal({ club, closeModal }: ClubModalProps) {
         credentials: "include",
       }).then((res) => res.json());
       setUser(user);
+      setFavorited(club.favorites.includes(user.username))
       const clubMembers = await fetch(`/api/clubs/${club.id}/members`, {
         method: "GET",
         credentials: "include",
@@ -146,7 +153,7 @@ function ClubModal({ club, closeModal }: ClubModalProps) {
                   primary
                 />
                 <Btn
-                  text="Favorite"
+                  text={favorited ? "Unfavorite" : "Favorite"}
                   onclick={handleFavorite}
                   styles="text-sm"
                 />
