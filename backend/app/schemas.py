@@ -44,6 +44,9 @@ class StaffResponse(BaseModel):
     class Config:
         from_attributes = True
 
+class BulkDeleteUsersRequest(BaseModel):
+    usernames: list[str]
+
 class UserUpdateRequest(BaseModel):
     first_name: str | None = None
     last_name: str | None = None

@@ -14,6 +14,9 @@ import Checkbox from "@/components/ui/checkbox";
 import Image from "next/image";
 import PasswordReset from "@/components/auth/password-reset";
 import DeleteAccount from "@/components/auth/delete-account";
+import WarningModal from "@/components/modals/warning";
+import Btn from "@/components/ui/btn";
+import { useRouter } from "next/navigation";
 
 const sorts = [
   "ID",
@@ -31,6 +34,8 @@ function Users({ users }: { users: UserType[] }) {
   const [user, setUser] = useState<UserType | null>(null);
   const [type, setType] = useState<string>(types[0]);
   const [selected, setSelected] = useState<string[]>([]);
+  const [bulkDeleting, setBulkDeleting] = useState<boolean | null>(null);
+  const router = useRouter();
   const [sort, setSort] = useState<{ name: string; ascending: boolean }>({
     name: sorts[1],
     ascending: false,
@@ -75,7 +80,18 @@ function Users({ users }: { users: UserType[] }) {
       return (sort.ascending ? -1 : 1) * res;
     });
 
-  //TODO: add multiselect bulk action
+  async function handleBulkDelete() {
+    setBulkDeleting(true);
+    await fetch("/api/users/bulk-delete", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      credentials: "include",
+      body: JSON.stringify({usernames: selected})
+    });
+    setBulkDeleting(null);
+    setSelected([]);
+    router.refresh();
+  }
 
   return (
     <div className="flex flex-col gap-y-5">
@@ -97,6 +113,16 @@ function Users({ users }: { users: UserType[] }) {
             label="User type"
           />
         </div>
+        {selected.length > 0 && (
+          <div className="flex items-center gap-x-3 text-sm">
+            <span>{selected.length} selected</span>
+            <Btn
+              text="Delete selected"
+              onclick={() => setBulkDeleting(false)}
+              styles="text-sm"
+            />
+          </div>
+        )}
       </div>
       <div>
         <div className="flex">
@@ -201,6 +227,15 @@ function Users({ users }: { users: UserType[] }) {
       </div>
       <AnimatePresence>
         {user && <UserModal user={user} closeModal={() => setUser(null)} />}
+        {bulkDeleting !== null && (
+          <WarningModal
+            title="Delete selected users confirmation"
+            description={`Are you sure you want to delete ${selected.length} selected user${selected.length === 1 ? "" : "s"}? This will permanently delete all their data and information on Iridium. This action cannot be undone. `}
+            confirm={handleBulkDelete}
+            closeModal={()=>setBulkDeleting(null)}
+            loading={bulkDeleting}
+          />
+        )}
       </AnimatePresence>
     </div>
   );

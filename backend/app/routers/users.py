@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 
 from app.database import get_db
 from app.models import User, UserRole
-from app.schemas import UserResponse, UserUpdateRequest, UploadResponse, ResetPasswordRequest, StaffResponse
+from app.schemas import UserResponse, UserUpdateRequest, BulkDeleteUsersRequest, UploadResponse, ResetPasswordRequest, StaffResponse
 from app.dependencies import require_admin, manager
 from app.s3 import s3_client, s3_internal, BUCKET_NAME, ENDPOINT
 from app.auth import hash_password
@@ -119,6 +119,21 @@ def delete_user(
     if user is None:
         raise HTTPException(status_code=404, detail="User not found.")
     db.delete(user)
+    db.commit()
+
+@router.post("/users/bulk-delete", status_code=204)
+def bulk_delete_users(
+    delete_request: BulkDeleteUsersRequest,
+    db: Session = Depends(get_db),
+    current_admin: User = Depends(require_admin),
+):
+    if current_admin.username in delete_request.usernames:
+        raise HTTPException(
+            status_code=400, detail="You cannot delete your own account this way."
+        )
+    db.query(User).filter(User.username.in_(delete_request.usernames)).delete(
+        synchronize_session=False
+    )
     db.commit()
 
 @router.post("/users/{username}/request", status_code=202)
