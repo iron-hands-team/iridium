@@ -32,7 +32,7 @@ interface NewChannelProps {
 function NewChannelModal({ closeModal, existing }: NewChannelProps) {
   const [channel, setChannel] = useState<ChannelType>({
     name: "",
-    role: "All",
+    role: "all",
   });
   const [clubs, setClubs] = useState<ClubType[]>([]);
   const [error, setError] = useState<string | null>(null);

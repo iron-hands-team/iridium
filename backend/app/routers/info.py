@@ -3,13 +3,14 @@ from sqlalchemy.orm import Session
 from sqlalchemy import or_, func
 
 from app.database import get_db
-from app.models import MapItem, User, Rule, Announcement, Event, Club, Report
+from app.models import MapItem, User, Rule, Announcement, Event, Club, ClassSection, Report
 from app.schemas import (
     MapUploadResponse,
     AddMapItemsRequest,
     MapResponse,
     RuleResponse,
     SearchResponse,
+    ClassSectionResponse,
     ReportResponse,
 )
 from app.dependencies import require_admin, manager
@@ -152,13 +153,19 @@ def get_search(
         .all()
     )
 
-    # TODO: add more search types
+    classes = (
+        db.query(ClassSection)
+        .filter(ClassSection.name.ilike(query))
+        .limit(l)
+        .all()
+    )
 
     return {
         "users": users,
         "announcements": announcements,
         "events": events,
         "clubs": clubs,
+        "classes": classes,
     }
 
 

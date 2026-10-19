@@ -1,4 +1,17 @@
 import type { UserResponse, UserType } from "@/types/user";
+import type { NotificationResponse, NotificationType } from "@/types/notification";
+
+export function parseNotification(n: NotificationResponse): NotificationType {
+  return {
+    id: n.id,
+    type: n.type,
+    title: n.title,
+    body: n.body,
+    link: n.link,
+    read: n.read,
+    createdAt: n.created_at,
+  };
+}
 
 export function parseUser(user: UserResponse): UserType {
   return {

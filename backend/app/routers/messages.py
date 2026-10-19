@@ -3,8 +3,9 @@ from sqlalchemy.orm import Session
 
 from app.database import get_db
 from app.auth import manager
-from app.models import Message, User
+from app.models import Message, User, NotificationType
 from app.schemas import MessageCreateRequest, MessageResponse
+from app.notify import create_notification
 
 router = APIRouter(tags=["messages"])
 
@@ -31,6 +32,14 @@ def send_message(
         body=new_message.body,
     )
     db.add(message)
+    create_notification(
+        db,
+        user_id=recipient.id,
+        type=NotificationType.message,
+        title=f"New message from {current_user.first_name} {current_user.last_name}",
+        body=new_message.subject,
+        link="/messages"
+    )
     db.commit()
     db.refresh(message)
     return message
@@ -99,3 +108,19 @@ def mark_read(
     db.commit()
     db.refresh(message)
     return message
+
+@router.delete('/messages/{message_id}', status_code=204)
+def delete_message(
+    message_id: int,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(manager),
+):
+    message = db.query(Message).filter(Message.id == message_id).first()
+    if message is None:
+        raise HTTPException(status_code=404, detail="Message doesen't exist.")
+
+    if message.recipient_id != current_user.id:
+        raise HTTPException(status_code=403, detail="Unable to delete this message.")
+
+    db.delete(message)
+    db.commit()

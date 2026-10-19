@@ -4,8 +4,8 @@ import type { MessageType } from "@/types/message";
 import type { UserType } from "@/types/user";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { AnimatePresence } from "framer-motion";
-import { FaEnvelopeOpen, FaEnvelope, FaExclamationTriangle } from "react-icons/fa";
+import { AnimatePresence} from "framer-motion";
+import { FaEnvelopeOpen, FaEnvelope, FaExclamationTriangle, FaTrash, FaTimes } from "react-icons/fa";
 import { type NewMessageType, newMessageSchema } from "@/lib/schemas";
 import MessageBtn from "@/components/chat/message-btn";
 import Btn from "@/components/ui/btn";
@@ -13,8 +13,8 @@ import Modal from "@/components/ui/modal";
 import Input from "@/components/ui/input";
 import Textarea from "@/components/ui/textarea";
 import Dropdown from "@/components/ui/dropdown";
-import { time } from "console";
-import { button } from "framer-motion/m";
+import { input } from "zod";
+import WarningModal from "@/components/modals/warning";
 
 const emptyMessage = { subject: "", body: "" };
 const labelStyles =
@@ -49,7 +49,10 @@ function Messages({
   const [sending, setSending] = useState<boolean>(false);
   const [composeError, setComposeError] = useState<string | null>(null);
   const [search, setSearch] = useState<string>("");
-  const router = useRouter();
+  const [deleting, setDeleting] = useState<Set<number>>(new Set()); //actual set of message ids the user checked so far
+  const [selecting, setSelecting] = useState<boolean>(false); //is the checkbox ui on?
+  const [confirming, setConfirming] = useState<boolean>(false); //is the confirm delete dialogue on hte screen?
+  const router = useRouter(); 
 
   const messages = (tab === "inbox" ? inbox : sent).filter((m) => {
     const other = tab === "inbox" ? m.sender : m.recipient;
@@ -121,6 +124,56 @@ function Messages({
     }
   }
 
+  function forwardMessage(m: MessageType) {
+    setMessage({
+      subject: `Fwd: ${m.subject}`,
+      body: `\n\n\---- Forwarded message ----\nFrom: ${m.sender.firstName} ${m.sender.lastName} (@${m.sender.username})\n\n${m.body}`
+    });
+    setComposing(true);
+  }
+
+  async function deleteMessage(id: number) {
+    try {
+      await fetch(`/api/messages/${id}`, {
+      method: "DELETE",
+      credentials: "include",
+      });
+    
+      router.refresh();
+    } catch(error) {
+      console.error("Failed to delete message:", error)
+    }
+  }
+
+  async function confirmBulkDelete() {
+    for (const id of deleting) {
+      await deleteMessage(id);
+    }
+    setConfirming(false);
+    setSelecting(false);
+    setDeleting(new Set());
+  }
+
+  function toggleSelected(id: number) {
+    const myset = new Set(deleting);
+
+    if (myset.has(id)) {
+      myset.delete(id);
+    } else {
+      myset.add(id);
+    }
+
+    setDeleting(myset);
+  }
+
+  function toggleSelectAll() {
+    if (deleting.size === messages.length) {
+      setDeleting(new Set());
+    } else {
+      setDeleting(new Set(messages.map((m)=>m.id)));
+    }
+  }
+
   async function markAllRead() {
     await fetch("/api/messages/read-all", {
       method: "PATCH",
@@ -154,6 +207,27 @@ function Messages({
             onClick={markAllRead}
           >
             Mark all read
+          </button>
+        )}
+        {selecting &&  (
+          <button
+            className="px-2 text-xs text-zinc-500 hover:text-black dark:hover:text-zinc-300 self-center"
+            onClick={toggleSelectAll}
+          >
+            {deleting.size === messages.length && messages.length > 0
+            ? "Deselect all"
+            : "Select all"}
+          </button>
+        )}
+        {selecting && (
+          <button
+            className="fixed bottom-24 right-6 z-50 bg-zinc-600 text-white p-4 rounded-full shadow-lg hover:bg-zinc-700"
+            onClick={()=>{
+              setSelecting(false);
+              setDeleting(new Set());
+            }}
+          >
+            <FaTimes />
           </button>
         )}
         <button
@@ -192,6 +266,14 @@ function Messages({
               >
                 <div className="flex justify-between items-center gap-x-3">
                   <div className="flex items-center gap-x-2">
+                    {selecting && (
+                      <input
+                        type="checkbox"
+                        checked={deleting.has(m.id)}
+                        onChange={() => toggleSelected(m.id)}
+                        onClick={(e) => e.stopPropagation()}
+                      />
+                    )}
                     {tab === "inbox" &&
                       (m.read ? (
                         <FaEnvelopeOpen size={14} className="text-zinc-500" />
@@ -214,13 +296,21 @@ function Messages({
                   <div className="flex flex-col gap-y-3 pt-2 border-t border-zinc-800">
                     <p className="text-sm whitespace-pre-wrap">{m.body}</p>
                     {tab === "inbox" && (
-                      <div onClick={(e) => e.stopPropagation()}>
+                      <div 
+                        onClick={(e) => e.stopPropagation()}
+                        className="flex gap-x-3"
+                      >
                         <MessageBtn
                           username={other.username}
                           onSent={() => router.refresh()}
                         >
                           <Btn text="Reply" styles="text-sm" />
                         </MessageBtn>
+                        <Btn
+                          text="Forward"
+                          styles="text-sm"
+                          onclick={()=>forwardMessage(m)}
+                        />
                       </div>
                     )}
                   </div>
@@ -251,7 +341,7 @@ function Messages({
                   Subject <span className="text-red-500">*</span>
                 </div>
                 <Input
-                  placeholder="Change My Grade to an A Now"
+                  placeholder="Please Change My Grade to an A "
                   value={message.subject}
                   setValue={(subject) => setMessage({ ...message, subject })}
                 />
@@ -284,6 +374,28 @@ function Messages({
           </Modal>
         )}
       </AnimatePresence>
+      <AnimatePresence>
+        {confirming && (
+            <WarningModal
+              title="Delete message(s) confirmation"
+              description={`Are you sure you want to delete the following message(s)? This will permanently delete all its data and information on Iridium. This action cannot be undone.`}
+              confirm={confirmBulkDelete}
+              closeModal={() => setConfirming(false)}
+            />
+          )}
+      </AnimatePresence>
+      <button
+        className="fixed bottom-6 right-6 z-50 bg-red-500 text-white p-4 rounded-full shadow-lg hover:bg-red-600"
+        onClick={() => {
+          if (!selecting) {
+            setSelecting(true);
+          } else if (selecting === true && deleting.size > 0) {
+            setConfirming(true);
+          }
+        }}
+      >
+        <FaTrash/>
+      </button>
     </div>
   );
 }

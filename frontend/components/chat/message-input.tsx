@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import type { ReplyType } from "@/types/chat";
+import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { FaXmark } from "react-icons/fa6";
 import { FaReply } from "react-icons/fa";
@@ -9,14 +10,15 @@ import Btn from "../ui/btn";
 
 interface MessageInputProps {
   id: number;
-  replying: number | null;
-  setReplying: React.Dispatch<React.SetStateAction<number | null>>;
+  replying: ReplyType | null;
+  setReplying: React.Dispatch<React.SetStateAction<ReplyType | null>>;
 }
 
 function MessageInput({ id, replying, setReplying }: MessageInputProps) {
   const [message, setMessage] = useState<string>("");
   const [sending, setSending] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
   const router = useRouter();
 
   async function handleSend(e: React.SubmitEvent) {
@@ -28,12 +30,17 @@ function MessageInput({ id, replying, setReplying }: MessageInputProps) {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ message, channel_id: id }),
+        body: JSON.stringify({
+          message,
+          channel_id: id,
+          replying: replying ? replying.id : undefined,
+        }),
       });
       if (res.ok) {
         setError(null);
         router.refresh();
         setMessage("");
+        setReplying(null);
       } else {
         setError("Something went wrong, please try again");
       }
@@ -41,13 +48,17 @@ function MessageInput({ id, replying, setReplying }: MessageInputProps) {
     }
   }
 
+  useEffect(() => {
+    if (replying) inputRef.current?.focus();
+  }, [replying]);
+
   return (
-    <div className="relative pl-5">
+    <div className="relative ml-5">
       {replying && (
         <div className="absolute bottom-full bg-zinc-300 dark:bg-zinc-900 px-3 py-2 flex items-center justify-between w-full border border-zinc-800 border-b-0">
           <div className="flex gap-x-3 items-center text-sm text-zinc-700 dark:text-zinc-300">
             <FaReply className="-scale-x-100" />
-            Replying to: {replying}
+            Replying to: {replying.text}
           </div>
           <FaXmark
             size={25}
@@ -66,6 +77,7 @@ function MessageInput({ id, replying, setReplying }: MessageInputProps) {
           value={message}
           setValue={(m) => setMessage(m)}
           styles="bg-transparent! px-5! py-4! flex-1"
+          ref={inputRef}
           full
         />
         {message.trim().length > 0 && (

@@ -44,6 +44,9 @@ class StaffResponse(BaseModel):
     class Config:
         from_attributes = True
 
+class BulkDeleteUsersRequest(BaseModel):
+    usernames: list[str]
+
 class UserUpdateRequest(BaseModel):
     first_name: str | None = None
     last_name: str | None = None
@@ -109,6 +112,7 @@ class ClubResponse(BaseModel):
     description: str | None
     sponsor: UserResponse | None
     categories: list[str]
+    favorites: list[str]
 
     class Config:
         from_attributes = True
@@ -296,10 +300,22 @@ class MessageResponse(BaseModel):
     class Config:
         from_attributes = True
 
+class NotificationResponse(BaseModel):
+    id: int
+    type: str
+    title: str
+    body: str | None = None 
+    link: str | None = None
+    read: bool
+    created_at: datetime
+
+    class Config:
+        from_attributes = True
+
 class RuleResponse(BaseModel):
     id: int
     name: str
-    description: str | None = None
+    description: str | None=None
 
 class ReportResponse(BaseModel):
     id: int | None = None
@@ -318,6 +334,7 @@ class SearchResponse(BaseModel):
     announcements: list[AnnouncementResponse]
     events: list[EventResponse]
     clubs: list[ClubResponse]
+    classes: list[ClassSectionResponse]
 
     class Config:
         from_attributes = True
@@ -345,6 +362,7 @@ class ChannelResponse(BaseModel):
     description: str | None = None
     role: str
     club: ClubResponse | None = None
+    count: int | None = None
 
     class Config:
         from_attributes = True
@@ -355,6 +373,14 @@ class ChannelCreateResponse(BaseModel):
 class MessageSendRequest(BaseModel):
     message: str
     channel_id: int | None = None
+    replying: int | None = None
+
+class ChatReactionRequest(BaseModel):
+    emoji: str
+
+class ChatReactionResponse(BaseModel):
+    emoji: str
+    users: list[int]
 
 class ChatMessageResponse(BaseModel):
     id: int
@@ -365,6 +391,7 @@ class ChatMessageResponse(BaseModel):
     user_id: int
     user: UserResponse
     channel_id: int
+    reaction_list: list[ChatReactionResponse]
 
     class Config:
         from_attributes = True

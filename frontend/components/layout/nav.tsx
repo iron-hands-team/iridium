@@ -1,6 +1,9 @@
+import type { NotificationResponse, NotificationType } from "@/types/notification";
 import { getSession } from "@/lib/auth";
+import { parseNotification } from "@/lib/helpers";
 import NavUser from "./nav-user";
 import NavSearch from "./nav-search";
+import Notifications from "./notifications";
 import Link from "next/link";
 import Image from "next/image";
 
@@ -21,6 +24,38 @@ async function Nav() {
           .then((data) => data.count as number)
           .catch(() => 0)
       : 0;
+
+  const [notificationsRaw, unreadNotificationCount]: [
+    NotificationResponse[],
+    number,
+  ] =
+    user && cookie
+      ? await Promise.all([
+          fetch(`${process.env.INTERNAL_API_URL}/notifications`, {
+            method: "GET",
+            headers: {
+              Authorization: `Bearer ${cookie.value}`,
+              "Content-Type": "application/json",
+            },
+            cache: "no-store",
+          })
+            .then((res) => res.json())
+            .catch(() => []),
+          fetch(`${process.env.INTERNAL_API_URL}/notifications/unread-count`, {
+            method: "GET",
+            headers: {
+              Authorization: `Bearer ${cookie.value}`,
+              "Content-Type": "application/json",
+            },
+            cache: "no-store",
+          })
+            .then((res) => res.json())
+            .then((data) => data.count as number)
+            .catch(() => 0),
+        ])
+      : [[], 0];
+
+  const notifications: NotificationType[] = notificationsRaw.map(parseNotification);
 
   return (
     <div className="sticky top-0 z-10 bg-zinc-100 dark:bg-zinc-950 border-b-1 border-zinc-800">
@@ -90,6 +125,10 @@ async function Nav() {
           {/* TODO: change back to /chat */}
           Chat
         </Link>
+        <Notifications
+          notifications={notifications}
+          unreadCount={unreadNotificationCount}
+        />
         <NavUser user={user} />
       </nav>
     </div>

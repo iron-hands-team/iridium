@@ -13,50 +13,55 @@ function NewMapModal({ closeModal }: { closeModal: () => void }) {
   const [labels, setLabels] = useState<string[]>([]);
   const [saving, setSaving] = useState<boolean>(false);
   const [loaded, setLoaded] = useState<number | boolean | null>(null);
-  const [existing, setExisting] = useState<string[] | null>(null); //TODO: implement existing array that holds images from useeffect fetch to fix bugs related to order of uploading images and skipping items to upload
+  const [removed, setRemoved] = useState<boolean>(false);
 
   async function handleUpload(
     e: React.ChangeEvent<HTMLInputElement>,
     index: number,
   ) {
-    const files = e.target.files;
-    if (files && files.length > 0) {
-      setFiles((prev) =>
-        prev
-          ? [...prev.slice(0, index), files[0], ...prev.slice(index + 1)]
-          : [files[0]],
-      );
-    }
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setFiles((prev) => {
+      const next = prev ? [...prev] : [];
+      next[index] = file;
+      return next;
+    });
   }
 
   async function handleSave() {
-    if (files) {
-      setSaving(true);
-      const res = await fetch(`/api/map/upload`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ labels }),
-      }).then((res) => res.json());
-      const uploadUrls: string[] = res.uploads;
-      uploadUrls.forEach(async (url, i) => {
-        await fetch("/s3" + url, {
-          method: "PUT",
-          headers: {
-            "Content-Type": files[i].type,
-          },
-          body: files[i],
-        });
-      });
-      setSaving(false);
-    } else if (loaded) {
-      setSaving(true);
+    setSaving(true);
+    if (removed) {
       await fetch(`/api/map/upload`, {
         method: "DELETE",
       });
       setSaving(false);
+      closeModal();
+      return;
     }
+    const res = await fetch(`/api/map/upload`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ labels }),
+    }).then((res) => res.json());
+    const uploadUrls: string[] = res.uploads;
+    if (files) {
+      await Promise.all(
+        uploadUrls.map((url, i) =>
+          files[i]
+            ? fetch("/s3" + url, {
+                method: "PUT",
+                headers: {
+                  "Content-Type": files[i].type,
+                },
+                body: files[i],
+              })
+            : Promise.resolve(),
+        ),
+      );
+    }
+    setSaving(false);
     closeModal();
   }
 
@@ -153,6 +158,7 @@ function NewMapModal({ closeModal }: { closeModal: () => void }) {
               onclick={() => {
                 setFiles(null);
                 setLabels([]);
+                setRemoved(true);
               }}
               styles={!labels ? "opacity-0 pointer-events-none" : "opacity-100"}
             />

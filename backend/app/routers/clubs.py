@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 
 from app.database import get_db
 from app.auth import manager
-from app.models import Club, ClubMembership, User
+from app.models import Club, ClubMembership, User, ClubFavorite
 from app.schemas import ClubCreateRequest, ClubUpdateRequest, ClubResponse, ClubMemberResponse
 from app.dependencies import require_staff, require_admin
 
@@ -114,3 +114,45 @@ def leave_club(
         raise HTTPException(status_code=404, detail="Not a member.")
     db.delete(membership)
     db.commit()
+
+@router.post("/{club_id}/favorite", response_model=ClubResponse)
+def favorite_club(
+    club_id: int,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(manager),
+):
+    club = db.query(Club).filter(Club.id == club_id).first()
+    if club is None:
+        raise HTTPException(status_code=404, detail="Club not found.")
+
+    existing = (
+        db.query(ClubFavorite)
+        .filter(ClubFavorite.club_id == club_id, ClubFavorite.user_id == current_user.id)
+        .first()
+    )
+    if existing is None:
+        db.add(ClubFavorite(club_id=club_id, user_id=current_user.id))
+        db.commit()
+        db.refresh(club)
+    return club
+
+@router.delete("/{club_id}/favorite", response_model=ClubResponse)
+def unfavorite_club(
+    club_id: int,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(manager),
+):
+    club = db.query(Club).filter(Club.id == club_id).first()
+    if club is None:
+        raise HTTPException(status_code=404, detail="Club not found.")
+
+    existing = (
+        db.query(ClubFavorite)
+        .filter(ClubFavorite.club_id == club_id, ClubFavorite.user_id == current_user.id)
+        .first()
+    )
+    if existing is not None:
+        db.delete(existing)
+        db.commit()
+        db.refresh(club)
+    return club
