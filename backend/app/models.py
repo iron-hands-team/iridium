@@ -31,6 +31,7 @@ class User(Base):
     announcements = relationship("Announcement", back_populates="author", cascade="all, delete-orphan")
     clubs_sponsored = relationship("Club", back_populates="sponsor")
     club_memberships = relationship("ClubMembership", back_populates="user", cascade="all, delete-orphan")
+    club_favorites = relationship("ClubFavorite", back_populates="user", cascade="all, delete-orphan")
     events_created = relationship("Event", back_populates="created_by", cascade="all, delete-orphan")
     schedule_items = relationship("ScheduleItem", back_populates="user", cascade="all, delete-orphan")
     classes_taught = relationship("ClassSection", back_populates="teacher", cascade="all, delete-orphan")
@@ -85,6 +86,11 @@ class Club(Base):
     sponsor = relationship("User", back_populates="clubs_sponsored")
     members = relationship("ClubMembership", back_populates="club")
     channel = relationship("Channel", back_populates="club", uselist=False)
+    favorite_records = relationship("ClubFavorite", back_populates="club", cascade="all, delete-orphan")
+
+    @property
+    def favorite(self):
+        return [fav.user.username for fav in self.favorite_records]
 
 class ClubMembership(Base):
     __tablename__ = "club_memberships"
@@ -94,6 +100,15 @@ class ClubMembership(Base):
 
     club = relationship("Club", back_populates="members")
     user = relationship("User", back_populates="club_memberships")
+
+class ClubFavorite(Base):
+    __tablename__ = "club_favorites"
+    id = Column(Integer, primary_key=True, index=True)
+    club_id = Column(Integer, ForeignKey("clubs.id"), nullable=False)
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+
+    club = relationship("Club", back_populates="favorite_records")
+    user = relationship("User", back_populates="club_favorites")
 
 class Event(Base):
     __tablename__ = "events"

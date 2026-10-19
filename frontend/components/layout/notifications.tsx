@@ -5,7 +5,6 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { FaBell } from "react-icons/fa";
-import { span } from "framer-motion/m";
 
 function timeAgo(iso: string): string {
     const diffMs = Date.now() - new Date(iso).getTime();
@@ -76,38 +75,41 @@ function Notifications({
                                     Mark all read
                                 </button>
                             )}
-                            {notifications.length === 0 ? (
-                                <div className="p-4 text-sm text-zinc-500 text-center">
-                                    No notifications yet.
-                                </div>
-                            ) : (
-                                notifications.map((n)=>(
-                                    <Link
-                                        key={n.id}
-                                        href={n.link || "#"}
-                                        onClick={()=>{
-                                            setOpen(false);
-                                            if (!n.read) markRead(n.id);
-                                        }}
-                                    >
-                                        <span>{n.title}</span>
-                                        {n.body && (
-                                            <span className="text-xs text-zinc-500 font-normal">
-                                                {n.body}
-                                            </span>
-                                        )}
-                                        <span className="text-xs text-zinc-500 font-normal">
-                                            {timeAgo(n.createdAt)}
-                                        </span>
-                                    </Link>
-                                ))
-                            )}
                         </div>
+                        {notifications.length === 0 ? (
+                            <div className="p-4 text-sm text-zinc-500 text-center">
+                                No notifications yet.
+                            </div>
+                        ) : (
+                            notifications.map((n)=>(
+                                <Link
+                                    key={n.id}
+                                    href={n.link || "#"}
+                                    onClick={()=>{
+                                        setOpen(false);
+                                        if (!n.read) markRead(n.id);
+                                    }}
+                                    className={`p-3 border-b border-zinc-800 text-sm flex flex-col gap-y-1 hover:bg-zinc-100 dark:hover:bg-zinc-900 ${
+                                        !n.read ? "font-bold" : ""
+                                    }`}
+                                >
+                                    <span>{n.title}</span>
+                                    {n.body && (
+                                        <span className="text-xs text-zinc-500 font-normal">
+                                            {n.body}
+                                        </span>
+                                    )}
+                                    <span className="text-xs text-zinc-500 font-normal">
+                                        {timeAgo(n.createdAt)}
+                                    </span>
+                                </Link>
+                            ))
+                        )}
                     </div>
                 </>
             )}
         </div>
-    ) ;   
+    );
 }
 
 export default Notifications;

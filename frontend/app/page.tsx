@@ -1,9 +1,12 @@
 import type { PostType } from "@/lib/schemas";
+import type { ScheduleItemType } from "@/types/schedule";
+import type { EventType } from "@/types/event";
 import { FaBell, FaBullhorn, FaCalendar, FaLink, FaMap } from "react-icons/fa";
 import { getSession } from "@/lib/auth";
 import { mapUrl } from "@/lib/helpers";
 import Announcement from "@/components/home/announcement";
 import NewAnnouncement from "@/components/admin/new-announcement";
+import EventCard from "@/components/calendar/event-card";
 import Btn from "@/components/ui/btn";
 import Link from "next/link";
 import Image from "next/image";
@@ -42,6 +45,32 @@ async function Page() {
       ? mapData.map((m: { label: string }) => m.label)
       : [];
 
+  const scheduleRes = await fetch(`${process.env.INTERNAL_API_URL}/schedule/me`, {
+    method: "GET",
+    headers: {
+      Authorization: `Bearer ${cookie.value}`,
+      "Content-Type": "application/json",
+    },
+  });
+  const scheduleData = await scheduleRes.json().catch(() => []);
+  const scheduleItems: ScheduleItemType[] =
+    scheduleRes.ok && Array.isArray(scheduleData) ? scheduleData : [];
+
+  const eventsRes = await fetch(`${process.env.INTERNAL_API_URL}/events`, {
+    method: "GET",
+    headers: {
+      Authorization: `Bearer ${cookie.value}`,
+      "Content-Type": "application/json",
+    },
+  });
+  const eventsData = await eventsRes.json().catch(() => []);
+  const upcomingEvents: EventType[] =
+    eventsRes.ok && Array.isArray(eventsData)
+      ? eventsData
+          .filter((e: EventType) => new Date(e.start_time) >= new Date())
+          .slice(0, 3)
+      : [];
+
   return (
     <div className="px-50 flex py-10 gap-x-15 h-[calc(100vh-53px)] overflow-y-auto pb-10">
       <div className="flex-1 flex flex-col gap-y-5">
@@ -74,15 +103,48 @@ async function Page() {
         <h2 className={headingStyles}>
           <FaBell size={18} /> Schedule
         </h2>
-        <div className="border-1 border-zinc-800 px-4 py-2">
-          <h2>Schedule</h2>
-        </div>
+        {scheduleItems.length > 0 ? (
+          <div className="border-1 border-zinc-800 flex flex-col">
+            {scheduleItems.map((item) => (
+              <div
+                key={item.id}
+                className="flex justify-between items-center px-4 py-2 border-b border-zinc-800 last:border-b-0 text-sm"
+              >
+                <div>
+                  <span className="font-bold">P{item.period}</span>{" "}
+                  {item.course_name}
+                  {item.room && (
+                    <span className="text-zinc-500"> &middot; {item.room}</span>
+                  )}
+                </div>
+                {item.start_time && (
+                  <span className="text-xs text-zinc-500">{item.start_time}</span>
+                )}
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div className="border-1 border-zinc-800 px-4 py-2 text-sm text-zinc-500 text-center">
+            No schedule set
+          </div>
+        )}
         <h2 className={headingStyles}>
           <FaCalendar size={18} /> Calendar
         </h2>
-        <div className="border-1 border-zinc-800 px-4 py-2">
-          <h2>Events</h2>
-        </div>
+        {upcomingEvents.length > 0 ? (
+          <div className="flex flex-col gap-y-3">
+            {upcomingEvents.map((event) => (
+              <EventCard key={event.id} event={event} user={user} />
+            ))}
+          </div>
+        ) : (
+          <div className="border-1 border-zinc-800 px-4 py-2 text-sm text-zinc-500 text-center">
+            No upcoming events
+          </div>
+        )}
+        <Link href="/calendar" className={linkStyles}>
+          View full calendar
+        </Link>
         <h2 className={headingStyles}>
           <FaLink size={18} /> Links
         </h2>

@@ -109,6 +109,7 @@ class ClubResponse(BaseModel):
     description: str | None
     sponsor: UserResponse | None
     categories: list[str]
+    favorites: list[str]
 
     class Config:
         from_attributes = True
