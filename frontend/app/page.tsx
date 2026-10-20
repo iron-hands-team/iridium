@@ -1,4 +1,4 @@
-import type { PostType } from "@/lib/schemas";
+import type { LinkType, PostType } from "@/lib/schemas";
 import type { ScheduleItemType } from "@/types/schedule";
 import type { EventType } from "@/types/event";
 import { FaBell, FaBullhorn, FaCalendar, FaLink, FaMap } from "react-icons/fa";
@@ -38,20 +38,39 @@ async function Page() {
   });
   const mapData = await mapRes.json().catch(() => null);
   if (!mapRes.ok || !Array.isArray(mapData)) {
-    console.error("Failed to load map items:", mapRes.status, mapData);
+    console.error("Failed to load map items: ", mapRes.status, mapData);
   }
   const mapItems: string[] =
     mapRes.ok && Array.isArray(mapData)
       ? mapData.map((m: { label: string }) => m.label)
       : [];
-
-  const scheduleRes = await fetch(`${process.env.INTERNAL_API_URL}/schedule/me`, {
+  const linkRes = await fetch(`${process.env.INTERNAL_API_URL}/links`, {
     method: "GET",
     headers: {
       Authorization: `Bearer ${cookie.value}`,
       "Content-Type": "application/json",
     },
   });
+  if (!linkRes.ok) console.error("Failed to load links: ", linkRes.status);
+  const linkData: LinkType[] = linkRes.ok ? await linkRes.json() : [];
+  const links = linkData.reduce(
+    (acc: LinkType[][], l, i) => {
+      acc[i % 2 === 0 ? 1 : 0] = [...acc[i % 2 === 0 ? 1 : 0], l];
+      return acc;
+    },
+    [[], []],
+  );
+
+  const scheduleRes = await fetch(
+    `${process.env.INTERNAL_API_URL}/schedule/me`,
+    {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${cookie.value}`,
+        "Content-Type": "application/json",
+      },
+    },
+  );
   const scheduleData = await scheduleRes.json().catch(() => []);
   const scheduleItems: ScheduleItemType[] =
     scheduleRes.ok && Array.isArray(scheduleData) ? scheduleData : [];
@@ -118,7 +137,9 @@ async function Page() {
                   )}
                 </div>
                 {item.start_time && (
-                  <span className="text-xs text-zinc-500">{item.start_time}</span>
+                  <span className="text-xs text-zinc-500">
+                    {item.start_time}
+                  </span>
                 )}
               </div>
             ))}
@@ -156,11 +177,31 @@ async function Page() {
             <Link href="/staff" className={linkStyles}>
               Staff directory
             </Link>
+            {links[0].map((l) => (
+              <Link
+                key={l.id}
+                href={l.href}
+                className={linkStyles}
+                target={l.blank ? "_blank" : undefined}
+              >
+                {l.label}
+              </Link>
+            ))}
           </div>
           <div className="flex w-[50%] flex-col gap-y-3">
             <Link href={`/profile/${user.username}`} className={linkStyles}>
               Profile
             </Link>
+            {links[1].map((l) => (
+              <Link
+                key={l.id}
+                href={l.href}
+                className={linkStyles}
+                target={l.blank ? "_blank" : undefined}
+              >
+                {l.label}
+              </Link>
+            ))}
           </div>
         </div>
         {mapItems.length > 0 && (

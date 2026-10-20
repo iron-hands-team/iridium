@@ -272,6 +272,18 @@ class ChatMessage(Base):
     user = relationship("User", back_populates="chat_messages")
     channel_id = Column(Integer, ForeignKey("channels.id"))
     channel = relationship("Channel", back_populates="messages")
+    channel = relationship("Channel", back_populates="messages")
+    reactions = relationship("ChatReaction", back_populates="message")
+
+class ChatReaction(Base):
+    __tablename__ = "chat_reactions"
+    id = Column(Integer, primary_key=True, index=True)
+    emoji = Column(String, nullable=False)
+
+    user_id = Column(Integer, ForeignKey("users.id"))
+    user = relationship("User", back_populates="chat_reactions")
+    message_id = Column(Integer, ForeignKey("chat_messages.id"))
+    message = relationship("ChatMessage", back_populates="reactions")
 
 class NotificationType(str, enum.Enum):
     message = "message"
@@ -290,3 +302,10 @@ class Notification(Base):
     created_at = Column(DateTime(timezone=True), default=utcnow, nullable=False)
 
     user = relationship("User", back_populates="notifications")
+
+class Link(Base):
+    __tablename__ = "links"
+    id = Column(Integer, primary_key=True, index=True)
+    label = Column(String, nullable=False)
+    href = Column(String, nullable=False)
+    blank = Column(Boolean, default=False)

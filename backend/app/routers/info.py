@@ -3,7 +3,17 @@ from sqlalchemy.orm import Session
 from sqlalchemy import or_, func
 
 from app.database import get_db
-from app.models import MapItem, User, Rule, Announcement, Event, Club, ClassSection, Report
+from app.models import (
+    MapItem,
+    User,
+    Rule,
+    Announcement,
+    Event,
+    Club,
+    ClassSection,
+    Report,
+    Link,
+)
 from app.schemas import (
     MapUploadResponse,
     AddMapItemsRequest,
@@ -12,6 +22,7 @@ from app.schemas import (
     SearchResponse,
     ClassSectionResponse,
     ReportResponse,
+    LinkResponse,
 )
 from app.dependencies import require_admin, manager
 from app.s3 import s3_client, s3_internal, BUCKET_NAME, ENDPOINT
@@ -154,10 +165,7 @@ def get_search(
     )
 
     classes = (
-        db.query(ClassSection)
-        .filter(ClassSection.name.ilike(query))
-        .limit(l)
-        .all()
+        db.query(ClassSection).filter(ClassSection.name.ilike(query)).limit(l).all()
     )
 
     return {
@@ -195,6 +203,7 @@ def get_reports(
         for r in reports
     ]
 
+
 @router.delete("/reports/{report_id}", status_code=204)
 def delete_report(
     report_id: int,
@@ -204,12 +213,13 @@ def delete_report(
     if current_user.role == "student":
         raise HTTPException(status_code=403, detail="Insufficient permission")
 
-    report =db.query(Report).filter(Report.id == report_id).first()
+    report = db.query(Report).filter(Report.id == report_id).first()
     if report is None:
         raise HTTPException(status_code=404, detail="Report not foind.")
     db.delete(report)
     db.commit()
-    
+
+
 @router.post("/reports", status_code=204)
 def submit_report(
     report: ReportResponse,
@@ -225,4 +235,25 @@ def submit_report(
         user_id=None if report.anonymous else current_user.id,
     )
     db.add(new_report)
+    db.commit()
+
+
+@router.get("/links", response_model=list[LinkResponse])
+def get_links(db: Session = Depends(get_db), _current_user: User = Depends(manager)):
+    return db.query(Link).all()
+
+
+@router.post("/links", status_code=204)
+def add_links(
+    links: list[LinkResponse],
+    db: Session = Depends(get_db),
+    _admin: User = Depends(require_admin),
+):
+    db.query(Link).delete()
+
+    new_links = []
+    for link in links:
+        new_links.append(Link(label=link.label, href=link.href, blank=link.blank))
+
+    db.add_all(new_links)
     db.commit()

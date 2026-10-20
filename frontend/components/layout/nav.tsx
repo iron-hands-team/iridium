@@ -7,6 +7,8 @@ import Notifications from "./notifications";
 import Link from "next/link";
 import Image from "next/image";
 
+const navLinkStyles = "px-2 py-1.5 text-sm";
+
 async function Nav() {
   const { user, cookie } = await getSession();
 
@@ -75,39 +77,37 @@ async function Nav() {
         </Link>
         <NavSearch />
         {user.role === "admin" && (
-          <Link href="/admin" className="px-2 py-1.5">
+          <Link href="/admin" className={navLinkStyles}>
             Manage
           </Link>
         )}
         {user.role !== "student" && (
-          <Link href="/classes" className="px-2 py-1.5">
+          <Link href="/classes" className={navLinkStyles}>
             Classes
           </Link>
         )}
-        <Link href="/schedule" className="px-2 py-1.5">
+        <Link href="/schedule" className={navLinkStyles}>
           Schedule
         </Link>
         {user.role === "student" && (
-          <Link href="/grades" className="px-2 py-1.5">
+          <Link href="/grades" className={navLinkStyles}>
             Grades
           </Link>
         )}
         {user.role === "student" && (
-          <Link href="/attendance" className="px-2 py-1.5">
+          <Link href="/attendance" className={navLinkStyles}>
             Attendance
           </Link>
         )}
-
         {user.role === "teacher" && (
-          <Link href="/admin/reports" className="px-2 py-1.5">
+          <Link href="/admin/reports" className={navLinkStyles}>
             Report
           </Link>
         )}
-
-        <Link href="/calendar" className="px-2 py-1.5">
+        <Link href="/calendar" className={navLinkStyles}>
           Calendar
         </Link>
-        <Link href="/clubs" className="px-2 py-1.5">
+        <Link href="/clubs" className={navLinkStyles}>
           Clubs
         </Link>
         <Link
@@ -121,8 +121,7 @@ async function Nav() {
             </span>
           )}
         </Link>
-        <Link href="/chat/1" className="px-2 py-1.5">
-          {/* TODO: change back to /chat */}
+        <Link href="/chat" className={navLinkStyles}>
           Chat
         </Link>
         <Notifications
