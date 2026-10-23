@@ -1,4 +1,7 @@
-import type { NotificationResponse, NotificationType } from "@/types/notification";
+import type {
+  NotificationResponse,
+  NotificationType,
+} from "@/types/notification";
 import { getSession } from "@/lib/auth";
 import { parseNotification } from "@/lib/helpers";
 import NavUser from "./nav-user";
@@ -6,6 +9,8 @@ import NavSearch from "./nav-search";
 import Notifications from "./notifications";
 import Link from "next/link";
 import Image from "next/image";
+
+const navLinkStyles = "px-2 py-1.5 text-sm";
 
 async function Nav() {
   const { user, cookie } = await getSession();
@@ -55,11 +60,12 @@ async function Nav() {
         ])
       : [[], 0];
 
-  const notifications: NotificationType[] = notificationsRaw.map(parseNotification);
+  const notifications: NotificationType[] =
+    notificationsRaw.map(parseNotification);
 
   return (
     <div className="sticky top-0 z-10 bg-zinc-100 dark:bg-zinc-950 border-b-1 border-zinc-800">
-      <nav className="flex items-center gap-x-4 py-2 px-3 sm:px-10 lg:px-50 max-w-450 mx-auto">
+      <nav className="flex items-center gap-x-2 py-2 px-3 sm:px-10 lg:px-50 max-w-450 mx-auto">
         <Link
           href="/"
           className="text-xl font-bold text-black dark:text-white mr-3 flex items-center gap-x-3"
@@ -75,44 +81,42 @@ async function Nav() {
         </Link>
         <NavSearch />
         {user.role === "admin" && (
-          <Link href="/admin" className="px-2 py-1.5">
+          <Link href="/admin" className={navLinkStyles}>
             Manage
           </Link>
         )}
         {user.role !== "student" && (
-          <Link href="/classes" className="px-2 py-1.5">
+          <Link href="/classes" className={navLinkStyles}>
             Classes
           </Link>
         )}
-        <Link href="/schedule" className="px-2 py-1.5">
+        <Link href="/schedule" className={navLinkStyles}>
           Schedule
         </Link>
         {user.role === "student" && (
-          <Link href="/grades" className="px-2 py-1.5">
+          <Link href="/grades" className={navLinkStyles}>
             Grades
           </Link>
         )}
         {user.role === "student" && (
-          <Link href="/attendance" className="px-2 py-1.5">
+          <Link href="/attendance" className={navLinkStyles}>
             Attendance
           </Link>
         )}
-
         {user.role === "teacher" && (
-          <Link href="/admin/reports" className="px-2 py-1.5">
+          <Link href="/admin/reports" className={navLinkStyles}>
             Report
           </Link>
         )}
-
-        <Link href="/calendar" className="px-2 py-1.5">
+        <Link href="/calendar" className={navLinkStyles}>
           Calendar
         </Link>
-        <Link href="/clubs" className="px-2 py-1.5">
+        <Link href="/clubs" className={navLinkStyles}>
           Clubs
         </Link>
         <Link
           href="/messages"
-          className="px-2 py-1.5 flex items-center gap-x-1"
+          className={navLinkStyles + " flex items-center gap-x-1"}
         >
           Messages
           {unreadCount > 0 && (
@@ -121,8 +125,7 @@ async function Nav() {
             </span>
           )}
         </Link>
-        <Link href="/chat/1" className="px-2 py-1.5">
-          {/* TODO: change back to /chat */}
+        <Link href="/chat" className={navLinkStyles}>
           Chat
         </Link>
         <Notifications

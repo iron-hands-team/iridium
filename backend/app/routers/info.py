@@ -3,7 +3,18 @@ from sqlalchemy.orm import Session
 from sqlalchemy import or_, func
 
 from app.database import get_db
-from app.models import MapItem, User, Rule, Announcement, Event, Club, ClassSection, Report
+from app.models import (
+    MapItem,
+    User,
+    Rule,
+    Announcement,
+    Event,
+    Club,
+    ClassSection,
+    Report,
+    Link,
+    File,
+)
 from app.schemas import (
     MapUploadResponse,
     AddMapItemsRequest,
@@ -12,6 +23,9 @@ from app.schemas import (
     SearchResponse,
     ClassSectionResponse,
     ReportResponse,
+    LinkResponse,
+    FileResponse,
+    FileUploadResponse,
 )
 from app.dependencies import require_admin, manager
 from app.s3 import s3_client, s3_internal, BUCKET_NAME, ENDPOINT
@@ -154,10 +168,7 @@ def get_search(
     )
 
     classes = (
-        db.query(ClassSection)
-        .filter(ClassSection.name.ilike(query))
-        .limit(l)
-        .all()
+        db.query(ClassSection).filter(ClassSection.name.ilike(query)).limit(l).all()
     )
 
     return {
@@ -195,6 +206,7 @@ def get_reports(
         for r in reports
     ]
 
+
 @router.delete("/reports/{report_id}", status_code=204)
 def delete_report(
     report_id: int,
@@ -204,12 +216,13 @@ def delete_report(
     if current_user.role == "student":
         raise HTTPException(status_code=403, detail="Insufficient permission")
 
-    report =db.query(Report).filter(Report.id == report_id).first()
+    report = db.query(Report).filter(Report.id == report_id).first()
     if report is None:
         raise HTTPException(status_code=404, detail="Report not foind.")
     db.delete(report)
     db.commit()
-    
+
+
 @router.post("/reports", status_code=204)
 def submit_report(
     report: ReportResponse,
@@ -226,3 +239,57 @@ def submit_report(
     )
     db.add(new_report)
     db.commit()
+
+
+@router.get("/links", response_model=list[LinkResponse])
+def get_links(db: Session = Depends(get_db), _current_user: User = Depends(manager)):
+    return db.query(Link).all()
+
+
+@router.post("/links", status_code=204)
+def add_links(
+    links: list[LinkResponse],
+    db: Session = Depends(get_db),
+    _admin: User = Depends(require_admin),
+):
+    db.query(Link).delete()
+
+    new_links = []
+    for link in links:
+        new_links.append(Link(label=link.label, href=link.href, blank=link.blank))
+
+    db.add_all(new_links)
+    db.commit()
+
+
+@router.get("/files", response_model=list[FileResponse])
+def get_files(db: Session = Depends(get_db), _current_user: User = Depends(manager)):
+    return db.query(File).all()
+
+
+@router.post("/files", response_model=FileUploadResponse)
+def upload_files(
+    files: list[FileResponse],
+    db: Session = Depends(get_db),
+    _current_user: User = Depends(manager),
+):
+    db.query(File).delete()
+
+    new_files = []
+    uploads = []
+    for index, file in enumerate(files):
+        new_files.append(
+            File(title=file.title, description=file.description, type=file.type)
+        )
+        object_key = f"files/{index}"
+        url = s3_client.generate_presigned_url(
+            ClientMethod="put_object",
+            Params={"Bucket": BUCKET_NAME, "Key": object_key},
+            ExpiresIn=120,
+        ).replace(ENDPOINT, "")
+        uploads.append(url)
+
+    db.add_all(new_files)
+    db.commit()
+
+    return {"uploads": uploads}

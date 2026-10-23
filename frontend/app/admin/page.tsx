@@ -1,13 +1,21 @@
 import { redirect } from "next/navigation";
 import { getSession } from "@/lib/auth";
 import { FaBasketball, FaUserGear } from "react-icons/fa6";
-import { FaBook, FaBullhorn, FaInfoCircle, FaClock, FaFlag } from "react-icons/fa";
+import {
+  FaBook,
+  FaBullhorn,
+  FaInfoCircle,
+  FaClock,
+  FaFlag,
+} from "react-icons/fa";
 import NewAnnouncement from "@/components/admin/new-announcement";
 import NewUser from "@/components/admin/new-user";
 import Btn from "@/components/ui/btn";
 import NewClub from "@/components/admin/new-club";
 import NewMap from "@/components/admin/new-map";
 import NewRule from "@/components/admin/new-rule";
+import ManageLinks from "@/components/admin/manage-links";
+import ManageFiles from "@/components/admin/manage-files";
 
 const headingStyles = "text-xl font-bold flex items-center gap-x-3";
 
@@ -68,13 +76,15 @@ async function Page() {
         <div className="border-1 border-zinc-800 px-4 py-2 flex flex-col gap-y-2">
           <NewMap />
           <NewRule text="Edit rules" />
+          <ManageLinks />
+          <ManageFiles />
         </div>
         <div className="flex-1 min-w-[40%] flex flex-col gap-y-5">
           <h2 className={headingStyles}>
-            <FaFlag size={18}/> Reports
+            <FaFlag size={18} /> Reports
           </h2>
           <div className="border-1 border-zinc-800 px-4 py-2 flex flex-col gap-y-2">
-            <Btn text="View reports" link="/admin/reports" primary/>
+            <Btn text="View reports" link="/admin/reports" primary />
           </div>
         </div>
       </div>

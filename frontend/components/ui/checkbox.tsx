@@ -6,11 +6,14 @@ interface CheckboxProps {
   text: string;
   checked: boolean;
   setChecked: (c: boolean) => void;
+  styles?: string;
 }
 
-function Checkbox({ text, checked, setChecked }: CheckboxProps) {
+function Checkbox({ text, checked, setChecked, styles }: CheckboxProps) {
   return (
-    <label className="flex items-center gap-x-2 cursor-pointer w-fit text-zinc-700 dark:text-zinc-300">
+    <label
+      className={`flex items-center gap-x-2 cursor-pointer w-fit text-zinc-700 dark:text-zinc-300 ${styles}`}
+    >
       <div
         className={`border-2 border-zinc-800 w-4 h-4 flex items-center justify-center relative ${checked && "bg-zinc-800"}`}
       >

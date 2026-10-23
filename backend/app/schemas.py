@@ -395,3 +395,18 @@ class ChatMessageResponse(BaseModel):
 
     class Config:
         from_attributes = True
+
+class LinkResponse(BaseModel):
+    id: int | None = None
+    label: str
+    href: str
+    blank: bool | None = None
+
+class FileResponse(BaseModel):
+    id: int | None = None
+    title: str
+    description: str | None = None
+    type: str
+
+class FileUploadResponse(BaseModel):
+    uploads: list[str]

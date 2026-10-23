@@ -233,6 +233,24 @@ Body: `{ type, title, description, anonymous, role?, user? }`
 
 Staff only. Deletes specified report, `204` on success, `403` if accessed by a student.
 
+### `GET /links`
+
+Auth required (any role). Fetches all uploaded links and their labels.
+
+### `POST /links`
+
+Admin only. Creates and replaces original links with set of new links and their data, `204` on success, `403` if not accessed by an admin.
+Body: `{ label, href, blank? }`
+
+### `GET /files`
+
+Auth required (any role). Fetches all uploaded files and their information.
+
+### `POST /files`
+
+Admin only. Creates and replaces original files with set of new files and their data, `204` on success, `403` if not accessed by an admin.
+Body: `{ title, description?, type }`
+
 ---
 
 ## Misc
