@@ -13,6 +13,7 @@ from app.models import (
     ClassSection,
     Report,
     Link,
+    File,
 )
 from app.schemas import (
     MapUploadResponse,
@@ -23,6 +24,8 @@ from app.schemas import (
     ClassSectionResponse,
     ReportResponse,
     LinkResponse,
+    FileResponse,
+    FileUploadResponse,
 )
 from app.dependencies import require_admin, manager
 from app.s3 import s3_client, s3_internal, BUCKET_NAME, ENDPOINT
@@ -257,3 +260,36 @@ def add_links(
 
     db.add_all(new_links)
     db.commit()
+
+
+@router.get("/files", response_model=list[FileResponse])
+def get_files(db: Session = Depends(get_db), _current_user: User = Depends(manager)):
+    return db.query(File).all()
+
+
+@router.post("/files", response_model=FileUploadResponse)
+def upload_files(
+    files: list[FileResponse],
+    db: Session = Depends(get_db),
+    _current_user: User = Depends(manager),
+):
+    db.query(File).delete()
+
+    new_files = []
+    uploads = []
+    for index, file in enumerate(files):
+        new_files.append(
+            File(title=file.title, description=file.description, type=file.type)
+        )
+        object_key = f"files/{index}"
+        url = s3_client.generate_presigned_url(
+            ClientMethod="put_object",
+            Params={"Bucket": BUCKET_NAME, "Key": object_key},
+            ExpiresIn=120,
+        ).replace(ENDPOINT, "")
+        uploads.append(url)
+
+    db.add_all(new_files)
+    db.commit()
+
+    return {"uploads": uploads}

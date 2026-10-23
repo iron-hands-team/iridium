@@ -118,6 +118,22 @@ export const newLinkSchema = z.array(
   }),
 );
 
+const fileTypes = z.enum(["All", "Image", "Video", "PDF", "Document", "Other"]);
+
+export const newFileSchema = z.array(
+  z
+    .object({
+      id: z.number().optional(),
+      title: z.string().trim().min(1, "Please enter a title"),
+      description: z.string().optional().nullable(),
+      file: z.file().optional(),
+      type: fileTypes.optional(),
+    })
+    .superRefine((file, ctx) => {
+      if (!file.type && !file.file) ctx.addIssue("Please upload a file");
+    }),
+);
+
 export type LoginType = z.infer<typeof loginSchema>;
 export type PostType = z.infer<typeof postSchema>;
 export type NewUserType = z.infer<typeof newUserSchema>;
@@ -129,5 +145,10 @@ export type ReportType = z.infer<typeof reportSchema>;
 export type ReportOptionType = z.infer<typeof reportTypes>;
 export type ChannelType = z.infer<typeof channelSchema>;
 export type LinkType = z.infer<typeof newLinkSchema.element>;
+export type FileType = Omit<z.infer<typeof newFileSchema.element>, "file"> & {
+  file?: File;
+};
+export type FileOptionType = z.infer<typeof fileTypes>;
 
 export const reportOptions = reportTypes.options;
+export const fileOptions = fileTypes.options;

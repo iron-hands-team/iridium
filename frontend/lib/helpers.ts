@@ -1,5 +1,8 @@
 import type { UserResponse, UserType } from "@/types/user";
-import type { NotificationResponse, NotificationType } from "@/types/notification";
+import type {
+  NotificationResponse,
+  NotificationType,
+} from "@/types/notification";
 
 export function parseNotification(n: NotificationResponse): NotificationType {
   return {
@@ -34,6 +37,10 @@ export function profileUrl(username: string) {
 
 export function mapUrl(index: number) {
   return `/s3/files/map/${index}?t=${new Date().getTime()}`;
+}
+
+export function fileUrl(index: number, refresh: boolean = true) {
+  return `/s3/files/files/${index}?t=${refresh ? new Date().getTime() : ""}`;
 }
 
 export function getTime(time: Date) {

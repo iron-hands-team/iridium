@@ -15,6 +15,7 @@ import NewClub from "@/components/admin/new-club";
 import NewMap from "@/components/admin/new-map";
 import NewRule from "@/components/admin/new-rule";
 import ManageLinks from "@/components/admin/manage-links";
+import ManageFiles from "@/components/admin/manage-files";
 
 const headingStyles = "text-xl font-bold flex items-center gap-x-3";
 
@@ -76,6 +77,7 @@ async function Page() {
           <NewMap />
           <NewRule text="Edit rules" />
           <ManageLinks />
+          <ManageFiles />
         </div>
         <div className="flex-1 min-w-[40%] flex flex-col gap-y-5">
           <h2 className={headingStyles}>

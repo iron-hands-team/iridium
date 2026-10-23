@@ -101,7 +101,7 @@ function NewMapModal({ closeModal }: { closeModal: () => void }) {
                     />
                   </label>
                   <label
-                    className="cursor-pointer border border-zinc-800 flex flex-col p-5 gap-y-5 text-zinc-700 dark:text-zinc-300 items-center hover:bg-zinc-900"
+                    className="cursor-pointer border border-zinc-800 flex flex-col p-5 gap-y-5 text-zinc-700 dark:text-zinc-300 items-center hover:bg-zinc-200 dark:hover:bg-zinc-900"
                     title="Upload image"
                   >
                     {i < (loaded as number) || (files && files[i]) ? (

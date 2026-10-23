@@ -44,6 +44,7 @@ class User(Base):
     messages_sent = relationship("Message", back_populates="sender", cascade="all, delete-orphan", foreign_keys="Message.sender_id")
     messages_received = relationship("Message", back_populates="recipient", cascade="all, delete-orphan", foreign_keys="Message.recipient_id")
     chat_messages = relationship("ChatMessage", back_populates="user")
+    chat_reactions = relationship("ChatReaction", back_populates="user")
     notifications = relationship("Notification", back_populates="user", cascade="all")
 
 class Announcement(Base):
@@ -309,3 +310,18 @@ class Link(Base):
     label = Column(String, nullable=False)
     href = Column(String, nullable=False)
     blank = Column(Boolean, default=False)
+
+class FileType(str, enum.Enum):
+    all = "All"
+    image = "Image"
+    video = "Video"
+    pdf = "PDF"
+    document = "Document"
+    other = "Other"
+
+class File(Base):
+    __tablename__ = "files"
+    id = Column(Integer, primary_key=True, index=True)
+    title = Column(String, nullable=False)
+    description = Column(String, nullable=True)
+    type = Column(Enum(FileType), nullable=False)

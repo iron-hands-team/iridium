@@ -1,4 +1,7 @@
-import type { NotificationResponse, NotificationType } from "@/types/notification";
+import type {
+  NotificationResponse,
+  NotificationType,
+} from "@/types/notification";
 import { getSession } from "@/lib/auth";
 import { parseNotification } from "@/lib/helpers";
 import NavUser from "./nav-user";
@@ -57,11 +60,12 @@ async function Nav() {
         ])
       : [[], 0];
 
-  const notifications: NotificationType[] = notificationsRaw.map(parseNotification);
+  const notifications: NotificationType[] =
+    notificationsRaw.map(parseNotification);
 
   return (
     <div className="sticky top-0 z-10 bg-zinc-100 dark:bg-zinc-950 border-b-1 border-zinc-800">
-      <nav className="flex items-center gap-x-4 py-2 px-3 sm:px-10 lg:px-50 max-w-450 mx-auto">
+      <nav className="flex items-center gap-x-2 py-2 px-3 sm:px-10 lg:px-50 max-w-450 mx-auto">
         <Link
           href="/"
           className="text-xl font-bold text-black dark:text-white mr-3 flex items-center gap-x-3"
@@ -112,7 +116,7 @@ async function Nav() {
         </Link>
         <Link
           href="/messages"
-          className="px-2 py-1.5 flex items-center gap-x-1"
+          className={navLinkStyles + " flex items-center gap-x-1"}
         >
           Messages
           {unreadCount > 0 && (

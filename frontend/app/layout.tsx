@@ -22,13 +22,6 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
   const { user } = await getSession();
 
   return (
-    <html>
-      <body>
-        <BusSchool/>
-      </body>
-    </html>
-  )
-  return (
     <html
       lang="en"
       className={`${inter.variable} h-full antialiased`}

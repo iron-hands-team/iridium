@@ -401,3 +401,12 @@ class LinkResponse(BaseModel):
     label: str
     href: str
     blank: bool | None = None
+
+class FileResponse(BaseModel):
+    id: int | None = None
+    title: str
+    description: str | None = None
+    type: str
+
+class FileUploadResponse(BaseModel):
+    uploads: list[str]
