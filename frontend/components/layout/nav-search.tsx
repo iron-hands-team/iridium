@@ -8,6 +8,7 @@ import {
   FaCalendar,
   FaUser,
   FaBasketballBall,
+  FaChalkboardTeacher,
 } from "react-icons/fa";
 import SearchResult from "./search-result";
 import Input from "../ui/input";
@@ -128,10 +129,28 @@ function NavSearch() {
                   ))}
                 </>
               )}
+              {result.classes.length > 0 && (
+                <>
+                  <div className="font-bold text-left px-4">Classes</div>
+                  {result.classes.map((c) => (
+                    <SearchResult
+                      key={c.id}
+                      href="/classes"
+                      name={c.name}
+                      description={
+                        c.teacher.first_name + " " + c.teacher.last_name
+                      }
+                    >
+                      <FaChalkboardTeacher size={18} />
+                    </SearchResult>
+                  ))}
+                </>
+              )}
               {result.announcements.length +
                 result.clubs.length +
                 result.events.length +
-                result.users.length ===
+                result.users.length +
+                result.classes.length ===
                 0 && "Nothing found. Try a different search?"}
             </>
           ) : (

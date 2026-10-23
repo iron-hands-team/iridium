@@ -39,6 +39,7 @@ class User(Base):
     announcement_likes = relationship("AnnouncementLike", back_populates="user", cascade="all, delete-orphan")
     event_rsvps = relationship("EventRSVP", back_populates="user", cascade="all, delete-orphan")
     grades = relationship("Grade", back_populates="student", cascade="all, delete-orphan")
+    submissions = relationship("Submission", back_populates="student", cascade="all, delete-orphan")
     reports = relationship("Report", back_populates="user")
     attendance_records = relationship("AttendanceRecord", back_populates="student", cascade="all, delete-orphan")
     messages_sent = relationship("Message", back_populates="sender", cascade="all, delete-orphan", foreign_keys="Message.sender_id")
@@ -187,9 +188,19 @@ class Grade(Base):
     student_id = Column(Integer, ForeignKey("users.id"), nullable=False)
     score = Column(Float, nullable=True)
 
-    assignment = relationship("Assignment", back_populates="grades")
+    assignment = relations token_tpe: str = "bearer"
+        user: UserResponsepindex.txt.txt
+    afrom pydantic import BaseModel
+    
+    from app.models import UserRole
+    class LoginRequest(BaseModel):
+            username: str    password: str
+            class UserCreateRequest(BaseModel):
+                    username: strip("Assignment", back_populates="grades")
     student = relationship("User", back_populates="grades")
 
+   lass Config: staticmethod
+       from_
 class ClassEnrollment(Base):
     __tablename__ = "class_enrollments"
     id = Column(Integer, primary_key=True, index=True)
