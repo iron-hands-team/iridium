@@ -2,7 +2,7 @@
 
 import type { FileType, FileOptionType } from "@/lib/schemas";
 import { useState } from "react";
-import { FaFilter } from "react-icons/fa";
+import { FaFilter, FaFileWord } from "react-icons/fa";
 import { fileUrl } from "@/lib/helpers";
 import { fileOptions } from "@/lib/schemas";
 import Input from "@/components/ui/input";
@@ -31,7 +31,7 @@ function Files({ files, isAdmin }: FilesProps) {
     <div>
       <div className="flex gap-x-10 items-center py-5">
         <Input
-          placeholder="Search clubs"
+          placeholder="Search files"
           value={search}
           setValue={(s) => setSearch(s)}
           styles="w-100!"
@@ -49,29 +49,55 @@ function Files({ files, isAdmin }: FilesProps) {
       </div>
       <div className="flex flex-wrap gap-5">
         {displayed.length > 0 ? (
-          displayed.map((file) => (
-            <div
-              key={file.id}
-              className="w-80 border border-zinc-800 flex flex-col gap-y-3 p-5 hover:bg-zinc-200 dark:hover:bg-zinc-900 cursor-pointer"
-            >
-              <Image
-                src={fileUrl(file.id as number, false)}
-                alt="Uploaded file"
-                width={150}
-                height={150}
-                unoptimized
-              />
-              <div className="text-lg font-bold">{file.title}</div>
-              {file.description && (
-                <p className="text-sm text-zinc-700 dark:text-zinc-300">
-                  {file.description}
-                </p>
-              )}
-              <div className="px-2 py-1.5 w-fit bg-zinc-300/50 dark:bg-zinc-800/50 text-sm text-zinc-700 dark:text-zinc-300">
-                {file.type}
-              </div>
-            </div>
-          ))
+          displayed.map((file) => {
+            const index = files.findIndex((c) => c.id === file.id);
+            const url =
+              file.type === "Document" ||
+              file.type === "PDF" ||
+              file.type === "Other"
+                ? fileUrl(index, false)
+                : undefined;
+            return (
+              <a
+                key={file.id}
+                className="w-80 border border-zinc-800 flex flex-col gap-y-3 p-5 hover:bg-zinc-200 dark:hover:bg-zinc-900 cursor-pointer"
+                href={url}
+                download={url}
+                title={url ? "Download file" : undefined}
+              >
+                {file.type === "Image" && (
+                  <Image
+                    src={fileUrl(index, false)}
+                    alt="Uploaded file"
+                    width={150}
+                    height={150}
+                    unoptimized
+                  />
+                )}
+                {file.type === "Video" && (
+                  <video src={fileUrl(index, false)} controls />
+                )}
+                {file.type === "PDF" && (
+                  <iframe
+                    src={`${url}#toolbar=0&navpanes=0&view=FitH`}
+                    title={file.title}
+                    loading="lazy"
+                    className="pointer-events-none h-full w-full"
+                  />
+                )}
+                {file.type === "Document" && <FaFileWord size={100} />}
+                <div className="text-lg font-bold">{file.title}</div>
+                {file.description && (
+                  <p className="text-sm text-zinc-700 dark:text-zinc-300">
+                    {file.description}
+                  </p>
+                )}
+                <div className="px-2 py-1.5 w-fit bg-zinc-300/50 dark:bg-zinc-800/50 text-sm text-zinc-700 dark:text-zinc-300">
+                  {file.type}
+                </div>
+              </a>
+            );
+          })
         ) : (
           <div className="text-sm py-3 text-zinc-700 dark:text-zinc-300">
             {files.length > 0 ? (

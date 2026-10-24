@@ -46,6 +46,7 @@ function NewMapModal({ closeModal }: { closeModal: () => void }) {
       body: JSON.stringify({ labels }),
     }).then((res) => res.json());
     const uploadUrls: string[] = res.uploads;
+    console.log(uploadUrls);
     if (files) {
       await Promise.all(
         uploadUrls.map((url, i) =>

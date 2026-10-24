@@ -3,7 +3,12 @@
 import { newFileSchema, type FileType } from "@/lib/schemas";
 import { useState, useEffect } from "react";
 import { AnimatePresence } from "framer-motion";
-import { FaExclamationTriangle, FaFile, FaTrash } from "react-icons/fa";
+import {
+  FaExclamationTriangle,
+  FaFile,
+  FaPaperclip,
+  FaTrash,
+} from "react-icons/fa";
 import { fileUrl } from "@/lib/helpers";
 import Btn from "../ui/btn";
 import Modal from "../ui/modal";
@@ -36,17 +41,18 @@ function ManageFiles() {
         const uploadUrls: string[] = uploadData.uploads;
         if (files) {
           await Promise.all(
-            uploadUrls.map((url, i) =>
-              files[i].file
+            uploadUrls.map((url, i) => {
+              const file = files[i];
+              return file.file
                 ? fetch("/s3" + url, {
                     method: "PUT",
                     headers: {
-                      "Content-Type": files[i].file.type,
+                      "Content-Type": file.file.type,
                     },
-                    body: files[i].file,
+                    body: file.file,
                   })
-                : Promise.resolve(),
-            ),
+                : Promise.resolve();
+            }),
           );
         }
         setEditing(false);
@@ -124,22 +130,28 @@ function ManageFiles() {
                     <div className="flex flex-col gap-y-3 pb-5">
                       <label
                         title="Upload file"
-                        className="cursor-pointer border border-zinc-800 flex flex-col p-5 gap-y-5 text-zinc-700 dark:text-zinc-300 items-center hover:bg-zinc-200 dark:hover:bg-zinc-900"
+                        className="cursor-pointer border border-zinc-800 flex flex-col p-5 gap-y-5 text-zinc-700 dark:text-zinc-300 items-center text-sm hover:bg-zinc-200 dark:hover:bg-zinc-900"
                       >
                         {file.file || file.id ? (
                           <>
-                            <Image
-                              src={
-                                file.file
-                                  ? URL.createObjectURL(file.file)
-                                  : fileUrl(file.id as number)
-                              }
-                              alt="Uploaded image"
-                              width={150}
-                              height={150}
-                              unoptimized
-                            />
-                            {/* TODO: dont show image tag for non-image files */}
+                            {file.type === "Image" ? (
+                              <Image
+                                src={
+                                  file.file
+                                    ? URL.createObjectURL(file.file)
+                                    : fileUrl(i)
+                                }
+                                alt="Uploaded image"
+                                width={150}
+                                height={150}
+                                unoptimized
+                              />
+                            ) : file.type ? (
+                              <>
+                                <FaPaperclip size={30} />
+                                Uploaded {file.type}
+                              </>
+                            ) : null}
                             {file.file && (
                               <div className="flex flex-col gap-y-1 items-center">
                                 <div>{file.file.name} </div>
