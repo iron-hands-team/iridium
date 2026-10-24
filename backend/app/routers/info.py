@@ -278,9 +278,8 @@ def upload_files(
     new_files = []
     uploads = []
     for index, file in enumerate(files):
-        new_files.append(
-            File(title=file.title, description=file.description, type=file.type)
-        )
+        new_file = File(title=file.title, description=file.description, type=file.type)
+        new_files.append(new_file)
         object_key = f"files/{index}"
         url = s3_client.generate_presigned_url(
             ClientMethod="put_object",

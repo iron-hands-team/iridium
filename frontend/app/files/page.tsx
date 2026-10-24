@@ -1,7 +1,26 @@
+import type { Metadata } from "next";
 import type { FileType } from "@/lib/schemas";
 import { getSession } from "@/lib/auth";
 import { FaFile } from "react-icons/fa";
 import Files from "./files";
+
+export const metadata: Metadata = {
+  title: "Files",
+  description:
+    "Browse and download all the images, videos, documents, PDFs, or other files uploaded by your school here.",
+  authors: [
+    { name: "Iron Hands Team", url: "https://github.com/iron-hands-team" },
+  ],
+  openGraph: {
+    title: "Files",
+    description:
+      "Browse and download all the images, videos, documents, PDFs, or other files uploaded by your school here.",
+    url: "https://iridium.tonymac.net/files",
+    siteName: "Iridium",
+    images: [{ url: "/logo.png", width: 100, height: 100 }],
+    type: "website",
+  },
+};
 
 async function Page() {
   const { user, cookie } = await getSession();

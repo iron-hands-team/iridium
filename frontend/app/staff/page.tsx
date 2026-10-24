@@ -1,8 +1,27 @@
+import type { Metadata } from "next";
 import type { UserType, UserResponse } from "@/types/user";
 import { parseUser } from "@/lib/helpers";
 import { FaUserAstronaut } from "react-icons/fa";
 import { getSession } from "@/lib/auth";
 import Staff from "./staff";
+
+export const metadata: Metadata = {
+  title: "Staff Directory",
+  description:
+    "Browse your school's complete staff directory of teachers and admins, view their information and classes, and message them.",
+  authors: [
+    { name: "Iron Hands Team", url: "https://github.com/iron-hands-team" },
+  ],
+  openGraph: {
+    title: "Staff Directory",
+    description:
+      "Browse your school's complete staff directory of teachers and admins, view their information and classes, and message them.",
+    url: "https://iridium.tonymac.net/staff",
+    siteName: "Iridium",
+    images: [{ url: "/logo.png", width: 100, height: 100 }],
+    type: "website",
+  },
+};
 
 async function Page() {
   const { cookie } = await getSession();

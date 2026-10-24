@@ -2,6 +2,7 @@
 
 import { AnimatePresence } from "framer-motion";
 import { useState } from "react";
+import toast from "react-hot-toast";
 import WarningModal from "../modals/warning";
 import Btn from "../ui/btn";
 
@@ -15,7 +16,8 @@ function Delete({ username }: { username: string }) {
       method: "POST",
     });
     if (res.ok) {
-      setDeleting(false); //TODO: add toast popup for backend operation status
+      toast.success("Account deletion requested successfully");
+      setDeleting(false);
     } else {
       setError("Something went wrong, please try again");
     }

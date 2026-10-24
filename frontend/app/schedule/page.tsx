@@ -1,6 +1,25 @@
+import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { FaClock } from "react-icons/fa";
 import { getSession } from "@/lib/auth";
+
+export const metadata: Metadata = {
+  title: "Schedule",
+  description:
+    "View your complete detailed schedule of different class periods for each data on this page.",
+  authors: [
+    { name: "Iron Hands Team", url: "https://github.com/iron-hands-team" },
+  ],
+  openGraph: {
+    title: "Schedule",
+    description:
+      "View your complete detailed schedule of different class periods for each data on this page.",
+    url: "https://iridium.tonymac.net/schedule",
+    siteName: "Iridium",
+    images: [{ url: "/logo.png", width: 100, height: 100 }],
+    type: "website",
+  },
+};
 
 interface ScheduleItem {
   id: number;
@@ -60,9 +79,7 @@ async function Page() {
                 <div className="flex-1 font-bold">{item.course_name}</div>
                 <div className="text-sm text-zinc-500">
                   {item.room && <>{item.room} &middot; </>}
-                  {start && end
-                    ? `${start} - ${end}`
-                    : start || end || ""}
+                  {start && end ? `${start} - ${end}` : start || end || ""}
                 </div>
               </div>
             );

@@ -8,6 +8,8 @@ import Channel from "@/components/chat/channel";
 import ChannelBtn from "@/components/chat/channel-btn";
 import Messages from "@/components/chat/messages";
 
+//TODO: async metadata
+
 type MessageType = MessageT & {
   user: UserResponse;
   created_at: string;

@@ -51,12 +51,12 @@ To host Iridium for your school or for other purposes, simply follow these steps
 5. Run the following commands to set a new Garage layout and set up the keys:
 
    ```bash
-   docker exec -it garage /garage status
-   docker exec -it garage /garage layout assign <ID_FROM_PREV_COMMAND> -c 5G -z garage
-   docker exec -it garage /garage layout apply --version 1
-   docker exec -it garage /garage key create iridium-key
-   docker exec -it garage /garage bucket create iridium-uploads
-   docker exec -it garage /garage bucket allow --read --write iridium-uploads --key iridium-key
+   docker exec -it garage-storage /garage status
+   docker exec -it garage-storage /garage layout assign <ID_FROM_PREV_COMMAND> -c 5G -z garage
+   docker exec -it garage-storage /garage layout apply --version 1
+   docker exec -it garage-storage /garage key create iridium-key
+   docker exec -it garage-storage /garage bucket create iridium-uploads
+   docker exec -it garage-storage /garage bucket allow --read --write iridium-uploads --key iridium-key
    ```
 
 6. Copy the Garage access and secret keys to `.env` (`GARAGE_ACCESS_KEY` and `GARAGE_SECRET_KEY`) and start Docker compose:

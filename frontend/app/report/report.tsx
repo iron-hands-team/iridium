@@ -8,6 +8,7 @@ import {
 } from "@/lib/schemas";
 import { useState } from "react";
 import { FaExclamationTriangle } from "react-icons/fa";
+import toast from "react-hot-toast";
 import Dropdown from "@/components/ui/dropdown";
 import Input from "@/components/ui/input";
 import Textarea from "@/components/ui/textarea";
@@ -16,13 +17,14 @@ import Btn from "@/components/ui/btn";
 
 const labelStyles =
   "text-black dark:text-zinc-300 text-sm flex flex-col gap-y-1 w-full";
+const emptyReport = {
+  title: "",
+  description: "",
+  type: "Discrimination",
+};
 
 function Report() {
-  const [report, setReport] = useState<ReportType>({
-    title: "",
-    description: "",
-    type: "Discrimination",
-  });
+  const [report, setReport] = useState<ReportType>(emptyReport as ReportType);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
 
@@ -41,6 +43,9 @@ function Report() {
       });
       if (!res.ok) {
         setError("Something went wrong, please try again");
+      } else {
+        toast.success("Report submitted successfully!");
+        setReport(emptyReport as ReportType);
       }
       setLoading(false);
     } else {

@@ -8,6 +8,7 @@ import { AnimatePresence } from "framer-motion";
 import { useRouter } from "next/navigation";
 import Menu from "../ui/menu";
 import WarningModal from "../modals/warning";
+import toast from "react-hot-toast";
 import { TbPinnedFilled } from "react-icons/tb";
 import PostAnnouncementModal from "../modals/post-announcement";
 
@@ -36,7 +37,7 @@ function Announcement({ announcement, user }: AnnouncementProps) {
   }
 
   async function handlePin() {
-    await fetch(`/api/announcements/${announcement.id}`, {
+    const res = await fetch(`/api/announcements/${announcement.id}`, {
       method: "PATCH",
       headers: {
         "Content-Type": "application/json",
@@ -44,12 +45,13 @@ function Announcement({ announcement, user }: AnnouncementProps) {
       credentials: "include",
       body: JSON.stringify({ pinned: !announcement.pinned }),
     });
+    if (res.ok) toast.success("Post pinned successfully!");
     router.refresh();
   }
 
   async function handleArchive() {
     setArchiving(true);
-    await fetch(`/api/announcements/${announcement.id}`, {
+    const res = await fetch(`/api/announcements/${announcement.id}`, {
       method: "PATCH",
       headers: {
         "Content-Type": "application/json",
@@ -57,19 +59,21 @@ function Announcement({ announcement, user }: AnnouncementProps) {
       credentials: "include",
       body: JSON.stringify({ archived: !announcement.archived }),
     });
+    if (res.ok) toast.success("Post archived successfully!");
     router.refresh();
     setArchiving(null);
   }
 
   async function handleDelete() {
     setDeleting(true);
-    await fetch(`/api/announcements/${announcement.id}`, {
+    const res = await fetch(`/api/announcements/${announcement.id}`, {
       method: "DELETE",
       headers: {
         "Content-Type": "application/json",
       },
       credentials: "include",
     });
+    if (res.ok) toast.success("Post deleted successfully!");
     router.refresh();
     setDeleting(null);
   }
@@ -146,6 +150,7 @@ function Announcement({ announcement, user }: AnnouncementProps) {
               <PostAnnouncementModal
                 existing={announcement}
                 closeModal={() => setEditing(null)}
+                toast={(m) => toast.success(m)}
               />
             )}
             {archiving !== null && (

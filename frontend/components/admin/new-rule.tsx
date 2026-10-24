@@ -3,6 +3,7 @@
 import type { RuleType } from "@/lib/schemas";
 import { useState } from "react";
 import { AnimatePresence } from "framer-motion";
+import toast from "react-hot-toast";
 import Btn from "../ui/btn";
 import NewRuleModal from "../modals/new-rule";
 
@@ -27,6 +28,7 @@ function NewRule({ text, existing, primary }: NewRuleProps) {
           <NewRuleModal
             closeModal={() => setAdding(false)}
             existing={existing}
+            toast={(m) => toast(m)}
           />
         )}
       </AnimatePresence>

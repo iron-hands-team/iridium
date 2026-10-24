@@ -4,6 +4,7 @@ import type { ClubType } from "@/types/clubs";
 import { useState } from "react";
 import { FaCaretUp, FaFilter } from "react-icons/fa";
 import { AnimatePresence } from "framer-motion";
+import toast from "react-hot-toast";
 import Input from "@/components/ui/input";
 import Dropdown from "@/components/ui/dropdown";
 import Checkbox from "@/components/ui/checkbox";
@@ -178,7 +179,13 @@ function Clubs({ clubs }: { clubs: ClubType[] }) {
         </div>
       </div>
       <AnimatePresence>
-        {club && <ClubModal club={club} closeModal={() => setClub(null)} />}
+        {club && (
+          <ClubModal
+            club={club}
+            closeModal={() => setClub(null)}
+            toast={(m) => toast.success(m)}
+          />
+        )}
       </AnimatePresence>
     </div>
   );

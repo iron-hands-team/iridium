@@ -7,6 +7,8 @@ import Edit from "@/components/profile/edit";
 import Avatar from "@/components/profile/avatar";
 import Delete from "@/components/profile/delete";
 
+//TODO: async metadata
+
 async function Page({ params }: { params: Promise<{ username: string }> }) {
   const { username } = await params;
   const { user: currentUser, cookie } = await getSession();

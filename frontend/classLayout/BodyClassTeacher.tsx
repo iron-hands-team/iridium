@@ -7,8 +7,8 @@ import "@/app/globals.css";
 import AssignmentsPopupClassTeacher from "./assignmentsPopupClassTeacher";
 import SettingsPopupClassTeacher from "./settingsPopupClassTeacher";
 import MessagePopupClassTeacher from "./messagesPopupClassTeacher";
-import StudentsPopupClassTeacher from "@/components/layout/studentsPopupClassTeacher";
-import QuizPopup from "@/components/layout/quizPopupTeacher";
+import StudentsPopupClassTeacher from "@/classLayout/studentsPopupClassTeacher";
+import QuizPopup from "@/classLayout/quizPopupTeacher";
 
 import AboutPopup from "@/components/layout/aboutPopup";
 

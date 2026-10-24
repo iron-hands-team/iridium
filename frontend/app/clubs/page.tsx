@@ -1,8 +1,29 @@
+import type { Metadata } from "next";
 import type { ClubResponse, ClubType } from "@/types/clubs";
 import { FaBasketball } from "react-icons/fa6";
 import { getSession } from "@/lib/auth";
 import { parseUser } from "@/lib/helpers";
 import Clubs from "./clubs";
+
+export const metadata: Metadata = {
+  title: "Clubs",
+  description:
+    "View and browse all the different clubs offered by your school on each date, join, edit, or leave them, and access each club's own page.",
+  authors: [
+    { name: "Iron Hands Team", url: "https://github.com/iron-hands-team" },
+  ],
+  openGraph: {
+    title: "Clubs",
+    description:
+      "View and browse all the different clubs offered by your school on each date, join, edit, or leave them, and access each club's own page.",
+    url: "https://iridium.tonymac.net/clubs",
+    siteName: "Iridium",
+    images: [{ url: "/logo.png", width: 100, height: 100 }],
+    type: "website",
+  },
+};
+
+//TODO: add club page
 
 async function Page() {
   const { cookie } = await getSession();
@@ -15,7 +36,9 @@ async function Page() {
       },
     }).then((res) => res.json())
   ).map((c: ClubResponse) => {
-    return c.sponsor ? { ...c, sponsor: parseUser(c.sponsor) } : c;
+    return c.sponsor
+      ? { ...c, sponsor: parseUser(c.sponsor), sponsorId: c.sponsor_id }
+      : c;
   });
 
   return (

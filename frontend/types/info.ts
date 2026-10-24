@@ -9,5 +9,10 @@ export interface SearchResponse {
   clubs: ClubResponse[];
   events: EventType[];
   announcements: PostType[];
-  classes: ClassType[];
+  classes: ClassType[]; //@iamharry0121 ???
+}
+
+export interface TipType {
+  icon: React.ReactNode;
+  text: string;
 }

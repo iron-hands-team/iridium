@@ -4,6 +4,7 @@ import { useState } from "react";
 import { AnimatePresence } from "framer-motion";
 import { FaTrash } from "react-icons/fa";
 import { useRouter } from "next/navigation";
+import toast from "react-hot-toast";
 import WarningModal from "../modals/warning";
 import Btn from "../ui/btn";
 
@@ -18,6 +19,7 @@ function DeleteAccount({ username }: { username: string }) {
       method: "DELETE",
     });
     if (res.ok) {
+      toast.success("User deleted successfully!");
       router.refresh();
       setDeleting(false);
     } else {
@@ -31,6 +33,7 @@ function DeleteAccount({ username }: { username: string }) {
       method: "PATCH",
     });
     if (res.ok) {
+      toast.success("Request cleared successfully!");
       router.refresh();
       setDeleting(false);
     } else {

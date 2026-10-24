@@ -15,9 +15,10 @@ const labelStyles = "text-sm flex flex-col gap-y-1";
 interface NewClubModalProps {
   closeModal: () => void;
   existing?: ClubType;
+  toast: (msg: string) => void;
 }
 
-function NewClubModal({ closeModal, existing }: NewClubModalProps) {
+function NewClubModal({ closeModal, existing, toast }: NewClubModalProps) {
   const [club, setClub] = useState<NewClubType>(
     existing
       ? { ...existing }
@@ -62,6 +63,7 @@ function NewClubModal({ closeModal, existing }: NewClubModalProps) {
         });
       }
       if (res.ok) {
+        toast(`Club ${existing ? "updated" : "added"} successfully!`);
         closeModal();
         router.refresh();
       } else {

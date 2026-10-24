@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { FaUserCircle } from "react-icons/fa";
 import { AnimatePresence } from "framer-motion";
+import toast from "react-hot-toast";
 import Image from "next/image";
 import AvatarModal from "../modals/avatar";
 
@@ -40,6 +41,7 @@ function Avatar({ image, canEdit, username }: AvatarProps) {
             closeModal={() => setEditing(false)}
             imageUrl={image}
             username={username}
+            toast={(m) => toast.success(m)}
           />
         )}
       </AnimatePresence>

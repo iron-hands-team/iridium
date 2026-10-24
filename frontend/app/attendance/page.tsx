@@ -1,6 +1,25 @@
-import { redirect } from "next/navigation";
+import type { Metadata } from "next";
 import type { StudentClassAttendanceType } from "@/types/attendance";
+import { redirect } from "next/navigation";
 import { getSession } from "@/lib/auth";
+
+export const metadata: Metadata = {
+  title: "Attendance",
+  description:
+    "View your detailed attendance records and statistics in each class on this page.",
+  authors: [
+    { name: "Iron Hands Team", url: "https://github.com/iron-hands-team" },
+  ],
+  openGraph: {
+    title: "Attendance",
+    description:
+      "View your detailed attendance records and statistics in each class on this page.",
+    url: "https://iridium.tonymac.net/attendance",
+    siteName: "Iridium",
+    images: [{ url: "/logo.png", width: 100, height: 100 }],
+    type: "website",
+  },
+};
 
 const statusStyles: Record<string, string> = {
   present: "text-green-500",
@@ -46,8 +65,7 @@ async function Page() {
           const present = cls.records.filter(
             (r) => r.status === "present",
           ).length;
-          const rate =
-            total > 0 ? ((present / total) * 100).toFixed(1) : null;
+          const rate = total > 0 ? ((present / total) * 100).toFixed(1) : null;
           return (
             <div
               key={cls.class_id}
@@ -67,19 +85,17 @@ async function Page() {
                 </p>
               ) : (
                 <div className="flex flex-col gap-y-1">
-                  {[...cls.records]
-                    .reverse()
-                    .map((r) => (
-                      <div
-                        key={r.date}
-                        className="flex justify-between items-center border-b border-zinc-800 py-1 text-sm"
-                      >
-                        <span>{r.date}</span>
-                        <span className={statusStyles[r.status] || ""}>
-                          {statusLabels[r.status] || r.status}
-                        </span>
-                      </div>
-                    ))}
+                  {[...cls.records].reverse().map((r) => (
+                    <div
+                      key={r.date}
+                      className="flex justify-between items-center border-b border-zinc-800 py-1 text-sm"
+                    >
+                      <span>{r.date}</span>
+                      <span className={statusStyles[r.status] || ""}>
+                        {statusLabels[r.status] || r.status}
+                      </span>
+                    </div>
+                  ))}
                 </div>
               )}
             </div>
