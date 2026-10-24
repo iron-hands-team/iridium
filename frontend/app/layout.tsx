@@ -5,7 +5,7 @@ import { ThemeProvider } from "next-themes";
 import LoginForm from "@/components/auth/login-form";
 import Nav from "@/components/layout/nav";
 
-import BodyClassTeacher from "@/components/layout/BodyClassTeacher";
+import BodyClassTeacher from "@/classLayout/BodyClassTeacher";
 import BusSchool from "@/components/layout/busSchoolBody";
 import "./globals.css";
 
