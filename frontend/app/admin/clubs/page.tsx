@@ -17,7 +17,9 @@ async function Page() {
       },
     }).then((res) => res.json())
   ).map((c: ClubResponse) => {
-    return c.sponsor ? { ...c, sponsor: parseUser(c.sponsor) } : c;
+    return c.sponsor
+      ? { ...c, sponsor: parseUser(c.sponsor), sponsorId: c.sponsor_id }
+      : c;
   });
 
   return (

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import { getSession } from "@/lib/auth";
 import { ThemeProvider } from "next-themes";
+import ToastProvider from "@/components/layout/toast-provider";
 import LoginForm from "@/components/auth/login-form";
 import Nav from "@/components/layout/nav";
 
@@ -15,7 +16,7 @@ const inter = Inter({
 
 export const metadata: Metadata = {
   title: "Home | Iridium",
-  description: "Welcome to Iridium!",
+  description: "Welcome to Iridium!", //TODO: add seo and responsive design
 };
 
 export default async function RootLayout({ children }: LayoutProps<"/">) {
@@ -37,6 +38,7 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
           ) : (
             <LoginForm />
           )}
+          <ToastProvider />
         </ThemeProvider>
       </body>
     </html>

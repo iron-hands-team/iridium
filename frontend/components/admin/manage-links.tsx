@@ -5,6 +5,7 @@ import { useState, useEffect } from "react";
 import { AnimatePresence } from "framer-motion";
 import { FaExclamationTriangle, FaLink, FaTrash } from "react-icons/fa";
 import { newLinkSchema } from "@/lib/schemas";
+import toast from "react-hot-toast";
 import Btn from "../ui/btn";
 import Input from "../ui/input";
 import Checkbox from "../ui/checkbox";
@@ -31,6 +32,7 @@ function ManageLinks() {
         body: JSON.stringify(validated.data),
       });
       if (res.ok) {
+        toast.success("Links added successfully!");
         setManaging(false);
       } else {
         setError("Something went wrong, please try again.");

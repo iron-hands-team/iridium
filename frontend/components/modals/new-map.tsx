@@ -8,7 +8,12 @@ import Image from "next/image";
 import Btn from "../ui/btn";
 import Input from "../ui/input";
 
-function NewMapModal({ closeModal }: { closeModal: () => void }) {
+interface NewMapModelProps {
+  closeModal: () => void;
+  toast: (msg: string) => void;
+}
+
+function NewMapModal({ closeModal, toast }: NewMapModelProps) {
   const [files, setFiles] = useState<File[] | null>(null);
   const [labels, setLabels] = useState<string[]>([]);
   const [saving, setSaving] = useState<boolean>(false);
@@ -46,7 +51,6 @@ function NewMapModal({ closeModal }: { closeModal: () => void }) {
       body: JSON.stringify({ labels }),
     }).then((res) => res.json());
     const uploadUrls: string[] = res.uploads;
-    console.log(uploadUrls);
     if (files) {
       await Promise.all(
         uploadUrls.map((url, i) =>
@@ -63,6 +67,7 @@ function NewMapModal({ closeModal }: { closeModal: () => void }) {
       );
     }
     setSaving(false);
+    toast("Map items uploaded successfully!");
     closeModal();
   }
 

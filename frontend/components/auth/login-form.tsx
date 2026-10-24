@@ -1,9 +1,10 @@
 "use client";
 
 import { type LoginType, loginSchema } from "@/lib/schemas";
-import { FaExclamationTriangle } from "react-icons/fa";
+import { FaCheckCircle, FaExclamationTriangle } from "react-icons/fa";
 import { AnimatePresence } from "framer-motion";
 import { useState } from "react";
+import toast from "react-hot-toast";
 import Image from "next/image";
 import Input from "../ui/input";
 import Btn from "../ui/btn";
@@ -37,7 +38,10 @@ function LoginForm() {
         body: JSON.stringify(userData),
       });
       if (response.ok) {
-        window.location.reload();
+        toast("Login successful!", { icon: <FaCheckCircle size={20} /> });
+        setTimeout(() => {
+          window.location.reload();
+        }, 500);
       } else {
         setError((await response.json()).detail);
       }
@@ -55,6 +59,7 @@ function LoginForm() {
         method: "POST",
       });
       if (res.ok) {
+        toast.success("Password reset requested successfully!");
         setRequesting(false);
       } else {
         setRequestError("Something went wrong, please try again");

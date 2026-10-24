@@ -11,6 +11,7 @@ import NewUserModal from "./new-user";
 import Modal from "../ui/modal";
 import Btn from "../ui/btn";
 import Image from "next/image";
+import toast from "react-hot-toast";
 
 interface UserModalProps {
   user: UserType;
@@ -32,6 +33,7 @@ function UserModal({ user, closeModal }: UserModalProps) {
     });
     setDeleting(null);
     if (res.ok) {
+      toast.success("User deleted successfull!");
       closeModal();
       router.refresh();
     } else {
@@ -40,7 +42,13 @@ function UserModal({ user, closeModal }: UserModalProps) {
   }
 
   if (editing) {
-    return <NewUserModal existing={user} closeModal={closeModal} />;
+    return (
+      <NewUserModal
+        existing={user}
+        closeModal={closeModal}
+        toast={(m) => toast.success(m)}
+      />
+    );
   }
 
   return (
@@ -52,6 +60,7 @@ function UserModal({ user, closeModal }: UserModalProps) {
             alt="User avatar"
             width={100}
             height={100}
+            unoptimized
           />
         ) : (
           <FaUserCircle size={100} />

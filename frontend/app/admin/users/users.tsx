@@ -6,6 +6,8 @@ import { FaCaretUp, FaCheck, FaFilter, FaUserCircle } from "react-icons/fa";
 import { AnimatePresence } from "framer-motion";
 import { roles } from "@/lib/constants";
 import { profileUrl } from "@/lib/helpers";
+import { useRouter } from "next/navigation";
+import toast from "react-hot-toast";
 import Input from "@/components/ui/input";
 import UserModal from "@/components/modals/user";
 import Dropdown from "@/components/ui/dropdown";
@@ -16,7 +18,6 @@ import PasswordReset from "@/components/auth/password-reset";
 import DeleteAccount from "@/components/auth/delete-account";
 import WarningModal from "@/components/modals/warning";
 import Btn from "@/components/ui/btn";
-import { useRouter } from "next/navigation";
 
 const sorts = [
   "ID",
@@ -82,12 +83,13 @@ function Users({ users }: { users: UserType[] }) {
 
   async function handleBulkDelete() {
     setBulkDeleting(true);
-    await fetch("/api/users/bulk-delete", {
+    const res = await fetch("/api/users/bulk-delete", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       credentials: "include",
-      body: JSON.stringify({usernames: selected})
+      body: JSON.stringify({ usernames: selected }),
     });
+    if (res.ok) toast.success("Users deleted successfully!");
     setBulkDeleting(null);
     setSelected([]);
     router.refresh();
@@ -232,7 +234,7 @@ function Users({ users }: { users: UserType[] }) {
             title="Delete selected users confirmation"
             description={`Are you sure you want to delete ${selected.length} selected user${selected.length === 1 ? "" : "s"}? This will permanently delete all their data and information on Iridium. This action cannot be undone. `}
             confirm={handleBulkDelete}
-            closeModal={()=>setBulkDeleting(null)}
+            closeModal={() => setBulkDeleting(null)}
             loading={bulkDeleting}
           />
         )}

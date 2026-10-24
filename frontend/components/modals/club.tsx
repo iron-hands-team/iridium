@@ -6,6 +6,7 @@ import { useState, useEffect } from "react";
 import { FaExclamationTriangle } from "react-icons/fa";
 import { AnimatePresence } from "framer-motion";
 import { useRouter } from "next/navigation";
+import toaster from "react-hot-toast";
 import Modal from "../ui/modal";
 import WarningModal from "./warning";
 import Btn from "../ui/btn";
@@ -14,9 +15,10 @@ import NewClubModal from "./new-club";
 interface ClubModalProps {
   club: ClubType;
   closeModal: () => void;
+  toast: (msg: string) => void;
 }
 
-function ClubModal({ club, closeModal }: ClubModalProps) {
+function ClubModal({ club, closeModal, toast }: ClubModalProps) {
   const [deleting, setDeleting] = useState<boolean | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [editing, setEditing] = useState<boolean>(false);
@@ -35,6 +37,7 @@ function ClubModal({ club, closeModal }: ClubModalProps) {
     });
     setDeleting(null);
     if (res.ok) {
+      toast("Club deleted successfully!");
       closeModal();
       router.refresh();
     } else {
@@ -46,10 +49,13 @@ function ClubModal({ club, closeModal }: ClubModalProps) {
     if (joined) {
       router.push(`/clubs/${club.id}`);
     } else if (user?.role === "student") {
-      await fetch(`/api/clubs/${club.id}/join`, {
+      const res = await fetch(`/api/clubs/${club.id}/join`, {
         method: "POST",
         credentials: "include",
       });
+      if (res.ok) {
+        toast("Club joined successfully!");
+      }
       router.refresh();
       closeModal();
     }
@@ -57,10 +63,13 @@ function ClubModal({ club, closeModal }: ClubModalProps) {
 
   async function handleLeave() {
     if (user?.role === "student") {
-      await fetch(`/api/clubs/${club.id}/leave`, {
+      const res = await fetch(`/api/clubs/${club.id}/leave`, {
         method: "DELETE",
         credentials: "include",
       });
+      if (res.ok) {
+        toast("Club left successfully!");
+      }
       router.refresh();
       closeModal();
     }
@@ -82,7 +91,7 @@ function ClubModal({ club, closeModal }: ClubModalProps) {
         credentials: "include",
       }).then((res) => res.json());
       setUser(user);
-      setFavorited(club.favorites.includes(user.username))
+      setFavorited(club.favorites.includes(user.username));
       const clubMembers = await fetch(`/api/clubs/${club.id}/members`, {
         method: "GET",
         credentials: "include",
@@ -90,11 +99,15 @@ function ClubModal({ club, closeModal }: ClubModalProps) {
       setMembers(clubMembers);
     }
     fetchData();
-  }, [club.id]);
+  }, [club.id, club.favorites]);
 
   if (editing) {
     return (
-      <NewClubModal existing={club} closeModal={() => setEditing(false)} />
+      <NewClubModal
+        existing={club}
+        closeModal={() => setEditing(false)}
+        toast={(m) => toaster.success(m)}
+      />
     );
   }
 

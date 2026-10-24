@@ -24,7 +24,7 @@ async function Page() {
       <h2 className="text-xl font-bold">Grades</h2>
       {classGrades.length === 0 ? (
         <p className="text-sm text-zinc-500">
-          You're not enrolled in any classes with a gradebook yet.
+          You&apos;re not enrolled in any classes with a gradebook yet.
         </p>
       ) : (
         classGrades.map((cls) => {

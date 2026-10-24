@@ -5,8 +5,12 @@ export interface ClubType {
   name: string;
   description?: string;
   sponsor?: UserType;
+  sponsorId?: number;
   categories: string[];
   favorites: string[];
 }
 
-export type ClubResponse = ClubType & { sponsor?: UserResponse };
+export type ClubResponse = ClubType & {
+  sponsor?: UserResponse;
+  sponsor_id: number;
+};

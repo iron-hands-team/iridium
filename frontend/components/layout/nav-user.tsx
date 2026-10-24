@@ -7,6 +7,8 @@ import {
   FaUserCircle,
   FaMoon,
   FaSun,
+  FaLightbulb,
+  FaExclamationCircle,
 } from "react-icons/fa";
 import { FaGear } from "react-icons/fa6";
 import { useState, useEffect, useRef } from "react";
@@ -14,25 +16,45 @@ import { useRouter, usePathname } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { useTheme } from "next-themes";
 import { profileUrl } from "@/lib/helpers";
+import { tips } from "@/lib/constants";
+import toast, { Renderable } from "react-hot-toast";
 import Link from "next/link";
 import Image from "next/image";
 
 const optionStyles =
-  "hover:bg-zinc-200 dark:hover:bg-zinc-900 flex items-center gap-x-2 p-2 group cursor-pointer";
+  "hover:bg-zinc-200 dark:hover:bg-zinc-900 flex items-center gap-x-2 p-2 group cursor-pointer text-sm";
 const iconStyles =
   "group-hover:scale-110 group-hover:-translate-y-1 group-active:scale-90 group-active:translate-y-1 transition-transform!";
 
 function NavUser({ user }: { user: UserType }) {
   const [menuOpen, setMenuOpen] = useState<boolean>(false);
+  const [currentTip, setCurrentTip] = useState<number>(0);
   const menuRef = useRef<HTMLDivElement>(null);
   const { theme, setTheme } = useTheme();
   const router = useRouter();
   const pathname = usePathname();
 
   async function handleLogout() {
-    await fetch("/api/logout", { method: "POST", credentials: "include" });
-    router.push("/");
-    router.refresh();
+    const res = await fetch("/api/logout", {
+      method: "POST",
+      credentials: "include",
+    });
+    if (res.ok) {
+      toast.success("Logout successful!");
+      router.push("/");
+      router.refresh();
+    } else {
+      toast.error("Logout failed, please try again");
+    }
+  }
+
+  function handleTip() {
+    let index = currentTip;
+    while (tips.length > 1 && index === currentTip) {
+      index = Math.floor(Math.random() * tips.length);
+    }
+    setCurrentTip(index);
+    toast(tips[index].text, { icon: tips[index].icon as Renderable });
   }
 
   useEffect(() => {
@@ -98,6 +120,14 @@ function NavUser({ user }: { user: UserType }) {
                 )}
                 Theme
               </div>
+              <div className={optionStyles} onClick={handleTip}>
+                <FaLightbulb size={18} className={iconStyles} />
+                Tip
+              </div>
+              <Link href="/report" className={optionStyles}>
+                <FaExclamationCircle size={18} className={iconStyles} />
+                Report
+              </Link>
               <Link href="/settings" className={optionStyles}>
                 <FaGear size={18} className={iconStyles} />
                 Settings

@@ -26,6 +26,7 @@ class UserResponse(BaseModel):
     requesting: bool | None = None
     requesting_delete: bool | None = None
     role: UserRole
+    title: str
 
     class Config:
         from_attributes = True
@@ -111,8 +112,9 @@ class ClubResponse(BaseModel):
     name: str
     description: str | None
     sponsor: UserResponse | None
+    sponsor_id: int | None = None
     categories: list[str]
-    favorites: list[str]
+    favorites: list[str] = []
 
     class Config:
         from_attributes = True
@@ -340,6 +342,7 @@ class SearchResponse(BaseModel):
         from_attributes = True
 
 class ReportResponse(BaseModel):
+    id: int
     type: str
     title: str
     description: str

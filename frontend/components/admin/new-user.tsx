@@ -2,6 +2,7 @@
 
 import { AnimatePresence } from "framer-motion";
 import { useState } from "react";
+import toast from "react-hot-toast";
 import Btn from "../ui/btn";
 import NewUserModal from "../modals/new-user";
 
@@ -22,7 +23,12 @@ function NewUser({ styles, primary }: NewUserProps) {
         primary={primary}
       />
       <AnimatePresence>
-        {adding && <NewUserModal closeModal={() => setAdding(false)} />}
+        {adding && (
+          <NewUserModal
+            closeModal={() => setAdding(false)}
+            toast={(m) => toast.success(m)}
+          />
+        )}
       </AnimatePresence>
     </div>
   );
