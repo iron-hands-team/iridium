@@ -1,8 +1,27 @@
+import type { Metadata } from "next";
 import type { RuleType } from "@/lib/schemas";
 import { FaBook } from "react-icons/fa";
 import { getSession } from "@/lib/auth";
 import NewRule from "@/components/admin/new-rule";
 import Rules from "./rules";
+
+export const metadata: Metadata = {
+  title: "Rules",
+  description:
+    "View all the different detailed school rules posted by your school on this page.",
+  authors: [
+    { name: "Iron Hands Team", url: "https://github.com/iron-hands-team" },
+  ],
+  openGraph: {
+    title: "Rules",
+    description:
+      "View all the different detailed school rules posted by your school on this page.",
+    url: "https://iridium.tonymac.net/rules",
+    siteName: "Iridium",
+    images: [{ url: "/logo.png", width: 100, height: 100 }],
+    type: "website",
+  },
+};
 
 async function Page() {
   const { user, cookie } = await getSession();

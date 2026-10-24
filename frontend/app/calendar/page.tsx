@@ -1,9 +1,28 @@
-import { redirect } from "next/navigation";
+import type { Metadata } from "next";
 import type { EventType } from "@/types/event";
+import { redirect } from "next/navigation";
 import { getSession } from "@/lib/auth";
+import { FaCalendar } from "react-icons/fa";
 import CalendarGrid from "@/components/calendar/calendar-grid";
 import NewEvent from "@/components/admin/new-event";
-import { FaCalendar } from "react-icons/fa";
+
+export const metadata: Metadata = {
+  title: "Event Calendar",
+  description:
+    "Browse the entire school year's calendar, search, create, or sign up for special events, and manage your personal schedule here.",
+  authors: [
+    { name: "Iron Hands Team", url: "https://github.com/iron-hands-team" },
+  ],
+  openGraph: {
+    title: "Event Calendar",
+    description:
+      "Browse the entire school year's calendar, search, create, or sign up for special events, and manage your personal schedule here.",
+    url: "https://iridium.tonymac.net/calendar",
+    siteName: "Iridium",
+    images: [{ url: "/logo.png", width: 100, height: 100 }],
+    type: "website",
+  },
+};
 
 async function Page() {
   //TODO: search params to directly navigate to date

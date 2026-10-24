@@ -1,9 +1,28 @@
+import type { Metadata } from "next";
 import type { ClubResponse, ClubType } from "@/types/clubs";
 import { FaBasketball } from "react-icons/fa6";
 import { getSession } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import { parseUser } from "@/lib/helpers";
 import Clubs from "./clubs";
+
+export const metadata: Metadata = {
+  title: "Manage Clubs",
+  description:
+    "Create new clubs, edit, modify, or delete existing clubs, and browse detailed information about different clubs here.",
+  authors: [
+    { name: "Iron Hands Team", url: "https://github.com/iron-hands-team" },
+  ],
+  openGraph: {
+    title: "Manage Clubs",
+    description:
+      "Create new clubs, edit, modify, or delete existing clubs, and browse detailed information about different clubs here.",
+    url: "https://iridium.tonymac.net/admin/clubs",
+    siteName: "Iridium",
+    images: [{ url: "/logo.png", width: 100, height: 100 }],
+    type: "website",
+  },
+};
 
 async function Page() {
   const { user, cookie } = await getSession();

@@ -1,6 +1,25 @@
-import { redirect } from "next/navigation";
+import type { Metadata } from "next";
 import type { StudentClassGradesType } from "@/types/grade";
+import { redirect } from "next/navigation";
 import { getSession } from "@/lib/auth";
+
+export const metadata: Metadata = {
+  title: "Grades",
+  description:
+    "Check your grades in each class and visualize your academic performance with detailed grade summaries.",
+  authors: [
+    { name: "Iron Hands Team", url: "https://github.com/iron-hands-team" },
+  ],
+  openGraph: {
+    title: "Grades",
+    description:
+      "Check your grades in each class and visualize your academic performance with detailed grade summaries.",
+    url: "https://iridium.tonymac.net/grades",
+    siteName: "Iridium",
+    images: [{ url: "/logo.png", width: 100, height: 100 }],
+    type: "website",
+  },
+};
 
 async function Page() {
   const { user, cookie } = await getSession();

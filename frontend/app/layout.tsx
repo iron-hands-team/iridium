@@ -15,10 +15,23 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "Home | Iridium",
-  description: "Welcome to Iridium!", //TODO: add seo and responsive design
+  title: { default: "Home | Iridium", template: "%s | Iridium" },
+  description:
+    "Iridium is an easy to use online platform for schools to post announcements, view schedules, create classes, and manage students and staff.",
+  authors: [
+    { name: "Iron Hands Team", url: "https://github.com/iron-hands-team" },
+  ],
+  openGraph: {
+    title: { default: "Iridium", template: "%s | Iridium" },
+    description:
+      "Iridium is an easy to use online platform for schools to post announcements, view schedules, create classes, and manage students and staff.",
+    url: "https://iridium.tonymac.net",
+    siteName: "Iridium",
+    images: [{ url: "/logo.png", width: 100, height: 100 }],
+    type: "website",
+  },
 };
-
+//TODO: add responsive design and landing/intro page for non logged in users
 export default async function RootLayout({ children }: LayoutProps<"/">) {
   const { user } = await getSession();
 

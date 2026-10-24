@@ -1,9 +1,28 @@
+import type { Metadata } from "next";
 import type { UserResponse, UserType } from "@/types/user";
 import { getSession } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import { FaUsers } from "react-icons/fa";
 import { parseUser } from "@/lib/helpers";
 import Users from "./users";
+
+export const metadata: Metadata = {
+  title: "Manage Users",
+  description:
+    "View and browse detailed information and status for every user on Iridium, edit and manage them, and delete users here.",
+  authors: [
+    { name: "Iron Hands Team", url: "https://github.com/iron-hands-team" },
+  ],
+  openGraph: {
+    title: "Manage Users",
+    description:
+      "View and browse detailed information and status for every user on Iridium, edit and manage them, and delete users here.",
+    url: "https://iridium.tonymac.net/admin/users",
+    siteName: "Iridium",
+    images: [{ url: "/logo.png", width: 100, height: 100 }],
+    type: "website",
+  },
+};
 
 async function Page() {
   const { user, cookie } = await getSession();
