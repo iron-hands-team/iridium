@@ -229,6 +229,7 @@ class MapResponse(BaseModel):
 class AssignmentCreateRequest(BaseModel):
     name: str
     max_score: float = 100
+    due_at: datetime | None = None
 
 class GradeResponse(BaseModel):
     id: int
@@ -243,6 +244,7 @@ class AssignmentResponse(BaseModel):
     name: str
     max_score: float
     class_id: int
+    due_at: datetime | None
     grades: list[GradeResponse]
 
     class Config:
@@ -251,11 +253,25 @@ class AssignmentResponse(BaseModel):
 class GradeUpdateRequest(BaseModel):
     score: float | None = None
 
+class SubmissionResponse(BaseModel):
+    id: int
+    student: UserResponse
+    filename: str
+    submitted_at: datetime
+
+    class Config:
+        from_attributes = True
+
+class SubmissionsCreateRequest(BaseModel):
+    filename: str
+
 class StudentAssignmentGrade(BaseModel):
     id: int
     name: str
     max_score: float
     score: float | None
+    due_at: datetime | None = None
+    submitted_at: datetime | None = None
 
 class StudentClassGrades(BaseModel):
     class_id: int
