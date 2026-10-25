@@ -201,33 +201,17 @@ def get_reports(
             anonymous=r.anonymous,
             type=r.type,
             role=r.role,
-            reporter=r.user if (not r.anonymous and r.user is not None) else None,
+            user=r.user if (not r.anonymous and r.user is not None) else None,
+            resolved=r.resolved,
         )
         for r in reports
     ]
-
-
-@router.delete("/reports/{report_id}", status_code=204)
-def delete_report(
-    report_id: int,
-    db: Session = Depends(get_db),
-    current_user: User = Depends(manager),
-):
-    if current_user.role == "student":
-        raise HTTPException(status_code=403, detail="Insufficient permission")
-
-    report = db.query(Report).filter(Report.id == report_id).first()
-    if report is None:
-        raise HTTPException(status_code=404, detail="Report not foind.")
-    db.delete(report)
-    db.commit()
-
 
 @router.post("/reports", status_code=204)
 def submit_report(
     report: ReportResponse,
     db: Session = Depends(get_db),
-    current_user: User = Depends(manager),
+    current_user: User = Depends(require_admin),
 ):
     new_report = Report(
         title=report.title,
@@ -240,6 +224,31 @@ def submit_report(
     db.add(new_report)
     db.commit()
 
+@router.delete("/reports/{report_id}", status_code=204)
+def delete_report(
+    report_id: int,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(require_admin),
+):
+    report = db.query(Report).filter(Report.id == report_id).first()
+    if report is None:
+        raise HTTPException(status_code=404, detail="Report not found.")
+    db.delete(report)
+    db.commit()
+
+@router.post("/reports/{report_id}", response_model=ReportResponse)
+def resolved_report(
+    report_id: int,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(require_admin),
+):
+    report = db.query(Report).filter(Report.id == report_id).first()
+    if report is None:
+            raise HTTPException(status_code=404, detail="Report not found.")
+    report.resolved = not report.resolved
+    db.commit()
+    db.refresh(report)
+    return report
 
 @router.get("/links", response_model=list[LinkResponse])
 def get_links(db: Session = Depends(get_db), _current_user: User = Depends(manager)):

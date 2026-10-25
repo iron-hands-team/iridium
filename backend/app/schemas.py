@@ -342,10 +342,14 @@ class ReportResponse(BaseModel):
     anonymous: bool = True
     type: str
     role: str | None = None
-    reporter: UserResponse | None = None
+    user: UserResponse | None = None
+    resolved: bool = False
 
     class Config:
         from_attributes = True
+
+class ReportUpdateRequest(BaseModel):
+    resolved: bool 
 
 class SearchResponse(BaseModel):
     users: list[StaffResponse]

@@ -222,7 +222,7 @@ function Users({ users }: { users: UserType[] }) {
             })
           ) : (
             <div className="text-center text-sm text-zinc-700 dark:text-zinc-300 py-10">
-              No users found. Try a different search?
+              No users found. Try a different search? 
             </div>
           )}
         </div>

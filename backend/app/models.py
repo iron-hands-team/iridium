@@ -261,6 +261,7 @@ class Report(Base):
     anonymous = Column(Boolean, nullable=False, default=True)
     type = Column(String, nullable=False)
     role = Column(String, nullable=True)
+    resolved = Column(Boolean, nullable=False, default=False)
 
     user_id = Column(Integer, ForeignKey("users.id"), nullable=True)
     user = relationship("User", back_populates="reports")
