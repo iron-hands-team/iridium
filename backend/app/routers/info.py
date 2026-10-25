@@ -211,7 +211,7 @@ def get_reports(
 def submit_report(
     report: ReportResponse,
     db: Session = Depends(get_db),
-    current_user: User = Depends(require_admin),
+    current_user: User = Depends(manager),
 ):
     new_report = Report(
         title=report.title,

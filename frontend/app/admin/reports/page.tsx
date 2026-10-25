@@ -41,7 +41,7 @@ async function Page() {
     }).then((res) => res.json())
   ).map((r: ReportResponse) => ({
     ...r,
-    reporter: r.reporter ? parseUser(r.reporter) : null,
+    reporter: r.user ? parseUser(r.user) : null,
   }));
 
   return (

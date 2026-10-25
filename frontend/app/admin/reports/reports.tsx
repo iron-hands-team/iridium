@@ -3,7 +3,7 @@
 import type { ReportType } from "@/types/report";
 import { useState } from "react";
 import { AnimatePresence } from "framer-motion";
-import { FaFilter, FaTrash, FaUserSecret } from "react-icons/fa";
+import { FaFilter, FaTrash, FaUserSecret, FaCheckCircle } from "react-icons/fa";
 import { useRouter } from "next/navigation";
 import { reportOptions } from "@/lib/schemas";
 import toast from "react-hot-toast";
@@ -18,6 +18,7 @@ function Reports({ reports }: { reports: ReportType[] }) {
   const [type, setType] = useState<string>(types[0]);
   const [dismissing, setDismissing] = useState<number | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [resolvedReports, setResolvedReports] = useState<Record<number, boolean>>({});
   const router = useRouter();
 
   const displayed = reports.filter((r) => {
@@ -34,6 +35,24 @@ function Reports({ reports }: { reports: ReportType[] }) {
     if (res.ok) {
       setDismissing(null);
       toast.success("Report dismissed successfully!");
+      router.refresh();
+    } else {
+      setError("Something went wrong, please try again");
+    }
+  }
+
+  async function resolveReport(id: number, currentlyResolved: boolean) {
+    const res = await fetch(`/api/reports/${id}`, { method: "POST" });
+    if (res.ok) {
+      setResolvedReports((prev)=>({
+        ...prev,
+        [id]: !prev[id]
+      }));
+      if (currentlyResolved===true) {
+        toast.success("Report set unresolved.");
+      } else {
+        toast.success("Report resolved");
+      }
       router.refresh();
     } else {
       setError("Something went wrong, please try again");
@@ -84,23 +103,39 @@ function Reports({ reports }: { reports: ReportType[] }) {
                         For: {r.role}
                       </span>
                     )}
+                    {r.resolved &&(
+                      <span className="border border-green-700 text-green-600 rounded px-2 py-0.5">
+                        Resolved
+                      </span>
+                    )}
                   </div>
                   <p className="text-lg font-bold">{r.title}</p>
                 </div>
-                <FaTrash
-                  className="text-red-500 cursor-pointer shrink-0"
-                  title="Dismiss this report"
-                  onClick={() => setDismissing(r.id)}
-                />
+                <div className="flex items-center gap-x-3 shrink-0">
+                  <FaCheckCircle
+                    className={
+                      r.resolved
+                        ? "text-green-500 cursor-pointer"
+                        : "text-zinc-500 cursor-pointer hover:text-green-500"
+                    }
+                    title={r.resolved ? "Mark as unresolved": "Mark as resolved"}
+                    onClick={()=>resolveReport(r.id, r.resolved)}
+                  />
+                  <FaTrash
+                    className="text-red-500 cursor-pointer shrink-0"
+                    title="Dismiss this report"
+                    onClick={() => setDismissing(r.id)}
+                  />
+                </div>
               </div>
               <p className="text-sm text-zinc-700 dark:text-zinc-300 whitespace-pre-wrap">
                 {r.description}
               </p>
               <p className="text-xs text-zinc-500 flex items-center gap-x-1">
-                {r.reporter ? (
+                {r.user ? (
                   <>
-                    Reported by {r.reporter.firstName} {r.reporter.lastName} (@
-                    {r.reporter.username})
+                    Reported by {r.user.firstName} {r.user.lastName} (@
+                    {r.user.username})
                   </>
                 ) : (
                   <>

@@ -361,18 +361,6 @@ class SearchResponse(BaseModel):
     class Config:
         from_attributes = True
 
-class ReportResponse(BaseModel):
-    id: int
-    type: str
-    title: str
-    description: str
-    anonymous: bool
-    role: str | None = None
-    user: UserResponse | None = None
-
-    class Config:
-        from_attributes = True
-
 class ChannelCreateRequest(BaseModel):
     name: str
     description: str | None = None
