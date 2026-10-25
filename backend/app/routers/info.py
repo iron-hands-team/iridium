@@ -14,6 +14,7 @@ from app.models import (
     Report,
     Link,
     File,
+    NotificationType
 )
 from app.schemas import (
     MapUploadResponse,
@@ -29,6 +30,7 @@ from app.schemas import (
 )
 from app.dependencies import require_admin, manager
 from app.s3 import s3_client, s3_internal, BUCKET_NAME, ENDPOINT
+from app.notify import create_notification
 
 router = APIRouter()
 
@@ -222,6 +224,15 @@ def submit_report(
         user_id=None if report.anonymous else current_user.id,
     )
     db.add(new_report)
+    for admin in db.query(User).filter(User.role == "admin").all():
+        create_notification(
+            db,
+            user_id=admin.id,
+            type=NotificationType.report,
+            title="New Report",
+            body=f"{report.description}",
+            link="/admin/reports",
+        )
     db.commit()
 
 @router.delete("/reports/{report_id}", status_code=204)

@@ -305,6 +305,7 @@ class NotificationType(str, enum.Enum):
     message = "message"
     announcement = "announcement"
     grade = "grade"
+    report = "report"
 
 class Notification(Base):
     __tablename__ = "notifications"
