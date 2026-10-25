@@ -264,7 +264,7 @@ class SubmissionResponse(BaseModel):
     class Config:
         from_attributes = True
 
-class SubmissionsCreateRequest(BaseModel):
+class SubmissionCreateRequest(BaseModel):
     filename: str
 
 class StudentAssignmentGrade(BaseModel):
