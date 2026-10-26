@@ -21,10 +21,7 @@ export const metadata: Metadata = {
     images: [{ url: "/logo.png", width: 100, height: 100 }],
     type: "website",
   },
-};
-
-//TODO: add club page
-
+};                                                                                      
 async function Page() {
   const { cookie } = await getSession();
   const clubs: ClubType[] = (
@@ -50,5 +47,4 @@ async function Page() {
     </div>
   );
 }
-
 export default Page;

@@ -14,3 +14,13 @@ export type ClubResponse = ClubType & {
   sponsor?: UserResponse;
   sponsor_id: number;
 };
+
+export interface ClubMemberType {
+  id: number;
+  user: UserType;
+}
+
+export interface ClubMemberResponse {
+  id: number;
+  user: UserResponse;
+}
