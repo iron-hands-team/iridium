@@ -16,9 +16,10 @@ const labelStyles =
 interface NewRuleModalProps {
   existing?: RuleType[];
   closeModal: () => void;
+  toast: (msg: string) => void;
 }
 
-function NewRuleModal({ existing, closeModal }: NewRuleModalProps) {
+function NewRuleModal({ existing, closeModal, toast }: NewRuleModalProps) {
   const [rules, setRules] = useState<RuleType[]>(existing || []);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
@@ -39,6 +40,7 @@ function NewRuleModal({ existing, closeModal }: NewRuleModalProps) {
         body: JSON.stringify(validated.data),
       });
       setLoading(false);
+      toast(`Rules ${existing ? "updated" : "created"} successfully!`);
       router.refresh();
       closeModal();
     } else {

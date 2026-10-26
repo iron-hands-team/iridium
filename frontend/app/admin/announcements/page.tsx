@@ -1,8 +1,27 @@
+import type { Metadata } from "next";
 import type { PostType } from "@/lib/schemas";
 import { getSession } from "@/lib/auth";
 import { FaBullhorn } from "react-icons/fa";
 import { redirect } from "next/navigation";
 import Announcements from "./announcements";
+
+export const metadata: Metadata = {
+  title: "Manage Announcements",
+  description:
+    "Post new announcements, edit, archive, delete published posts, and browse announcement posts here.",
+  authors: [
+    { name: "Iron Hands Team", url: "https://github.com/iron-hands-team" },
+  ],
+  openGraph: {
+    title: "Manage Announcements",
+    description:
+      "Post new announcements, edit, archive, delete published posts, and browse announcement posts here.",
+    url: "https://iridium.tonymac.net/admin/announcements",
+    siteName: "Iridium",
+    images: [{ url: "/logo.png", width: 100, height: 100 }],
+    type: "website",
+  },
+};
 
 async function Page() {
   const { user, cookie } = await getSession();

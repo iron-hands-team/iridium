@@ -35,7 +35,7 @@ export const newUserSchema = z.object({
 
 export const newClubSchema = z.object({
   name: z.string().trim().min(1, "Please enter a name"),
-  description: z.string().optional(),
+  description: z.string().optional().nullable(),
   sponsorId: z.number().optional(),
   categories: z
     .array(z.string().trim())

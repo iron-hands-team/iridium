@@ -1,9 +1,28 @@
-import { redirect } from "next/navigation";
+import type { Metadata } from "next";
 import type { MessageResponse, MessageType } from "@/types/message";
 import type { UserResponse, UserType } from "@/types/user";
+import { redirect } from "next/navigation";
 import { getSession } from "@/lib/auth";
 import { parseUser } from "@/lib/helpers";
 import Messages from "./messages";
+
+export const metadata: Metadata = {
+  title: "Messages",
+  description:
+    "Send messages to other users, browse and manage your inbox, and access the latest updates from each class here.",
+  authors: [
+    { name: "Iron Hands Team", url: "https://github.com/iron-hands-team" },
+  ],
+  openGraph: {
+    title: "Messages",
+    description:
+      "Send messages to other users, browse and manage your inbox, and access the latest updates from each class here.",
+    url: "https://iridium.tonymac.net/messages",
+    siteName: "Iridium",
+    images: [{ url: "/logo.png", width: 100, height: 100 }],
+    type: "website",
+  },
+};
 
 function parseMessage(m: MessageResponse): MessageType {
   return {

@@ -18,9 +18,10 @@ const classes = ["Freshman", "Sophomore", "Junior", "Senior"];
 interface NewUserModalProps {
   closeModal: () => void;
   existing?: UserType;
+  toast: (msg: string) => void;
 }
 
-function NewUserModal({ closeModal, existing }: NewUserModalProps) {
+function NewUserModal({ closeModal, existing, toast }: NewUserModalProps) {
   const [user, setUser] = useState<NewUserType>(
     existing
       ? { ...existing, password: "secretpassword123" }
@@ -73,6 +74,7 @@ function NewUserModal({ closeModal, existing }: NewUserModalProps) {
         });
       }
       if (res.ok) {
+        toast(`User ${existing ? "updated" : "created"} successfully!`);
         closeModal();
         router.refresh();
       } else {

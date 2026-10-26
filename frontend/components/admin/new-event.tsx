@@ -2,6 +2,7 @@
 
 import { AnimatePresence } from "framer-motion";
 import { useState } from "react";
+import toast from "react-hot-toast";
 import Btn from "../ui/btn";
 import NewEventModal from "../modals/new-event";
 
@@ -17,7 +18,12 @@ function NewEvent({ full }: { full?: boolean }) {
         primary
       />
       <AnimatePresence>
-        {creating && <NewEventModal closeModal={() => setCreating(false)} />}
+        {creating && (
+          <NewEventModal
+            closeModal={() => setCreating(false)}
+            toast={(m) => toast.success(m)}
+          />
+        )}
       </AnimatePresence>
     </div>
   );

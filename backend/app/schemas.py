@@ -26,6 +26,7 @@ class UserResponse(BaseModel):
     requesting: bool | None = None
     requesting_delete: bool | None = None
     role: UserRole
+    title: str
 
     class Config:
         from_attributes = True
@@ -111,8 +112,9 @@ class ClubResponse(BaseModel):
     name: str
     description: str | None
     sponsor: UserResponse | None
+    sponsor_id: int | None = None
     categories: list[str]
-    favorites: list[str]
+    favorites: list[str] = []
 
     class Config:
         from_attributes = True
@@ -229,6 +231,7 @@ class MapResponse(BaseModel):
 class AssignmentCreateRequest(BaseModel):
     name: str
     max_score: float = 100
+    due_at: datetime | None = None
 
 class GradeResponse(BaseModel):
     id: int
@@ -243,6 +246,7 @@ class AssignmentResponse(BaseModel):
     name: str
     max_score: float
     class_id: int
+    due_at: datetime | None
     grades: list[GradeResponse]
 
     class Config:
@@ -251,11 +255,25 @@ class AssignmentResponse(BaseModel):
 class GradeUpdateRequest(BaseModel):
     score: float | None = None
 
+class SubmissionResponse(BaseModel):
+    id: int
+    student: UserResponse
+    filename: str
+    submitted_at: datetime
+
+    class Config:
+        from_attributes = True
+
+class SubmissionCreateRequest(BaseModel):
+    filename: str
+
 class StudentAssignmentGrade(BaseModel):
     id: int
     name: str
     max_score: float
     score: float | None
+    due_at: datetime | None = None
+    submitted_at: datetime | None = None
 
 class StudentClassGrades(BaseModel):
     class_id: int
@@ -324,10 +342,14 @@ class ReportResponse(BaseModel):
     anonymous: bool = True
     type: str
     role: str | None = None
-    reporter: UserResponse | None = None
+    user: UserResponse | None = None
+    resolved: bool = False
 
     class Config:
         from_attributes = True
+
+class ReportUpdateRequest(BaseModel):
+    resolved: bool 
 
 class SearchResponse(BaseModel):
     users: list[StaffResponse]
@@ -335,17 +357,6 @@ class SearchResponse(BaseModel):
     events: list[EventResponse]
     clubs: list[ClubResponse]
     classes: list[ClassSectionResponse]
-
-    class Config:
-        from_attributes = True
-
-class ReportResponse(BaseModel):
-    type: str
-    title: str
-    description: str
-    anonymous: bool
-    role: str | None = None
-    user: UserResponse | None = None
 
     class Config:
         from_attributes = True

@@ -2,6 +2,7 @@
 
 import { AnimatePresence } from "framer-motion";
 import { useState } from "react";
+import toast from "react-hot-toast";
 import Btn from "../ui/btn";
 import NewClubModal from "../modals/new-club";
 
@@ -22,7 +23,12 @@ function NewClub({ full, primary }: NewClubProps) {
         primary={!primary}
       />
       <AnimatePresence>
-        {creating && <NewClubModal closeModal={() => setCreating(false)} />}
+        {creating && (
+          <NewClubModal
+            closeModal={() => setCreating(false)}
+            toast={(m) => toast.success(m)}
+          />
+        )}
       </AnimatePresence>
     </div>
   );

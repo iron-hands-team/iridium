@@ -12,9 +12,15 @@ interface AvatarModalProps {
   closeModal: () => void;
   imageUrl?: string;
   username: string;
+  toast: (msg: string) => void;
 }
 
-function AvatarModal({ closeModal, imageUrl, username }: AvatarModalProps) {
+function AvatarModal({
+  closeModal,
+  imageUrl,
+  username,
+  toast,
+}: AvatarModalProps) {
   const [file, setFile] = useState<File | null>(null);
   const [image, setImage] = useState<string | null>(imageUrl || null);
   const [saving, setSaving] = useState<boolean>(false);
@@ -44,6 +50,7 @@ function AvatarModal({ closeModal, imageUrl, username }: AvatarModalProps) {
         });
         if (upload.ok) {
           setImage(profileUrl(username));
+          toast("Profile picture updated successfully!");
         }
       }
       setSaving(false);

@@ -27,9 +27,10 @@ type ChannelType = Omit<ChannelT, "club"> & {
 interface NewChannelProps {
   closeModal: () => void;
   existing?: ChannelType;
+  toast: (msg: string) => void;
 }
 
-function NewChannelModal({ closeModal, existing }: NewChannelProps) {
+function NewChannelModal({ closeModal, existing, toast }: NewChannelProps) {
   const [channel, setChannel] = useState<ChannelType>({
     name: "",
     role: "all",
@@ -58,6 +59,7 @@ function NewChannelModal({ closeModal, existing }: NewChannelProps) {
       if (res.ok) {
         router.refresh();
         router.push(`/chat/${channel.id}`);
+        toast(`Channel ${existing ? "updated" : "created"} successfully!`);
         closeModal();
       } else {
         setError(

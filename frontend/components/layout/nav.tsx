@@ -105,7 +105,7 @@ async function Nav() {
         )}
         {user.role === "teacher" && (
           <Link href="/admin/reports" className={navLinkStyles}>
-            Report
+            View reports
           </Link>
         )}
         <Link href="/calendar" className={navLinkStyles}>

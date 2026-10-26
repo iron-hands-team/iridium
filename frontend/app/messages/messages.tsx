@@ -4,8 +4,14 @@ import type { MessageType } from "@/types/message";
 import type { UserType } from "@/types/user";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { AnimatePresence} from "framer-motion";
-import { FaEnvelopeOpen, FaEnvelope, FaExclamationTriangle, FaTrash, FaTimes } from "react-icons/fa";
+import { AnimatePresence } from "framer-motion";
+import {
+  FaEnvelopeOpen,
+  FaEnvelope,
+  FaExclamationTriangle,
+  FaTrash,
+  FaTimes,
+} from "react-icons/fa";
 import { type NewMessageType, newMessageSchema } from "@/lib/schemas";
 import MessageBtn from "@/components/chat/message-btn";
 import Btn from "@/components/ui/btn";
@@ -13,8 +19,8 @@ import Modal from "@/components/ui/modal";
 import Input from "@/components/ui/input";
 import Textarea from "@/components/ui/textarea";
 import Dropdown from "@/components/ui/dropdown";
-import { input } from "zod";
 import WarningModal from "@/components/modals/warning";
+import toast from "react-hot-toast";
 
 const emptyMessage = { subject: "", body: "" };
 const labelStyles =
@@ -22,12 +28,12 @@ const labelStyles =
 
 function timeAgo(iso: string): string {
   const diffMs = Date.now() - new Date(iso).getTime();
-  const minutes = Math.floor(diffMs/60000);
+  const minutes = Math.floor(diffMs / 60000);
   if (minutes < 1) return "Just now";
   if (minutes < 60) return `${minutes}m ago`;
-  const hours = Math.floor(minutes/60);
-  if (hours<24) return `${hours}h ago`;
-  const days = Math.floor(hours/24);
+  const hours = Math.floor(minutes / 60);
+  if (hours < 24) return `${hours}h ago`;
+  const days = Math.floor(hours / 24);
   if (days < 7) return `${days}d ago`;
   return new Date(iso).toLocaleDateString();
 }
@@ -52,7 +58,7 @@ function Messages({
   const [deleting, setDeleting] = useState<Set<number>>(new Set()); //actual set of message ids the user checked so far
   const [selecting, setSelecting] = useState<boolean>(false); //is the checkbox ui on?
   const [confirming, setConfirming] = useState<boolean>(false); //is the confirm delete dialogue on hte screen?
-  const router = useRouter(); 
+  const router = useRouter();
 
   const messages = (tab === "inbox" ? inbox : sent).filter((m) => {
     const other = tab === "inbox" ? m.sender : m.recipient;
@@ -107,7 +113,9 @@ function Messages({
       router.refresh();
     } else {
       const body = await res.json().catch(() => null);
-      setComposeError(body?.detail || "Something went wrong. Please try again.");
+      setComposeError(
+        body?.detail || "Something went wrong. Please try again.",
+      );
     }
     setSending(false);
   }
@@ -127,7 +135,7 @@ function Messages({
   function forwardMessage(m: MessageType) {
     setMessage({
       subject: `Fwd: ${m.subject}`,
-      body: `\n\n\---- Forwarded message ----\nFrom: ${m.sender.firstName} ${m.sender.lastName} (@${m.sender.username})\n\n${m.body}`
+      body: `\n\n\---- Forwarded message ----\nFrom: ${m.sender.firstName} ${m.sender.lastName} (@${m.sender.username})\n\n${m.body}`,
     });
     setComposing(true);
   }
@@ -135,13 +143,13 @@ function Messages({
   async function deleteMessage(id: number) {
     try {
       await fetch(`/api/messages/${id}`, {
-      method: "DELETE",
-      credentials: "include",
+        method: "DELETE",
+        credentials: "include",
       });
-    
+
       router.refresh();
-    } catch(error) {
-      console.error("Failed to delete message:", error)
+    } catch (error) {
+      console.error("Failed to delete message:", error);
     }
   }
 
@@ -149,6 +157,7 @@ function Messages({
     for (const id of deleting) {
       await deleteMessage(id);
     }
+    toast.success("Messages deleted successfully!");
     setConfirming(false);
     setSelecting(false);
     setDeleting(new Set());
@@ -170,7 +179,7 @@ function Messages({
     if (deleting.size === messages.length) {
       setDeleting(new Set());
     } else {
-      setDeleting(new Set(messages.map((m)=>m.id)));
+      setDeleting(new Set(messages.map((m) => m.id)));
     }
   }
 
@@ -185,63 +194,68 @@ function Messages({
   return (
     <div className="flex flex-col gap-y-5">
       <div className="flex justify-between items-center gap-x-3 border-b border-zinc-800">
-      <div className="flex gap-x-3">
-        <button
-          className={`px-4 py-2 font-bold flex items-center gap-x-2 ${
-            tab === "inbox"
-              ? "border-b-2 border-zinc-950 dark:border-zinc-300"
-              : "text-zinc-500"
-          }`}
-          onClick={() => setTab("inbox")}
-        >
-          Inbox
-          {unread > 0 && (
-            <span className="text-xs bg-red-500 text-white rounded-full px-2 py-0.5">
-              {unread}
-            </span>
+        <div className="flex gap-x-3">
+          <button
+            className={`px-4 py-2 font-bold flex items-center gap-x-2 ${
+              tab === "inbox"
+                ? "border-b-2 border-zinc-950 dark:border-zinc-300"
+                : "text-zinc-500"
+            }`}
+            onClick={() => setTab("inbox")}
+          >
+            Inbox
+            {unread > 0 && (
+              <span className="text-xs bg-red-500 text-white rounded-full px-2 py-0.5">
+                {unread}
+              </span>
+            )}
+          </button>
+          {tab === "inbox" && unread > 0 && (
+            <button
+              className="px-2 text-xs text-zinc-500 hover:text-black dark:hover:text-zinc-300 self-center"
+              onClick={markAllRead}
+            >
+              Mark all read
+            </button>
           )}
-        </button>
-         {tab === "inbox" && unread > 0 && (
+          {selecting && (
+            <button
+              className="px-2 text-xs text-zinc-500 hover:text-black dark:hover:text-zinc-300 self-center"
+              onClick={toggleSelectAll}
+            >
+              {deleting.size === messages.length && messages.length > 0
+                ? "Deselect all"
+                : "Select all"}
+            </button>
+          )}
+          {selecting && (
+            <button
+              className="fixed bottom-24 right-6 z-50 bg-zinc-600 text-white p-4 rounded-full shadow-lg hover:bg-zinc-700"
+              onClick={() => {
+                setSelecting(false);
+                setDeleting(new Set());
+              }}
+            >
+              <FaTimes />
+            </button>
+          )}
           <button
-            className="px-2 text-xs text-zinc-500 hover:text-black dark:hover:text-zinc-300 self-center"
-            onClick={markAllRead}
+            className={`px-4 py-2 font-bold ${
+              tab === "sent"
+                ? "border-b-2 border-zinc-950 dark:border-zinc-300"
+                : "text-zinc-500"
+            }`}
+            onClick={() => setTab("sent")}
           >
-            Mark all read
+            Sent
           </button>
-        )}
-        {selecting &&  (
-          <button
-            className="px-2 text-xs text-zinc-500 hover:text-black dark:hover:text-zinc-300 self-center"
-            onClick={toggleSelectAll}
-          >
-            {deleting.size === messages.length && messages.length > 0
-            ? "Deselect all"
-            : "Select all"}
-          </button>
-        )}
-        {selecting && (
-          <button
-            className="fixed bottom-24 right-6 z-50 bg-zinc-600 text-white p-4 rounded-full shadow-lg hover:bg-zinc-700"
-            onClick={()=>{
-              setSelecting(false);
-              setDeleting(new Set());
-            }}
-          >
-            <FaTimes />
-          </button>
-        )}
-        <button
-          className={`px-4 py-2 font-bold ${
-            tab === "sent"
-              ? "border-b-2 border-zinc-950 dark:border-zinc-300"
-              : "text-zinc-500"
-          }`}
-          onClick={() => setTab("sent")}
-        >
-          Sent
-        </button>
-      </div>
-        <Btn text="New Message" styles="text-sm" onclick={() => setComposing(true)} primary />
+        </div>
+        <Btn
+          text="New Message"
+          styles="text-sm"
+          onclick={() => setComposing(true)}
+          primary
+        />
       </div>
       <Input
         placeholder={`Search ${tab}`}
@@ -285,7 +299,10 @@ function Messages({
                       {other.lastName} (@{other.username})
                     </span>
                   </div>
-                  <span className="text-xs text-zinc-500" title={new Date(m.createdAt).toLocaleString()}>
+                  <span
+                    className="text-xs text-zinc-500"
+                    title={new Date(m.createdAt).toLocaleString()}
+                  >
                     {timeAgo(m.createdAt)}
                   </span>
                 </div>
@@ -296,7 +313,7 @@ function Messages({
                   <div className="flex flex-col gap-y-3 pt-2 border-t border-zinc-800">
                     <p className="text-sm whitespace-pre-wrap">{m.body}</p>
                     {tab === "inbox" && (
-                      <div 
+                      <div
                         onClick={(e) => e.stopPropagation()}
                         className="flex gap-x-3"
                       >
@@ -309,7 +326,7 @@ function Messages({
                         <Btn
                           text="Forward"
                           styles="text-sm"
-                          onclick={()=>forwardMessage(m)}
+                          onclick={() => forwardMessage(m)}
                         />
                       </div>
                     )}
@@ -376,13 +393,13 @@ function Messages({
       </AnimatePresence>
       <AnimatePresence>
         {confirming && (
-            <WarningModal
-              title="Delete message(s) confirmation"
-              description={`Are you sure you want to delete the following message(s)? This will permanently delete all its data and information on Iridium. This action cannot be undone.`}
-              confirm={confirmBulkDelete}
-              closeModal={() => setConfirming(false)}
-            />
-          )}
+          <WarningModal
+            title="Delete message(s) confirmation"
+            description={`Are you sure you want to delete the following message(s)? This will permanently delete all its data and information on Iridium. This action cannot be undone.`}
+            confirm={confirmBulkDelete}
+            closeModal={() => setConfirming(false)}
+          />
+        )}
       </AnimatePresence>
       <button
         className="fixed bottom-6 right-6 z-50 bg-red-500 text-white p-4 rounded-full shadow-lg hover:bg-red-600"
@@ -394,7 +411,7 @@ function Messages({
           }
         }}
       >
-        <FaTrash/>
+        <FaTrash />
       </button>
     </div>
   );

@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { getSession } from "@/lib/auth";
 import { FaBasketball, FaUserGear } from "react-icons/fa6";
@@ -18,6 +19,24 @@ import ManageLinks from "@/components/admin/manage-links";
 import ManageFiles from "@/components/admin/manage-files";
 
 const headingStyles = "text-xl font-bold flex items-center gap-x-3";
+
+export const metadata: Metadata = {
+  title: "Admin Dashboard",
+  description:
+    "View and access all admin features for managing users, classes, clubs, schedules, information, and more on this dashboard.",
+  authors: [
+    { name: "Iron Hands Team", url: "https://github.com/iron-hands-team" },
+  ],
+  openGraph: {
+    title: "Admin Dashboard",
+    description:
+      "View and access all admin features for managing users, classes, clubs, schedules, information, and more on this dashboard.",
+    url: "https://iridium.tonymac.net/admin",
+    siteName: "Iridium",
+    images: [{ url: "/logo.png", width: 100, height: 100 }],
+    type: "website",
+  },
+};
 
 async function Page() {
   const { user } = await getSession();
@@ -74,6 +93,7 @@ async function Page() {
           <FaInfoCircle size={18} /> School information
         </h2>
         <div className="border-1 border-zinc-800 px-4 py-2 flex flex-col gap-y-2">
+          {/* TODO: modal for actually putting school info like contact name and address */}
           <NewMap />
           <NewRule text="Edit rules" />
           <ManageLinks />

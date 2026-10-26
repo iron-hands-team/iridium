@@ -6,6 +6,7 @@ import { FaMapMarkerAlt, FaCheckCircle, FaRegCircle } from "react-icons/fa";
 import { useState } from "react";
 import { AnimatePresence } from "framer-motion";
 import { useRouter } from "next/navigation";
+import toast from "react-hot-toast";
 import Menu from "../ui/menu";
 import WarningModal from "../modals/warning";
 import NewEventModal from "../modals/new-event";
@@ -60,11 +61,12 @@ function EventCard({ event, user }: EventCardProps) {
 
   async function handleDelete() {
     setDeleting(true);
-    await fetch(`/api/events/${event.id}`, {
+    const res = await fetch(`/api/events/${event.id}`, {
       method: "DELETE",
       headers: { "Content-Type": "application/json" },
       credentials: "include",
     });
+    if (res.ok) toast.success("Event deleted successfully!");
     router.refresh();
     setDeleting(null);
   }
@@ -123,7 +125,11 @@ function EventCard({ event, user }: EventCardProps) {
 
       <AnimatePresence>
         {editing && (
-          <NewEventModal existing={event} closeModal={() => setEditing(false)} />
+          <NewEventModal
+            existing={event}
+            closeModal={() => setEditing(false)}
+            toast={(m) => toast.success(m)}
+          />
         )}
         {deleting !== null && (
           <WarningModal

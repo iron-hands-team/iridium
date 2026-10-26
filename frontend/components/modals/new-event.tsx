@@ -23,9 +23,15 @@ interface NewEventModalProps {
   closeModal: () => void;
   existing?: EventType;
   defaultDate?: Date;
+  toast: (msg: string) => void;
 }
 
-function NewEventModal({ closeModal, existing, defaultDate }: NewEventModalProps) {
+function NewEventModal({
+  closeModal,
+  existing,
+  defaultDate,
+  toast,
+}: NewEventModalProps) {
   const [event, setEvent] = useState<NewEventType>(
     existing
       ? {
@@ -82,6 +88,7 @@ function NewEventModal({ closeModal, existing, defaultDate }: NewEventModalProps
     setLoading(false);
     if (res.ok) {
       router.refresh();
+      toast(`Event ${existing ? "updated" : "added"} successfully!`);
       closeModal();
     } else {
       setError(
@@ -93,9 +100,7 @@ function NewEventModal({ closeModal, existing, defaultDate }: NewEventModalProps
   return (
     <Modal closeModal={closeModal}>
       <div className="flex flex-col gap-y-5 p-5">
-        <h2 className="text-xl font-bold">
-          {existing ? "Edit" : "New"} event
-        </h2>
+        <h2 className="text-xl font-bold">{existing ? "Edit" : "New"} event</h2>
         <label className={labelStyles}>
           <div>
             Title <span className="text-red-500">*</span>

@@ -4,7 +4,7 @@ from app.models import Notification, NotificationType
 
 def create_notification(
     db: Session,
-    user_id: int,
+    user_id: int | None,
     type: NotificationType,
     title: str,
     body: str | None = None,

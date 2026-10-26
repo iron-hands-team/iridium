@@ -10,6 +10,7 @@ import {
   FaTrash,
 } from "react-icons/fa";
 import { fileUrl } from "@/lib/helpers";
+import toast from "react-hot-toast";
 import Btn from "../ui/btn";
 import Modal from "../ui/modal";
 import Input from "../ui/input";
@@ -55,6 +56,7 @@ function ManageFiles() {
             }),
           );
         }
+        toast.success("Files uploaded successfully!");
         setEditing(false);
       } else {
         setError("Something went wrong, please try again");

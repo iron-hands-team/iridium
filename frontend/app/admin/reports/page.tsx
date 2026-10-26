@@ -1,9 +1,28 @@
+import type { Metadata } from "next";
 import type { ReportResponse, ReportType } from "@/types/report";
 import { FaFlag } from "react-icons/fa";
 import { getSession } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import { parseUser } from "@/lib/helpers";
 import Reports from "./reports";
+
+export const metadata: Metadata = {
+  title: "Manage Reports",
+  description:
+    "View and respond to different user-filed reports, dismiss them, and filter or organize them here.",
+  authors: [
+    { name: "Iron Hands Team", url: "https://github.com/iron-hands-team" },
+  ],
+  openGraph: {
+    title: "Manage Reports",
+    description:
+      "View and respond to different user-filed reports, dismiss them, and filter or organize them here.",
+    url: "https://iridium.tonymac.net/admin/reports",
+    siteName: "Iridium",
+    images: [{ url: "/logo.png", width: 100, height: 100 }],
+    type: "website",
+  },
+};
 
 async function Page() {
   const { user, cookie } = await getSession();
@@ -22,7 +41,7 @@ async function Page() {
     }).then((res) => res.json())
   ).map((r: ReportResponse) => ({
     ...r,
-    reporter: r.reporter ? parseUser(r.reporter) : null,
+    reporter: r.user ? parseUser(r.user) : null,
   }));
 
   return (

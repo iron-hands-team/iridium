@@ -181,6 +181,9 @@ class Assignment(Base):
     grades = relationship(
         "Grade", back_populates="assignment", cascade="all, delete-orphan"
     )
+    submissions = relationship(
+        "Submission", back_populates="assignment", cascade="all, delete-orphan"
+    )
 
 class Grade(Base):
     __tablename__ = "grades"
@@ -189,19 +192,20 @@ class Grade(Base):
     student_id = Column(Integer, ForeignKey("users.id"), nullable=False)
     score = Column(Float, nullable=True)
 
-    assignment = relations token_tpe: str = "bearer"
-        user: UserResponsepindex.txt.txt
-    afrom pydantic import BaseModel
-    
-    from app.models import UserRole
-    class LoginRequest(BaseModel):
-            username: str    password: str
-            class UserCreateRequest(BaseModel):
-                    username: strip("Assignment", back_populates="grades")
+    assignment = relationship("Assignment", back_populates="grades")
     student = relationship("User", back_populates="grades")
 
-   lass Config: staticmethod
-       from_
+class Submission(Base):
+    __tablename__ = "submissions"
+    id = Column(Integer, primary_key=True, index=True)
+    assignment_id = Column(Integer, ForeignKey("assignments.id"), nullable=False)
+    student_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    filename = Column(String, nullable=False)
+    submitted_at = Column(DateTime(timezone=True), default=utcnow, nullable=False)
+
+    assignment = relationship("Assignment", back_populates="submissions")
+    student = relationship("User", back_populates="submissions")
+
 class ClassEnrollment(Base):
     __tablename__ = "class_enrollments"
     id = Column(Integer, primary_key=True, index=True)
@@ -257,6 +261,7 @@ class Report(Base):
     anonymous = Column(Boolean, nullable=False, default=True)
     type = Column(String, nullable=False)
     role = Column(String, nullable=True)
+    resolved = Column(Boolean, nullable=False, default=False)
 
     user_id = Column(Integer, ForeignKey("users.id"), nullable=True)
     user = relationship("User", back_populates="reports")
@@ -284,7 +289,6 @@ class ChatMessage(Base):
     user = relationship("User", back_populates="chat_messages")
     channel_id = Column(Integer, ForeignKey("channels.id"))
     channel = relationship("Channel", back_populates="messages")
-    channel = relationship("Channel", back_populates="messages")
     reactions = relationship("ChatReaction", back_populates="message")
 
 class ChatReaction(Base):
@@ -301,6 +305,7 @@ class NotificationType(str, enum.Enum):
     message = "message"
     announcement = "announcement"
     grade = "grade"
+    report = "report"
 
 class Notification(Base):
     __tablename__ = "notifications"

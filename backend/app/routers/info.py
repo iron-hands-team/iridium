@@ -14,6 +14,7 @@ from app.models import (
     Report,
     Link,
     File,
+    NotificationType
 )
 from app.schemas import (
     MapUploadResponse,
@@ -29,6 +30,7 @@ from app.schemas import (
 )
 from app.dependencies import require_admin, manager
 from app.s3 import s3_client, s3_internal, BUCKET_NAME, ENDPOINT
+from app.notify import create_notification
 
 router = APIRouter()
 
@@ -201,27 +203,11 @@ def get_reports(
             anonymous=r.anonymous,
             type=r.type,
             role=r.role,
-            reporter=r.user if (not r.anonymous and r.user is not None) else None,
+            user=r.user if (not r.anonymous and r.user is not None) else None,
+            resolved=r.resolved,
         )
         for r in reports
     ]
-
-
-@router.delete("/reports/{report_id}", status_code=204)
-def delete_report(
-    report_id: int,
-    db: Session = Depends(get_db),
-    current_user: User = Depends(manager),
-):
-    if current_user.role == "student":
-        raise HTTPException(status_code=403, detail="Insufficient permission")
-
-    report = db.query(Report).filter(Report.id == report_id).first()
-    if report is None:
-        raise HTTPException(status_code=404, detail="Report not foind.")
-    db.delete(report)
-    db.commit()
-
 
 @router.post("/reports", status_code=204)
 def submit_report(
@@ -238,8 +224,42 @@ def submit_report(
         user_id=None if report.anonymous else current_user.id,
     )
     db.add(new_report)
+    for admin in db.query(User).filter(User.role == "admin").all():
+        create_notification(
+            db,
+            user_id=admin.id,
+            type=NotificationType.report,
+            title="New Report",
+            body=f"{report.description}",
+            link="/admin/reports",
+        )
     db.commit()
 
+@router.delete("/reports/{report_id}", status_code=204)
+def delete_report(
+    report_id: int,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(require_admin),
+):
+    report = db.query(Report).filter(Report.id == report_id).first()
+    if report is None:
+        raise HTTPException(status_code=404, detail="Report not found.")
+    db.delete(report)
+    db.commit()
+
+@router.post("/reports/{report_id}", response_model=ReportResponse)
+def resolved_report(
+    report_id: int,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(require_admin),
+):
+    report = db.query(Report).filter(Report.id == report_id).first()
+    if report is None:
+            raise HTTPException(status_code=404, detail="Report not found.")
+    report.resolved = not report.resolved
+    db.commit()
+    db.refresh(report)
+    return report
 
 @router.get("/links", response_model=list[LinkResponse])
 def get_links(db: Session = Depends(get_db), _current_user: User = Depends(manager)):

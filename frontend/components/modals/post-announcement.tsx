@@ -17,11 +17,13 @@ const labelStyles =
 interface PostAnnouncementModalProps {
   closeModal: () => void;
   existing?: PostType;
+  toast: (msg: string) => void;
 }
 
 function PostAnnouncementModal({
   closeModal,
   existing,
+  toast,
 }: PostAnnouncementModalProps) {
   const [post, setPost] = useState<PostType>(
     existing || {
@@ -70,6 +72,7 @@ function PostAnnouncementModal({
       setLoading(false);
       if (res.ok) {
         router.refresh();
+        toast(`Post ${existing ? "edited" : "created"} successfully!`);
         closeModal();
       } else {
         setError("Something went wrong, please try again");

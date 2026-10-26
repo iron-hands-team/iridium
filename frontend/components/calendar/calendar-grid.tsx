@@ -5,6 +5,7 @@ import type { UserType } from "@/types/user";
 import { useState, useEffect } from "react";
 import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
 import { AnimatePresence } from "framer-motion";
+import toast from "react-hot-toast";
 import EventCard from "./event-card";
 import NewEventModal from "../modals/new-event";
 
@@ -89,7 +90,9 @@ function CalendarGrid({ events, user }: CalendarGridProps) {
               <FaChevronLeft size={12} />
             </div>
             <div
-              onClick={() => setViewDate(new Date(today.getFullYear(), today.getMonth(), 1))}
+              onClick={() =>
+                setViewDate(new Date(today.getFullYear(), today.getMonth(), 1))
+              }
               className="px-3 py-2 border border-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-900 cursor-pointer text-xs"
             >
               Today
@@ -177,9 +180,7 @@ function CalendarGrid({ events, user }: CalendarGridProps) {
         </div>
         <div className="flex flex-col gap-y-3">
           {selectedEvents.length === 0 ? (
-            <div className="text-sm text-zinc-500">
-              No events on this day.
-            </div>
+            <div className="text-sm text-zinc-500">No events on this day.</div>
           ) : (
             selectedEvents.map((event) => (
               <EventCard key={event.id} event={event} user={user} />
@@ -193,6 +194,7 @@ function CalendarGrid({ events, user }: CalendarGridProps) {
           <NewEventModal
             defaultDate={addingOn}
             closeModal={() => setAddingOn(null)}
+            toast={(m) => toast.success(m)}
           />
         )}
       </AnimatePresence>

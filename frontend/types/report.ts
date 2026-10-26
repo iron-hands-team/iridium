@@ -3,11 +3,12 @@ import type {UserResponse, UserType} from "./user";
 export interface ReportResponse {
     id: number;
     title: string;
-    descripton: string;
+    description: string;
     anonymous: boolean;
     type: string;
     role: string | null;
-    reporter: UserResponse | null;
+    user: UserResponse | null;
+    resolved: boolean;
 }
 
 export interface ReportType {
@@ -17,5 +18,6 @@ export interface ReportType {
     anonymous: boolean;
     type: string;
     role: string | null;
-    reporter: UserType | null;
+    user: UserType | null;
+    resolved: boolean;
 }
