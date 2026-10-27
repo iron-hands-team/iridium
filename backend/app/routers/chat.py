@@ -9,6 +9,7 @@ from app.schemas import (
     ChannelCreateRequest,
     ChannelResponse,
     ChannelCreateResponse,
+    ChannelUpdateRequest,
     MessageSendRequest,
     ChatMessageResponse,
     ChatReactionRequest,
@@ -94,6 +95,54 @@ def get_messages(
             {"emoji": emoji, "users": users} for emoji, users in emojis.items()
         ]
     return messages
+
+
+@router.patch("/channel/{channel_id}", response_model=ChannelResponse)
+def update_channel(
+    channel_id: int,
+    channel: ChannelUpdateRequest,
+    db: Session = Depends(get_db),
+    _current_user: User = Depends(require_admin),
+):
+    existing = db.query(Channel).filter(Channel.id == channel_id).first()
+    if existing is None:
+        raise HTTPException(
+            status_code=404, detail=f"Channel with ID {channel_id} not found."
+        )
+    conditions = [Channel.name == channel.name]
+    if channel.club is not None:
+        conditions.append(Channel.club_id == channel.club)
+    same = db.query(Channel).filter(Channel.id != channel_id, or_(*conditions)).first()
+    if same is not None:
+        raise HTTPException(
+            status_code=403,
+            detail="A channel with that name or club already exists, please pick a different one.",
+        )
+
+    for field, value in channel.model_dump(exclude_unset=True).items():
+        setattr(existing, "club_id" if field == "club" else field, value)
+    if channel.club is None:
+        existing.club_id = None
+
+    db.commit()
+    db.refresh(existing)
+    return existing
+
+
+@router.delete("/channel/{channel_id}", status_code=204)
+def delete_channel(
+    channel_id: int,
+    db: Session = Depends(get_db),
+    _current_user: User = Depends(require_admin),
+):
+    existing = db.query(Channel).filter(Channel.id == channel_id).first()
+    if existing is None:
+        raise HTTPException(
+            status_code=404, detail=f"Channel with ID {channel_id} not found."
+        )
+
+    db.delete(existing)
+    db.commit()
 
 
 @router.post("/send", status_code=204)

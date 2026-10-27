@@ -79,7 +79,7 @@ async function Page({ params }: { params: Promise<{ id: number }> }) {
   return (
     <div className="flex px-3 sm:px-10 lg:px-50 max-w-450 mx-auto">
       <ChannelSidebar
-        channels={channel}
+        channels={channels}
         clubChannels={clubChannels}
         selectedId={id}
         showNewChannelBtn={user.role === "admin"}

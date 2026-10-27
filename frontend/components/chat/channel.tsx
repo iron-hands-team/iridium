@@ -1,21 +1,28 @@
-import type { ChannelType } from "@/lib/schemas";
+import type { ChannelType } from "@/app/chat/page";
 import { FaHashtag } from "react-icons/fa";
+import ChannelMenu from "./channel-menu";
 import Link from "next/link";
 
 interface ChannelProps {
   channel: ChannelType;
   selected?: boolean;
+  admin?: boolean;
 }
 
-function Channel({ channel, selected }: ChannelProps) {
+function Channel({ channel, selected, admin }: ChannelProps) {
   return (
-    <Link
-      href={`/chat/${channel.id}`}
-      className={`hover:bg-zinc-300/50 dark:hover:bg-zinc-900/50 flex px-4 py-1.5 items-center gap-x-2 text-zinc-700 dark:text-zinc-300 ${selected && "font-bold bg-zinc-300 dark:bg-zinc-900"}`}
+    <div
+      className={`hover:bg-zinc-300/50 dark:hover:bg-zinc-900/50 flex items-center text-zinc-700 dark:text-zinc-300 group relative ${selected && "font-bold bg-zinc-300 dark:bg-zinc-900"}`}
     >
-      <FaHashtag size={15} />
-      {channel.name}
-    </Link>
+      <Link
+        href={`/chat/${channel.id}`}
+        className="w-full px-4 py-2 flex items-center gap-x-2"
+      >
+        <FaHashtag size={15} />
+        {channel.name}
+      </Link>
+      {admin && <ChannelMenu channel={channel} />}
+    </div>
   );
 }
 

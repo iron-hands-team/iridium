@@ -31,10 +31,12 @@ interface NewChannelProps {
 }
 
 function NewChannelModal({ closeModal, existing, toast }: NewChannelProps) {
-  const [channel, setChannel] = useState<ChannelType>({
-    name: "",
-    role: "all",
-  });
+  const [channel, setChannel] = useState<ChannelType>(
+    existing || {
+      name: "",
+      role: "all",
+    },
+  );
   const [clubs, setClubs] = useState<ClubType[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
@@ -48,13 +50,21 @@ function NewChannelModal({ closeModal, existing, toast }: NewChannelProps) {
     });
     if (validated.success) {
       setError(null);
-      const res = await fetch(`/api/chat/channels`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(validated.data),
-      });
+      const res = existing
+        ? await fetch(`/api/chat/channel/${existing.id}`, {
+            method: "PATCH",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(validated.data),
+          })
+        : await fetch("/api/chat/channels", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(validated.data),
+          });
       const channel = await res.json();
       if (res.ok) {
         router.refresh();
@@ -161,7 +171,7 @@ function NewChannelModal({ closeModal, existing, toast }: NewChannelProps) {
             text={
               existing
                 ? loading
-                  ? "Saving"
+                  ? "Saving..."
                   : "Save"
                 : loading
                   ? "Creating..."

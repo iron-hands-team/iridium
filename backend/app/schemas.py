@@ -367,6 +367,12 @@ class ChannelCreateRequest(BaseModel):
     role: str
     club: int | None = None
 
+class ChannelUpdateRequest(BaseModel):
+    name: str | None = None
+    description: str | None = None
+    role: str | None = None
+    club: int | None = None
+
 class ChannelResponse(BaseModel):
     id: int
     name: str

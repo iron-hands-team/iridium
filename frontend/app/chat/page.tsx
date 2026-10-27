@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
-import type { ChannelType } from "@/lib/schemas";
-import ChannelSidebar from "./channel-sidebar";
+import type { ChannelType as ChannelT } from "@/lib/schemas";
+import type { ClubType } from "@/types/clubs";
 import { getSession } from "@/lib/auth";
+import ChannelSidebar from "./channel-sidebar";
 
 export const metadata: Metadata = {
   title: "Chat",
@@ -21,9 +22,10 @@ export const metadata: Metadata = {
   },
 };
 
+export type ChannelType = Omit<ChannelT, "club"> & { club: ClubType };
 
 async function Page() {
-  const {user, cookie} = await getSession();
+  const { user, cookie } = await getSession();
   const channelData = await fetch(
     `${process.env.INTERNAL_API_URL}/chat/channels`,
     {
@@ -32,17 +34,17 @@ async function Page() {
         Authorization: `Bearer ${cookie.value}`,
       },
     },
-  ).then((res)=>res.json())
+  ).then((res) => res.json());
 
-  const channels: ChannelType[] = 
+  const channels: ChannelType[] =
     channelData.length > 0
       ? channelData.filter((c: ChannelType) => !c.club)
       : [];
-  const clubChannels: ChannelType[] = 
+  const clubChannels: ChannelType[] =
     channelData.length > 0
-      ? channelData.filter((c: ChannelType)=>c.club)
+      ? channelData.filter((c: ChannelType) => c.club)
       : [];
-  
+
   return (
     <div className="flex px-3 sm:px-10 lg:px-50 max-w-450 mx-auto">
       <ChannelSidebar
@@ -56,6 +58,5 @@ async function Page() {
     </div>
   );
 }
-
 
 export default Page;
