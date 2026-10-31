@@ -115,6 +115,7 @@ class ClubResponse(BaseModel):
     sponsor_id: int | None = None
     categories: list[str]
     favorites: list[str] = []
+    joined: bool
 
     class Config:
         from_attributes = True

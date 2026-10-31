@@ -14,7 +14,15 @@ def list_clubs(
     db: Session = Depends(get_db),
     _current_user: User = Depends(manager),
 ):
-    return db.query(Club).order_by(Club.name).all() # TODO: add joined field for whether current user is a member
+    clubs = db.query(Club).order_by(Club.name).all()
+    my_memberships = db.query(ClubMembership).filter(ClubMembership.user_id == _current_user.id).all()
+    my_club_ids = {m.club_id for m in my_memberships}
+    results = []
+    for club in clubs:
+        response = ClubResponse.model_validate(club)
+        response.joined = club.id in my_club_ids
+        results.append(response)
+    return results
 
 @router.post("", response_model=ClubResponse)
 def create_club(
