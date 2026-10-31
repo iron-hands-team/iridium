@@ -114,9 +114,9 @@ def get_search(
     db: Session = Depends(get_db),
     current_user: User = Depends(manager),
 ):
-    if l == 0 or q == "":
+    if l <= 0 or q == "":
         raise HTTPException(
-            status_code=501, detail="Please provide a valid seaarch query and limit"
+            status_code=400, detail="Please provide a valid seaarch query and limit"
         )
     limit = 20 if l > 20 else l
     query = f"%{q}%"
@@ -130,7 +130,7 @@ def get_search(
                 User.title.ilike(query),
             )
         )
-        .limit(l)
+        .limit(limit)
         .all()
     )
     announcements = (
@@ -147,13 +147,13 @@ def get_search(
                 Announcement.content.ilike(query),
             ),
         )
-        .limit(l)
+        .limit(limit)
         .all()
     )
     events = (
         db.query(Event)
         .filter(or_(Event.title.ilike(query), Event.description.ilike(query)))
-        .limit(l)
+        .limit(limit)
         .all()
     )
     clubs = (
@@ -165,12 +165,12 @@ def get_search(
                 func.array_to_string(Club.categories, " ").ilike(query),
             )
         )
-        .limit(l)
+        .limit(limit)
         .all()
     )
 
     classes = (
-        db.query(ClassSection).filter(ClassSection.name.ilike(query)).limit(l).all()
+        db.query(ClassSection).filter(ClassSection.name.ilike(query)).limit(limit).all()
     )
 
     return {
@@ -291,7 +291,7 @@ def get_files(db: Session = Depends(get_db), _current_user: User = Depends(manag
 def upload_files(
     files: list[FileResponse],
     db: Session = Depends(get_db),
-    _current_user: User = Depends(manager),
+    _current_user: User = Depends(require_admin),
 ):
     db.query(File).delete()
 

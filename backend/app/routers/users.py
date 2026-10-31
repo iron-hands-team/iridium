@@ -158,13 +158,13 @@ def request_reset(
 def request_delete(
     username: str,
     db: Session = Depends(get_db),
-    _current_user: User = Depends(manager),
+    current_user: User = Depends(manager),
 ):
+    if current_user.username != username:
+        raise HTTPException(status_code=403, detail="Uh..., what do you think you're doing?")
     user = db.query(User).filter(User.username == username).first()
     if user is None:
         raise HTTPException(status_code=404, detail="User not found.")
-    if user.username != username:
-        raise HTTPException(status_code=405, detail="Uh..., what do you think you're doing?")
     user.requesting_delete = True
     db.commit()
 
@@ -191,7 +191,7 @@ def reset_password(
     return user
 
 @router.patch("/users/{username}/clear", response_model=UserResponse)
-def reset_password(
+def clear_delete_request(
     username: str,
     db: Session = Depends(get_db),
     _admin: User = Depends(require_admin),

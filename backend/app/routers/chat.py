@@ -4,7 +4,7 @@ from sqlalchemy import func, or_
 from collections import defaultdict
 
 from app.database import get_db
-from app.models import Channel, User, ChatMessage, ClubMembership, ChatReaction
+from app.models import Channel, User, ChatMessage, ClubMembership, ChatReaction, UserRole
 from app.schemas import (
     ChannelCreateRequest,
     ChannelResponse,
@@ -18,6 +18,18 @@ from app.dependencies import require_admin, manager
 
 router = APIRouter(prefix="/chat", tags=["chat"])
 
+def get_accessible_channel(channel_id: int, db: Session, current_user: User) -> Channel:
+    channel = db.query(Channel).filter(Channel.id == channel_id).first()
+    if channel is None:
+        raise HTTPException(status_code=404, detail="Channel not found.")
+    if current_user.role != UserRole.admin:
+        if channel.club_id is not None:
+            member = (
+                db.query(ClubMembership)            
+                .filter(ClubMembership.club_id == channel.club_id,
+                        ClubMembership.user_id == current_user.id)
+                .first()         
+            )
 
 @router.get("/channels", response_model=list[ChannelResponse])
 def get_channels(db: Session = Depends(get_db), current_user: User = Depends(manager)):

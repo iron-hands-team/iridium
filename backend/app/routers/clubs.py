@@ -12,10 +12,10 @@ router = APIRouter(prefix="/clubs", tags=["clubs"])
 @router.get("", response_model=list[ClubResponse])
 def list_clubs(
     db: Session = Depends(get_db),
-    _current_user: User = Depends(manager),
+    current_user: User = Depends(manager),
 ):
     clubs = db.query(Club).order_by(Club.name).all()
-    my_memberships = db.query(ClubMembership).filter(ClubMembership.user_id == _current_user.id).all()
+    my_memberships = db.query(ClubMembership).filter(ClubMembership.user_id == current_user.id).all()
     my_club_ids = {m.club_id for m in my_memberships}
     results = []
     for club in clubs:
