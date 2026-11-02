@@ -175,6 +175,7 @@ class Assignment(Base):
     class_id = Column(Integer, ForeignKey("class_sections.id"), nullable=False)
     name = Column(String, nullable=False)
     max_score = Column(Float, nullable=False, default=100)
+    due_at = Column(DateTime(timezone=True), nullable=True)
     created_at = Column(DateTime(timezone=True), default=utcnow, nullable=False)
 
     class_section = relationship("ClassSection", back_populates="assignments")

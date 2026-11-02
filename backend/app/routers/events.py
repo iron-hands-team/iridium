@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 
 from app.database import get_db
 from app.auth import manager
-from app.models import Event, EventRSVP, User
+from app.models import Event, EventRSVP, User, UserRole
 from app.schemas import EventCreateRequest, EventUpdateRequest, EventResponse
 from app.dependencies import require_staff
 
@@ -40,11 +40,13 @@ def update_event(
     event_id: int,
     updates: EventUpdateRequest,
     db: Session = Depends(get_db),
-    _staff: User = Depends(require_staff),
+    current_user: User = Depends(require_staff),
 ):
     event = db.query(Event).filter(Event.id == event_id).first()
     if event is None:
         raise HTTPException(status_code=404, detail="Event not found.")
+    if current_user.role != UserRole.admin and event.created_by_id != current_user.id:
+        raise HTTPException(status_code=403, detail="That's not your event.")
 
     for field, value in updates.model_dump(exclude_unset=True).items():
         setattr(event, field, value)
@@ -57,11 +59,13 @@ def update_event(
 def delete_event(
     event_id: int,
     db: Session = Depends(get_db),
-    _staff: User = Depends(require_staff),
+    current_user: User = Depends(require_staff),
 ):
     event = db.query(Event).filter(Event.id == event_id).first()
     if event is None:
         raise HTTPException(status_code=404, detail="Event not found.")
+    if current_user.role != UserRole.admin and event.created_by_id != current_user.id:
+        raise HTTPException(status_code=403, detail="That's not your event.")
     db.delete(event)
     db.commit()
 

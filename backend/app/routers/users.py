@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi import APIRouter, Depends, HTTPException, Query, Request
 from sqlalchemy.orm import Session
 
 from app.database import get_db
@@ -13,6 +13,7 @@ from app.schemas import (
 from app.dependencies import require_admin, manager
 from app.s3 import s3_client, s3_internal, BUCKET_NAME, ENDPOINT
 from app.auth import hash_password
+from app.limiter import limiter
 
 router = APIRouter()
 
@@ -49,7 +50,11 @@ def get_user(
     if user is None:
         raise HTTPException(status_code=404, detail="User not found.")
 
-    return user
+    response = UserResponse.model_validate(user)
+    if _current_user.role != UserRole.admin and _current_user.id != user.id:
+        response.requesting = None
+        response.requesting_delete = None
+    return response
 
 @router.get("/users/upload/{username}", response_model=UploadResponse)
 def get_upload_url(
@@ -143,7 +148,9 @@ def bulk_delete_users(
     db.commit()
 
 @router.post("/users/{username}/request", status_code=202)
+@limiter.limit("5/minute")
 def request_reset(
+    request: Request,
     username: str,
     db: Session = Depends(get_db),
 ):

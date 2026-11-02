@@ -10,7 +10,7 @@ from app.schemas import (
     ScheduleItemUpdateRequest,
     ScheduleCopyRequest,
 )
-from app.dependencies import require_staff
+from app.dependencies import require_staff, require_admin
 
 router = APIRouter(prefix="/schedule", tags=["schedule"])
 
@@ -30,7 +30,7 @@ def get_my_schedule(
 def get_user_schedule(
     user_id: int,
     db: Session = Depends(get_db),
-    _staff: User = Depends(require_staff),
+    _admin: User = Depends(require_admin),
 ):
     return (
         db.query(ScheduleItem)
@@ -43,7 +43,7 @@ def get_user_schedule(
 def create_schedule_item(
     new_item: ScheduleItemCreateRequest,
     db: Session = Depends(get_db),
-    _staff: User = Depends(require_staff),
+    _admin: User = Depends(require_admin),
 ):
     item = ScheduleItem(**new_item.model_dump())
     db.add(item)
@@ -55,7 +55,7 @@ def create_schedule_item(
 def copy_schedule(
     copy_request: ScheduleCopyRequest,
     db: Session = Depends(get_db),
-    _staff: User = Depends(require_staff),
+    _admin: User = Depends(require_admin),
 ):
     source_items = (
         db.query(ScheduleItem)
@@ -95,7 +95,7 @@ def update_schedule_item(
     item_id: int,
     updates: ScheduleItemUpdateRequest,
     db: Session = Depends(get_db),
-    _staff: User = Depends(require_staff),
+    _admin: User = Depends(require_admin),
 ):
     item = db.query(ScheduleItem).filter(ScheduleItem.id == item_id).first()
     if item is None:
@@ -112,7 +112,7 @@ def update_schedule_item(
 def delete_schedule_item(
     item_id: int,
     db: Session = Depends(get_db),
-    _staff: User = Depends(require_staff),
+    _admin: User = Depends(require_admin),
 ):
     item = db.query(ScheduleItem).filter(ScheduleItem.id == item_id).first()
     if item is None:

@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 
 from app.database import get_db
 from app.auth import manager
-from app.models import Club, ClubMembership, User, ClubFavorite
+from app.models import Club, ClubMembership, User, ClubFavorite, UserRole
 from app.schemas import ClubCreateRequest, ClubUpdateRequest, ClubResponse, ClubMemberResponse
 from app.dependencies import require_staff, require_admin
 
@@ -44,11 +44,13 @@ def update_club(
     club_id: int,
     updates: ClubUpdateRequest,
     db: Session = Depends(get_db),
-    _staff: User = Depends(require_staff),
+    current_user: User = Depends(require_staff),
 ):
     club = db.query(Club).filter(Club.id == club_id).first()
     if club is None:
         raise HTTPException(status_code=404, detail="Club not found.")
+    if current_user.role != UserRole.admin and club.sponsor_id != current_user.id:
+        raise HTTPException(status_code=403, detail="You're not this club's sponsor.")
 
     data = updates.model_dump(exclude_unset=True)
     if "name" in data and data["name"] != club.name:
