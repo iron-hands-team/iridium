@@ -39,7 +39,7 @@ async function Page() {
   const users: UserType[] = rawUsers.map((u: UserResponse) => parseUser(u));
 
   return (
-    <div className="px-50 py-10 flex flex-col gap-y-10">
+    <div className="px-4 sm:px-10 lg:px-50 py-10 flex flex-col gap-y-10">
       <h2 className="text-xl font-bold flex items-center gap-x-3">
         <FaUsers size={18} /> View users
       </h2>

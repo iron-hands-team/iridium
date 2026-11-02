@@ -36,7 +36,7 @@ async function Page() {
   ).then((res) => res.json());
 
   return (
-    <div className="px-50 py-10 flex flex-col gap-y-5">
+    <div className="px-4 sm:px-10 lg:px-50 py-10 flex flex-col gap-y-5">
       <h2 className="text-xl font-bold flex items-center gap-x-3">
         <FaFile size={18} /> Files
       </h2>

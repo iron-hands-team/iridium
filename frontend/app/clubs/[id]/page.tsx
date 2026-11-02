@@ -59,7 +59,7 @@ async function Page({ params }: { params: Promise<{ id: number}>}) {
     const channel = channelsData.find((c)=>c.club?.id==id);
 
     return (
-        <div className="px-50 py-10">
+        <div className="px-4 sm:px-10 lg:px-50 py-10">
             <ClubDetail
                 club={club}
                 members={members}
