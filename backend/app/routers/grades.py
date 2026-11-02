@@ -97,7 +97,7 @@ def set_grade(
 
     enrolled = (
         db.query(ClassEnrollment)
-        .filter(ClassEnrollment.class_id == assignment.class_id)
+        .filter(ClassEnrollment.class_id == assignment.class_id, ClassEnrollment.student_id == student_id)
         .first()
     )
     if enrolled is None:
