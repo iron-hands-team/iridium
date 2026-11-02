@@ -38,7 +38,7 @@ function CalendarGrid({ events, user }: CalendarGridProps) {
 
   if (!mounted || !today || !viewDate || !selected) {
     return (
-      <div className="flex gap-x-10">
+      <div className="flex flex-col lg:flex-row gap-y-8 lg:gap-x-10">
         <div className="flex-1 text-sm text-zinc-500">Loading calendar...</div>
       </div>
     );
@@ -121,7 +121,7 @@ function CalendarGrid({ events, user }: CalendarGridProps) {
               return (
                 <div
                   key={i}
-                  className="h-24 border-r border-b border-zinc-800 bg-zinc-100/50 dark:bg-zinc-950/50"
+                  className="h-16 sm:h-24 border-r border-b border-zinc-800 bg-zinc-100/50 dark:bg-zinc-950/50"
                 />
               );
             }
@@ -132,7 +132,7 @@ function CalendarGrid({ events, user }: CalendarGridProps) {
               <div
                 key={i}
                 onClick={() => setSelected(cellDate)}
-                className={`h-24 border-r border-b border-zinc-800 p-1.5 cursor-pointer flex flex-col gap-y-1 overflow-hidden hover:bg-zinc-200/50 dark:hover:bg-zinc-900/50 ${isSelected ? "bg-zinc-200 dark:bg-zinc-900" : ""}`}
+                className={`h-16 sm:h-24 border-r border-b border-zinc-800 p-1.5 cursor-pointer flex flex-col gap-y-1 overflow-hidden hover:bg-zinc-200/50 dark:hover:bg-zinc-900/50 ${isSelected ? "bg-zinc-200 dark:bg-zinc-900" : ""}`}
               >
                 <div
                   className={`text-xs w-5 h-5 flex items-center justify-center ${isToday ? "bg-zinc-950 dark:bg-zinc-300 text-zinc-300 dark:text-zinc-950 rounded-full" : ""}`}
@@ -160,7 +160,7 @@ function CalendarGrid({ events, user }: CalendarGridProps) {
         </div>
       </div>
 
-      <div className="w-90 flex flex-col gap-y-4">
+      <div className="w-full lg:w-90 flex flex-col gap-y-4">
         <div className="flex items-center justify-between">
           <h3 className="font-bold">
             {selected.toLocaleDateString(undefined, {

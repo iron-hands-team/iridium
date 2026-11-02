@@ -44,7 +44,7 @@ async function Page() {
 
   return (
     <div className="px-4 sm:px-10 lg:px-50 py-10 flex justify-center gap-10 flex-wrap">
-      <div className="flex-1 min-w-[40%] flex flex-col gap-y-5">
+      <div className="flex-1 min-w-full lg:min-w-[40%] flex flex-col gap-y-5">
         <h2 className={headingStyles}>
           <FaUserGear size={18} /> User management
         </h2>
@@ -53,7 +53,7 @@ async function Page() {
           <NewUser styles="w-full" />
         </div>
       </div>
-      <div className="flex-1 min-w-[40%] flex flex-col gap-y-5">
+      <div className="flex-1 min-w-full lg:min-w-[40%] flex flex-col gap-y-5">
         <h2 className={headingStyles}>
           <FaBullhorn size={18} /> Announcement management
         </h2>
@@ -62,7 +62,7 @@ async function Page() {
           <Btn text="View announcements" link="/admin/announcements" />
         </div>
       </div>
-      <div className="flex-1 min-w-[40%] flex flex-col gap-y-5">
+      <div className="flex-1 min-w-full lg:min-w-[40%] flex flex-col gap-y-5">
         <h2 className={headingStyles}>
           <FaBasketball size={18} /> Club management
         </h2>
@@ -71,7 +71,7 @@ async function Page() {
           <NewClub primary full />
         </div>
       </div>
-      <div className="flex-1 min-w-[40%] flex flex-col gap-y-5">
+      <div className="flex-1 min-w-full lg:min-w-[40%] flex flex-col gap-y-5">
         <h2 className={headingStyles}>
           <FaBook size={18} /> Class management
         </h2>
@@ -80,7 +80,7 @@ async function Page() {
           <Btn text="Add class" />
         </div>
       </div>
-      <div className="flex-1 min-w-[40%] flex flex-col gap-y-5">
+      <div className="flex-1 min-w-full lg:min-w-[40%] flex flex-col gap-y-5">
         <h2 className={headingStyles}>
           <FaClock size={18} /> Schedule management
         </h2>
@@ -88,7 +88,7 @@ async function Page() {
           <Btn text="Manage schedules" link="/admin/schedule" primary />
         </div>
       </div>
-      <div className="flex-1 min-w-[40%] flex flex-col gap-y-5">
+      <div className="flex-1 min-w-full lg:min-w-[40%] flex flex-col gap-y-5">
         <h2 className={headingStyles}>
           <FaInfoCircle size={18} /> School information
         </h2>
@@ -99,7 +99,7 @@ async function Page() {
           <ManageLinks />
           <ManageFiles />
         </div>
-        <div className="flex-1 min-w-[40%] flex flex-col gap-y-5">
+        <div className="flex-1 min-w-full lg:min-w-[40%] flex flex-col gap-y-5">
           <h2 className={headingStyles}>
             <FaFlag size={18} /> Reports
           </h2>

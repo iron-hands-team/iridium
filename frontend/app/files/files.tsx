@@ -60,7 +60,7 @@ function Files({ files, isAdmin }: FilesProps) {
             return (
               <a
                 key={file.id}
-                className="w-80 border border-zinc-800 flex flex-col gap-y-3 p-5 hover:bg-zinc-200 dark:hover:bg-zinc-900 cursor-pointer"
+                className="w-full sm:w-80 border border-zinc-800 flex flex-col gap-y-3 p-5 hover:bg-zinc-200 dark:hover:bg-zinc-900 cursor-pointer"
                 href={url}
                 download={url}
                 title={url ? "Download file" : undefined}

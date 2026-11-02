@@ -71,7 +71,7 @@ async function Page() {
             return (
               <div
                 key={item.id}
-                className="flex items-center gap-x-6 border-b border-zinc-800 px-4 py-3"
+                className="flex flex-wrap items-center gap-x-6 gap-y-1 border-b border-zinc-800 px-4 py-3"
               >
                 <div className="w-20 text-sm text-zinc-500">
                   Period {item.period}
