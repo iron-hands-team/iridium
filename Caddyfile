@@ -4,6 +4,12 @@ iridium.tonymac.net, localhost {
     }
 
     handle_path /s3/files/* {
+        header {
+            Content-Security-Policy "sandbox; default-src 'none'"
+            X-Content-Type-Options nosniff
+            Content-Disposition attachment
+        }
+
         reverse_proxy garage-storage:3902 {
             header_up Host iridium-uploads.web.garage
         }
