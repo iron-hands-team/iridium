@@ -6,9 +6,11 @@ import ToastProvider from "@/components/layout/toast-provider";
 import LoginForm from "@/components/auth/login-form";
 import Nav from "@/components/layout/nav";
 
-import BodyClassTeacher from "@/classLayout/BodyClassTeacher";
-import BusSchool from "@/components/layout/busSchoolBody";
+import BodyClassTeacher from "@/components/classLayout/classTeacherBody";
+import BodyClubSystem from "@/components/club/clubSystemBody";
+import BusSchool from "@/components/busSystem/busSchoolBody";
 import "./globals.css";
+import ClubManagerSystem from "@/components/club/clubManagerSystem";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -36,6 +38,21 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
   const { user } = await getSession();
 
   return (
+    <html>
+      <body>
+        <BodyClubSystem/>
+      </body>
+    </html>
+  );
+  return (
+    <html>
+      <body>
+        <BusSchool/>
+      </body>
+    </html>
+  );
+  /*
+  return (
     <html
       lang="en"
       className={`${inter.variable} h-full antialiased`}
@@ -56,4 +73,5 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
       </body>
     </html>
   );
+  */
 }
