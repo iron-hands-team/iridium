@@ -9,9 +9,17 @@ interface DropdownProps {
   values: string[];
   label?: string;
   above?: boolean;
+  right?: boolean;
 }
 
-function Dropdown({ value, setValue, values, label, above }: DropdownProps) {
+function Dropdown({
+  value,
+  setValue,
+  values,
+  label,
+  above,
+  right,
+}: DropdownProps) {
   const [menuOpen, setMenuOpen] = useState<boolean>(false);
   const menuRef = useRef<HTMLDivElement>(null);
 
@@ -46,7 +54,7 @@ function Dropdown({ value, setValue, values, label, above }: DropdownProps) {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className={`absolute left-0 min-w-35 z-10 bg-zinc-100 dark:bg-zinc-950 max-h-70 overflow-y-auto border border-zinc-800 p-2 ${above ? "bottom-[calc(100%+10px)]" : "top-[calc(100%+10px)]"}`}
+            className={`absolute ${right ? "right-0" : "left-0"} min-w-35 z-10 bg-zinc-100 dark:bg-zinc-950 max-h-70 overflow-y-auto border border-zinc-800 p-2 ${above ? "bottom-[calc(100%+10px)]" : "top-[calc(100%+10px)]"}`}
           >
             {label && (
               <div className="text-center pb-2 text-zinc-700 dark:text-zinc-300">

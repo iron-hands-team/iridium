@@ -177,7 +177,10 @@ async function Page() {
             <Link href="/staff" className={linkStyles}>
               Staff directory
             </Link>
-            {links[1].map((l) => (
+            <Link href="/school" className={linkStyles}>
+              School information
+            </Link>
+            {links[0].map((l) => (
               <Link
                 key={l.id}
                 href={l.href}
@@ -195,7 +198,7 @@ async function Page() {
             <Link href="/files" className={linkStyles}>
               Files
             </Link>
-            {links[0].map((l) => (
+            {links[1].map((l) => (
               <Link
                 key={l.id}
                 href={l.href}

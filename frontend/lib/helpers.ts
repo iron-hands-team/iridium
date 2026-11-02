@@ -43,6 +43,10 @@ export function fileUrl(index: number, refresh: boolean = true) {
   return `/s3/files/files/${index}?t=${refresh ? new Date().getTime() : ""}`;
 }
 
+export function schoolUrl(type: "logo" | "banner") {
+  return `/s3/files/school/${type}`;
+}
+
 export function getTime(time: Date) {
   const now = new Date();
   return time.getTime() > new Date(now.toLocaleDateString()).getTime()

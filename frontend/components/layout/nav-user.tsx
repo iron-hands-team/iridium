@@ -9,6 +9,7 @@ import {
   FaSun,
   FaLightbulb,
   FaExclamationCircle,
+  FaSchool,
 } from "react-icons/fa";
 import { FaGear } from "react-icons/fa6";
 import { useState, useEffect, useRef } from "react";
@@ -120,6 +121,10 @@ function NavUser({ user }: { user: UserType }) {
                 )}
                 Theme
               </div>
+              <Link href="/school" className={optionStyles}>
+                <FaSchool size={18} className={iconStyles} />
+                School
+              </Link>
               <div className={optionStyles} onClick={handleTip}>
                 <FaLightbulb size={18} className={iconStyles} />
                 Tip

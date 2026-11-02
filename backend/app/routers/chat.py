@@ -2,9 +2,18 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from sqlalchemy import func, or_
 from collections import defaultdict
+from datetime import datetime
 
 from app.database import get_db
-from app.models import Channel, User, ChatMessage, ClubMembership, ChatReaction, UserRole
+from app.models import (
+    Channel,
+    User,
+    ChatMessage,
+    ClubMembership,
+    ChatReaction,
+    UserRole,
+    Settings,
+)
 from app.schemas import (
     ChannelCreateRequest,
     ChannelResponse,
@@ -18,6 +27,9 @@ from app.dependencies import require_admin, manager
 
 router = APIRouter(prefix="/chat", tags=["chat"])
 
+DURATION_SECONDS = {"Seconds": 1, "Minutes": 60, "Hours": 3600}
+
+
 def get_accessible_channel(channel_id: int, db: Session, current_user: User) -> Channel:
     channel = db.query(Channel).filter(Channel.id == channel_id).first()
     if channel is None:
@@ -25,16 +37,21 @@ def get_accessible_channel(channel_id: int, db: Session, current_user: User) -> 
     if current_user.role != UserRole.admin:
         if channel.club_id is not None:
             member = (
-                db.query(ClubMembership)            
-                .filter(ClubMembership.club_id == channel.club_id,
-                        ClubMembership.user_id == current_user.id)
-                .first()         
+                db.query(ClubMembership)
+                .filter(
+                    ClubMembership.club_id == channel.club_id,
+                    ClubMembership.user_id == current_user.id,
+                )
+                .first()
             )
             if member is None:
                 raise HTTPException(status_code=403, detail="You're not in this club.")
         if channel.role != "all" and channel.role != current_user.role.value:
-            raise HTTPException(status_code=403, detail="You can't access this channel.")
+            raise HTTPException(
+                status_code=403, detail="You can't access this channel."
+            )
     return channel
+
 
 @router.get("/channels", response_model=list[ChannelResponse])
 def get_channels(db: Session = Depends(get_db), current_user: User = Depends(manager)):
@@ -50,7 +67,9 @@ def get_channels(db: Session = Depends(get_db), current_user: User = Depends(man
         query = query.filter(or_(Channel.club_id.is_(None), Channel.club_id.in_(clubs)))
 
     if current_user.role != UserRole.admin:
-        query = query.filter(or_(Channel.role == "all", Channel.role == current_user.role.value))
+        query = query.filter(
+            or_(Channel.role == "all", Channel.role == current_user.role.value)
+        )
 
     channels = query.order_by(Channel.name).all()
     for c in channels:
@@ -63,7 +82,9 @@ def get_channels(db: Session = Depends(get_db), current_user: User = Depends(man
     return channels
 
 
-@router.post("/channels", response_model=ChannelCreateResponse)
+@router.post(
+    "/channels", response_model=ChannelCreateResponse
+)  # TODO: is chat realtime?
 def create_channel(
     channel: ChannelCreateRequest,
     db: Session = Depends(get_db),
@@ -176,10 +197,28 @@ def send_message(
     get_accessible_channel(message.channel_id, db, current_user)
 
     if message.replying is not None:
-        parent = db.query(ChatMessage).filter(ChatMessage.id == message.replying).first()
+        parent = (
+            db.query(ChatMessage).filter(ChatMessage.id == message.replying).first()
+        )
         if parent is None or parent.channel_id != message.channel_id:
             raise HTTPException(status_code=400, detail="Invalid reply target.")
-        
+
+    settings = db.query(Settings).first()
+    slow = settings.get("slow", {})  # TODO: censored word/phrase detection
+    if slow.enabled:
+        minimum = slow.get("number", {}) * DURATION_SECONDS[slow.get("duration", {})]
+        prev = (
+            db.query(ChatMessage)
+            .filter(ChatMessage.user_id == current_user.id)
+            .order_by(ChatMessage.created_at.desc())
+            .first()
+        )
+        diff = (datetime.now() - prev.created_at).total_seconds()
+        if prev is not None and diff.total_seconds() < minimum:
+            raise HTTPException(
+                status_code=403,
+                detail=f"Slow mode enabled, please wait {minimum-diff} more seconds before sending another message!",
+            )
     chat_message = ChatMessage(
         text=message.message,
         channel_id=message.channel_id,

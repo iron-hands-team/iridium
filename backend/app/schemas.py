@@ -428,3 +428,49 @@ class FileResponse(BaseModel):
 
 class FileUploadResponse(BaseModel):
     uploads: list[str]
+
+class SocialRequest(BaseModel):
+    id: int | None = None
+    name: str
+    link: str
+
+class SchoolRequest(BaseModel):
+    title: str
+    description: str | None = None
+    address: str | None = None
+    email: str | None = None
+    number: str | None = None
+    socials: list[SocialRequest]
+
+    class Config:
+        from_attributes = True
+
+class SchoolResponse(BaseModel):
+    logo: str
+    banner: str
+
+class ArchiveSetting(BaseModel):
+    number: int
+    duration: str
+    never: bool | None = None
+
+class SlowSetting(BaseModel):
+    number: int
+    duration: str
+    enabled: bool | None = None
+
+class CensoredSetting(BaseModel):
+    words: list[str]
+    sensitive: bool | None = None
+
+class SettingsRequest(BaseModel):
+    id: int | None = None
+    features: list[str]
+    archive: ArchiveSetting
+    messages: ArchiveSetting
+    slow: SlowSetting
+    censored: CensoredSetting
+    paused: bool | None = None
+
+    class Config:
+        from_attributes = True

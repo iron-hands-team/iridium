@@ -23,6 +23,33 @@ services:
     environment:
       GARAGE_RPC_SECRET: ${GARAGE_RPC_SECRET}
 
+  redis:
+    image: redis:7-alpine
+    container_name: redis-broker
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  celery:
+    build:
+      context: ./backend/celery
+      dockerfile: Dockerfile
+    container_name: celery-scheduler
+    command: celery -A app worker -B -l info -s /tmp/celery-beat-schedule
+    environment:
+      DATABASE_URL: postgresql://${DB_USER}:${DB_PASSWORD}@db:5432/school_db
+      CELERY_BROKER_URL: redis://redis:6379/0
+      CELERY_RESULT_BACKEND: redis://redis:6379/0
+    restart: unless-stopped
+    depends_on:
+      redis:
+        condition: service_healthy
+      db:
+        condition: service_healthy
+
   db:
     image: postgres:16-alpine
     container_name: postgres-db

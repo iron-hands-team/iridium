@@ -249,7 +249,39 @@ Auth required (any role). Fetches all uploaded files and their information.
 ### `POST /files`
 
 Admin only. Creates and replaces original files with set of new files and their data, `204` on success, `403` if not accessed by an admin.
-Body: `{ title, description?, type }`
+Body: `{ title, description?, type }[]`
+
+### `GET /school`
+
+Auth required (any role). Fetches school information, branding assets, and contact methods.
+
+### `POST /school`
+
+Admin only. Saves and uploads school information, branding assets, and contact methods and returns Garage upload URLs for the logo and banner on success, `403` if not accessed by an admin.
+Body: `{ title, description?, address?, email?, number?, socials }`
+
+---
+
+## Platform settings
+
+### `GET /settings`
+
+Admin only. Fetches platform settings for enabled features, automated tasks, and other options.
+
+### `POST /settings`
+
+Admin only. Saves all the platform settings for enabled features, automated tasks, and other options. `204` on success, `403` if not accessed by an admin.
+Body: `{ features, archive, messages, slow, censored, paused }`
+
+### `POST /pause`
+
+Admin only (requires password reverification). Pauses all backend operations and user interactions, effectively freezing/pausing the platform for maintenance, emergency, or other purposes. `204` on success, `400` if password is incorrect, `403` if not accessed by an admin.
+Body: `{ password }`
+
+### `DELETE /clear`
+
+Admin only (requires password reverification). Drops all database tables and clears everything except for the admin user performaing this very dangerous operation. `204` on success, `400` if password is incorrect, `403` if not accessed by an admin.
+Body: `{ password }`
 
 ---
 

@@ -2,13 +2,7 @@ import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { getSession } from "@/lib/auth";
 import { FaBasketball, FaUserGear } from "react-icons/fa6";
-import {
-  FaBook,
-  FaBullhorn,
-  FaInfoCircle,
-  FaClock,
-  FaFlag,
-} from "react-icons/fa";
+import { FaBook, FaBullhorn, FaInfoCircle, FaClock } from "react-icons/fa";
 import NewAnnouncement from "@/components/admin/new-announcement";
 import NewUser from "@/components/admin/new-user";
 import Btn from "@/components/ui/btn";
@@ -17,6 +11,8 @@ import NewMap from "@/components/admin/new-map";
 import NewRule from "@/components/admin/new-rule";
 import ManageLinks from "@/components/admin/manage-links";
 import ManageFiles from "@/components/admin/manage-files";
+import SchoolInfo from "@/components/admin/school-info";
+import PlatformSettings from "@/components/admin/platform-settings";
 
 const headingStyles = "text-xl font-bold flex items-center gap-x-3";
 
@@ -82,10 +78,12 @@ async function Page() {
       </div>
       <div className="flex-1 min-w-full lg:min-w-[40%] flex flex-col gap-y-5">
         <h2 className={headingStyles}>
-          <FaClock size={18} /> Schedule management
+          <FaClock size={18} /> School management
         </h2>
         <div className="border-1 border-zinc-800 px-4 py-2 flex flex-col gap-y-2">
           <Btn text="Manage schedules" link="/admin/schedule" primary />
+          <Btn text="View reports" link="/admin/reports" />
+          <PlatformSettings />
         </div>
       </div>
       <div className="flex-1 min-w-full lg:min-w-[40%] flex flex-col gap-y-5">
@@ -93,19 +91,11 @@ async function Page() {
           <FaInfoCircle size={18} /> School information
         </h2>
         <div className="border-1 border-zinc-800 px-4 py-2 flex flex-col gap-y-2">
-          {/* TODO: modal for actually putting school info like contact name and address */}
+          <SchoolInfo />
           <NewMap />
           <NewRule text="Edit rules" />
           <ManageLinks />
           <ManageFiles />
-        </div>
-        <div className="flex-1 min-w-full lg:min-w-[40%] flex flex-col gap-y-5">
-          <h2 className={headingStyles}>
-            <FaFlag size={18} /> Reports
-          </h2>
-          <div className="border-1 border-zinc-800 px-4 py-2 flex flex-col gap-y-2">
-            <Btn text="View reports" link="/admin/reports" primary />
-          </div>
         </div>
       </div>
     </div>

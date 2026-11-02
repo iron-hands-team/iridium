@@ -30,6 +30,7 @@ export const metadata: Metadata = {
   },
 };
 //TODO: add responsive design and landing/intro page for non logged in users
+//TODO: add top loading bar
 export default async function RootLayout({ children }: LayoutProps<"/">) {
   const { user } = await getSession();
 
