@@ -23,7 +23,7 @@ function ClubDetail({ club, members, currentUser, channelId }: ClubDetailProps) 
     club.favorites.includes(currentUser.username),
   );
   const router = useRouter();
-  const joined = members.some((m) => m.user.id === currentUser.id);
+  const joined = club.joined;
 
   async function handleJoin() {
     const res = await fetch(`/api/clubs/${club.id}/join`, {

@@ -4,7 +4,7 @@ import type { ReplyType } from "@/types/chat";
 import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { FaXmark } from "react-icons/fa6";
-import { FaReply } from "react-icons/fa";
+import { FaClock, FaReply } from "react-icons/fa";
 import Input from "../ui/input";
 import Btn from "../ui/btn";
 
@@ -18,6 +18,14 @@ function MessageInput({ id, replying, setReplying }: MessageInputProps) {
   const [message, setMessage] = useState<string>("");
   const [sending, setSending] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
+  const [slow, setSlow] = useState<number | null>(null);
+  const time = slow
+    ? slow > 3600
+      ? Math.floor(slow / 3600) + " hours"
+      : slow > 60
+        ? Math.floor(slow / 60) + " minutes"
+        : slow + " seconds"
+    : "";
   const inputRef = useRef<HTMLInputElement>(null);
   const router = useRouter();
 
@@ -51,6 +59,14 @@ function MessageInput({ id, replying, setReplying }: MessageInputProps) {
   useEffect(() => {
     if (replying) inputRef.current?.focus();
   }, [replying]);
+
+  useEffect(() => {
+    async function fetchSlow() {
+      const res = await fetch("/api/slow").then((res) => res.json());
+      setSlow(res); //TODO: actually add the api endpoint
+    }
+    fetchSlow();
+  }, []);
 
   return (
     <div className="relative ml-5">
@@ -88,9 +104,15 @@ function MessageInput({ id, replying, setReplying }: MessageInputProps) {
           />
         )}
       </form>
-      {error && (
-        <div className="text-red-500 text-xs absolute top-full pt-0.5">
-          {error}
+      {(slow || error) && (
+        <div className="absolute top-full pt-0.5 text-xs">
+          {slow && (
+            <div className="text-zinc-700 dark:text-zinc-300">
+              <FaClock size={13} title="Slow mode enabled" />
+              Chat slow mode enabled: wait {time} between sending messages
+            </div>
+          )}
+          {error && <div className="text-red-500">{error}</div>}
         </div>
       )}
     </div>

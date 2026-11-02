@@ -2,7 +2,7 @@ import enum
 from datetime import datetime, timezone
 
 from sqlalchemy import Column, Integer, String, Enum, Text, DateTime, Time, Date, Boolean, Float, ForeignKey, UniqueConstraint
-from sqlalchemy.dialects.postgresql import ARRAY
+from sqlalchemy.dialects.postgresql import ARRAY, JSONB
 from sqlalchemy.orm import relationship
 from app.database import Base
 
@@ -175,6 +175,7 @@ class Assignment(Base):
     class_id = Column(Integer, ForeignKey("class_sections.id"), nullable=False)
     name = Column(String, nullable=False)
     max_score = Column(Float, nullable=False, default=100)
+    due_at = Column(DateTime(timezone=True), nullable=True)
     created_at = Column(DateTime(timezone=True), default=utcnow, nullable=False)
 
     class_section = relationship("ClassSection", back_populates="assignments")
@@ -341,3 +342,28 @@ class File(Base):
     title = Column(String, nullable=False)
     description = Column(String, nullable=True)
     type = Column(Enum(FileType), nullable=False)
+
+class InfoSocial(Base):
+    __tablename__ = "socials"
+    id = Column(Integer, primary_key=True, index=True)
+    name = Column(String, nullable=False)
+    link = Column(String, nullable=False)
+    info_id = Column(Integer, ForeignKey("info.id"), nullable=False)
+    info = relationship("Info", back_populates="socials")
+
+class Info(Base):
+    __tablename__ = "info"
+    id = Column(Integer, primary_key=True, index=True)
+    title = Column(String, nullable=False)
+    description = Column(String, nullable=True)
+    address = Column(String, nullable=True)
+    email = Column(String, nullable=True)
+    number = Column(String, nullable=True)
+    socials = relationship("InfoSocial", back_populates="info")
+
+class Settings(Base):
+    __tablename__ = "settings"
+    id = Column(Integer, primary_key=True, index=True)
+    data = Column(JSONB, nullable=False, default=dict)
+    updated_at = Column(DateTime(timezone=True), default=utcnow, nullable=False)
+    

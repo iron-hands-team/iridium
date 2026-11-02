@@ -61,11 +61,13 @@ def update_announcement(
     announcement_id: int,
     updates: AnnouncementUpdateRequest,
     db: Session = Depends(get_db),
-    _staff: User = Depends(require_staff),
+    current_user: User = Depends(require_staff),
 ):
     announcement = db.query(Announcement).filter(Announcement.id == announcement_id).first()
     if announcement is None:
         raise HTTPException(status_code=404, detail="Announcement not found.")
+    if current_user.role != UserRole.admin and announcement.author_id != current_user.id:
+        raise HTTPException(status_code=403, detail="That's not your announcement.")
 
     for field, value in updates.model_dump(exclude_unset=True).items():
         setattr(announcement, field, value)
@@ -78,11 +80,13 @@ def update_announcement(
 def delete_announcement(
     announcement_id: int,
     db: Session = Depends(get_db),
-    _staff: User = Depends(require_staff),
+    current_user: User = Depends(require_staff),
 ):
     announcement = db.query(Announcement).filter(Announcement.id == announcement_id).first()
     if announcement is None:
         raise HTTPException(status_code=404, detail="Announcement not found.")
+    if current_user.role != UserRole.admin and announcement.author_id != current_user.id:
+        raise HTTPException(status_code=403, detail="That's not your announcement.")
     db.delete(announcement)
     db.commit()
 

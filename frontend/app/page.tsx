@@ -91,7 +91,7 @@ async function Page() {
       : [];
 
   return (
-    <div className="px-50 flex py-10 gap-x-15 h-[calc(100vh-53px)] overflow-y-auto pb-10">
+    <div className="px-4 sm:px-10 lg:px-50 flex flex-col lg:flex-row py-10 gap-y-8 lg:gap-x-15 lg:h-[calc(100vh-53px)] overflow-y-auto pb-10">
       <div className="flex-1 flex flex-col gap-y-5">
         <h2 className={headingStyles}>
           <FaBullhorn size={18} /> Announcements
@@ -177,7 +177,10 @@ async function Page() {
             <Link href="/staff" className={linkStyles}>
               Staff directory
             </Link>
-            {links[1].map((l) => (
+            <Link href="/school" className={linkStyles}>
+              School information
+            </Link>
+            {links[0].map((l) => (
               <Link
                 key={l.id}
                 href={l.href}
@@ -195,7 +198,7 @@ async function Page() {
             <Link href="/files" className={linkStyles}>
               Files
             </Link>
-            {links[0].map((l) => (
+            {links[1].map((l) => (
               <Link
                 key={l.id}
                 href={l.href}

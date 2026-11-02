@@ -8,6 +8,7 @@ export interface ClubType {
   sponsorId?: number;
   categories: string[];
   favorites: string[];
+  joined: boolean;
 }
 
 export type ClubResponse = ClubType & {

@@ -6,9 +6,6 @@ import ToastProvider from "@/components/layout/toast-provider";
 import LoginForm from "@/components/auth/login-form";
 import Nav from "@/components/layout/nav";
 
-import BodyClassTeacher from "@/components/classLayout/classTeacherBody";
-import BodyClubSystem from "@/components/club/clubSystemBody";
-import BusSchool from "@/components/busSystem/busSchoolBody";
 import "./globals.css";
 import ClubManagerSystem from "@/components/club/clubManagerSystem";
 
@@ -34,6 +31,7 @@ export const metadata: Metadata = {
   },
 };
 //TODO: add responsive design and landing/intro page for non logged in users
+//TODO: add top loading bar
 export default async function RootLayout({ children }: LayoutProps<"/">) {
   const { user } = await getSession();
 

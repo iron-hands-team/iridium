@@ -2,13 +2,7 @@ import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { getSession } from "@/lib/auth";
 import { FaBasketball, FaUserGear } from "react-icons/fa6";
-import {
-  FaBook,
-  FaBullhorn,
-  FaInfoCircle,
-  FaClock,
-  FaFlag,
-} from "react-icons/fa";
+import { FaBook, FaBullhorn, FaInfoCircle, FaClock } from "react-icons/fa";
 import NewAnnouncement from "@/components/admin/new-announcement";
 import NewUser from "@/components/admin/new-user";
 import Btn from "@/components/ui/btn";
@@ -17,6 +11,8 @@ import NewMap from "@/components/admin/new-map";
 import NewRule from "@/components/admin/new-rule";
 import ManageLinks from "@/components/admin/manage-links";
 import ManageFiles from "@/components/admin/manage-files";
+import SchoolInfo from "@/components/admin/school-info";
+import PlatformSettings from "@/components/admin/platform-settings";
 
 const headingStyles = "text-xl font-bold flex items-center gap-x-3";
 
@@ -43,8 +39,8 @@ async function Page() {
   if (user.role !== "admin") redirect("/");
 
   return (
-    <div className="px-50 py-10 flex justify-center gap-10 flex-wrap">
-      <div className="flex-1 min-w-[40%] flex flex-col gap-y-5">
+    <div className="px-4 sm:px-10 lg:px-50 py-10 flex justify-center gap-10 flex-wrap">
+      <div className="flex-1 min-w-full lg:min-w-[40%] flex flex-col gap-y-5">
         <h2 className={headingStyles}>
           <FaUserGear size={18} /> User management
         </h2>
@@ -53,7 +49,7 @@ async function Page() {
           <NewUser styles="w-full" />
         </div>
       </div>
-      <div className="flex-1 min-w-[40%] flex flex-col gap-y-5">
+      <div className="flex-1 min-w-full lg:min-w-[40%] flex flex-col gap-y-5">
         <h2 className={headingStyles}>
           <FaBullhorn size={18} /> Announcement management
         </h2>
@@ -62,7 +58,7 @@ async function Page() {
           <Btn text="View announcements" link="/admin/announcements" />
         </div>
       </div>
-      <div className="flex-1 min-w-[40%] flex flex-col gap-y-5">
+      <div className="flex-1 min-w-full lg:min-w-[40%] flex flex-col gap-y-5">
         <h2 className={headingStyles}>
           <FaBasketball size={18} /> Club management
         </h2>
@@ -71,7 +67,7 @@ async function Page() {
           <NewClub primary full />
         </div>
       </div>
-      <div className="flex-1 min-w-[40%] flex flex-col gap-y-5">
+      <div className="flex-1 min-w-full lg:min-w-[40%] flex flex-col gap-y-5">
         <h2 className={headingStyles}>
           <FaBook size={18} /> Class management
         </h2>
@@ -80,32 +76,26 @@ async function Page() {
           <Btn text="Add class" />
         </div>
       </div>
-      <div className="flex-1 min-w-[40%] flex flex-col gap-y-5">
+      <div className="flex-1 min-w-full lg:min-w-[40%] flex flex-col gap-y-5">
         <h2 className={headingStyles}>
-          <FaClock size={18} /> Schedule management
+          <FaClock size={18} /> School management
         </h2>
         <div className="border-1 border-zinc-800 px-4 py-2 flex flex-col gap-y-2">
           <Btn text="Manage schedules" link="/admin/schedule" primary />
+          <Btn text="View reports" link="/admin/reports" />
+          <PlatformSettings />
         </div>
       </div>
-      <div className="flex-1 min-w-[40%] flex flex-col gap-y-5">
+      <div className="flex-1 min-w-full lg:min-w-[40%] flex flex-col gap-y-5">
         <h2 className={headingStyles}>
           <FaInfoCircle size={18} /> School information
         </h2>
         <div className="border-1 border-zinc-800 px-4 py-2 flex flex-col gap-y-2">
-          {/* TODO: modal for actually putting school info like contact name and address */}
+          <SchoolInfo />
           <NewMap />
           <NewRule text="Edit rules" />
           <ManageLinks />
           <ManageFiles />
-        </div>
-        <div className="flex-1 min-w-[40%] flex flex-col gap-y-5">
-          <h2 className={headingStyles}>
-            <FaFlag size={18} /> Reports
-          </h2>
-          <div className="border-1 border-zinc-800 px-4 py-2 flex flex-col gap-y-2">
-            <Btn text="View reports" link="/admin/reports" primary />
-          </div>
         </div>
       </div>
     </div>

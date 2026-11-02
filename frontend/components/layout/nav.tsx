@@ -9,8 +9,7 @@ import NavSearch from "./nav-search";
 import Notifications from "./notifications";
 import Link from "next/link";
 import Image from "next/image";
-
-const navLinkStyles = "px-2 py-1.5 text-sm";
+import NavLinks, { type NavLink } from "./nav-links";
 
 async function Nav() {
   const { user, cookie } = await getSession();
@@ -63,6 +62,25 @@ async function Nav() {
   const notifications: NotificationType[] =
     notificationsRaw.map(parseNotification);
 
+  const links: NavLink[] = [
+    ...(user.role === "admin" ? [{ href: "/admin", label: "Manage" }] : []),
+    ...(user.role !== "student" ? [{ href: "/classes", label: "Classes" }] : []),
+    { href: "/schedule", label: "Schedule" },
+    ...(user.role === "student"
+      ? [
+          { href: "/grades", label: "Grades" },
+          { href: "/attendance", label: "Attendance" },
+        ]
+      : []),
+    ...(user.role === "teacher"
+      ? [{ href: "/admin/reports", label: "View reports" }]
+      : []),
+    { href: "/calendar", label: "Calendar" },
+    { href: "/clubs", label: "Clubs" },
+    { href: "/messages", label: "Messages", badge: unreadCount },
+    { href: "/chat", label: "Chat" },
+  ];
+
   return (
     <div className="sticky top-0 z-10 bg-zinc-100 dark:bg-zinc-950 border-b-1 border-zinc-800">
       <nav className="flex items-center gap-x-2 py-2 px-3 sm:px-10 lg:px-50 max-w-450 mx-auto">
@@ -79,63 +97,16 @@ async function Nav() {
           />
           Iridium
         </Link>
-        <NavSearch />
-        {user.role === "admin" && (
-          <Link href="/admin" className={navLinkStyles}>
-            Manage
-          </Link>
-        )}
-        {user.role !== "student" && (
-          <Link href="/classes" className={navLinkStyles}>
-            Classes
-          </Link>
-        )}
-        <Link href="/schedule" className={navLinkStyles}>
-          Schedule
-        </Link>
-        {user.role === "student" && (
-          <Link href="/grades" className={navLinkStyles}>
-            Grades
-          </Link>
-        )}
-        {user.role === "student" && (
-          <Link href="/attendance" className={navLinkStyles}>
-            Attendance
-          </Link>
-        )}
-        {user.role === "teacher" && (
-          <Link href="/admin/reports" className={navLinkStyles}>
-            View reports
-          </Link>
-        )}
-        <Link href="/calendar" className={navLinkStyles}>
-          Calendar
-        </Link>
-        <Link href="/clubs" className={navLinkStyles}>
-          Clubs
-        </Link>
-        <Link
-          href="/messages"
-          className={navLinkStyles + " flex items-center gap-x-1"}
-        >
-          Messages
-          {unreadCount > 0 && (
-            <span className="text-xs bg-red-500 text-white rounded-full px-1.5">
-              {unreadCount}
-            </span>
-          )}
-        </Link>
-        <Link href="/chat" className={navLinkStyles}>
-          Chat
-        </Link>
+        <NavSearch/>
+        <div className="flex-1"/>
+        <NavLinks links={links}/>
         <Notifications
           notifications={notifications}
           unreadCount={unreadNotificationCount}
         />
-        <NavUser user={user} />
+        <NavUser user={user}/>
       </nav>
     </div>
   );
 }
-
 export default Nav;

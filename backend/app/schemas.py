@@ -1,6 +1,6 @@
 from datetime import datetime, time, date
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from app.models import UserRole
 
 class LoginRequest(BaseModel):
@@ -8,8 +8,8 @@ class LoginRequest(BaseModel):
     password: str
 
 class UserCreateRequest(BaseModel):
-    username: str
-    password: str
+    username: str = Field(min_length=1, max_length=40)
+    password: str = Field(min_length=10, max_length=128)
     role: UserRole
     first_name: str
     last_name: str
@@ -57,7 +57,7 @@ class UserUpdateRequest(BaseModel):
     requesting: bool | None = None
 
 class ResetPasswordRequest(BaseModel):
-    password: str | None = None
+    password: str | None = Field(default=None, min_length=10, max_length=128)
     clear: bool | None = None
 
 class UploadResponse(BaseModel):
@@ -69,8 +69,8 @@ class TokenResponse(BaseModel):
     user: UserResponse
 
 class AnnouncementCreateRequest(BaseModel):
-    title: str
-    content: str
+    title: str = Field(max_length=200)
+    content: str = Field(max_length=10000)
     pinned: bool = False
     role: str = "all"
 
@@ -115,6 +115,7 @@ class ClubResponse(BaseModel):
     sponsor_id: int | None = None
     categories: list[str]
     favorites: list[str] = []
+    joined: bool = False
 
     class Config:
         from_attributes = True
@@ -253,7 +254,7 @@ class AssignmentResponse(BaseModel):
         from_attributes = True
 
 class GradeUpdateRequest(BaseModel):
-    score: float | None = None
+    score: float | None = Field(default=None, ge=0)
 
 class SubmissionResponse(BaseModel):
     id: int
@@ -303,8 +304,8 @@ class StudentClassAttendance(BaseModel):
 
 class MessageCreateRequest(BaseModel):
     recipient_username: str
-    subject: str
-    body: str
+    subject: str = Field(max_length=200)
+    body: str = Field(max_length=10000)
 
 class MessageResponse(BaseModel):
     id: int
@@ -388,7 +389,7 @@ class ChannelCreateResponse(BaseModel):
     id: int
 
 class MessageSendRequest(BaseModel):
-    message: str
+    message: str = Field(max_length=4000)
     channel_id: int | None = None
     replying: int | None = None
 
@@ -427,3 +428,49 @@ class FileResponse(BaseModel):
 
 class FileUploadResponse(BaseModel):
     uploads: list[str]
+
+class SocialRequest(BaseModel):
+    id: int | None = None
+    name: str
+    link: str
+
+class SchoolRequest(BaseModel):
+    title: str
+    description: str | None = None
+    address: str | None = None
+    email: str | None = None
+    number: str | None = None
+    socials: list[SocialRequest]
+
+    class Config:
+        from_attributes = True
+
+class SchoolResponse(BaseModel):
+    logo: str
+    banner: str
+
+class ArchiveSetting(BaseModel):
+    number: int
+    duration: str
+    never: bool | None = None
+
+class SlowSetting(BaseModel):
+    number: int
+    duration: str
+    enabled: bool | None = None
+
+class CensoredSetting(BaseModel):
+    words: list[str]
+    sensitive: bool | None = None
+
+class SettingsRequest(BaseModel):
+    id: int | None = None
+    features: list[str]
+    archive: ArchiveSetting
+    messages: ArchiveSetting
+    slow: SlowSetting
+    censored: CensoredSetting
+    paused: bool | None = None
+
+    class Config:
+        from_attributes = True

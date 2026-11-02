@@ -95,6 +95,16 @@ def set_grade(
 ):
     assignment = get_owned_assignment(assignment_id, db, current_user)
 
+    enrolled = (
+        db.query(ClassEnrollment)
+        .filter(ClassEnrollment.class_id == assignment.class_id, ClassEnrollment.student_id == student_id)
+        .first()
+    )
+    if enrolled is None:
+        raise HTTPException(status_code=404, detail="Student is not in this class.")
+    if updates.score is not None and updates.score > assignment.max_score:
+        raise HTTPException(status_code=400, detail="Score is higher than the assignment's max score")
+    
     grade = (
         db.query(Grade)
         .filter(Grade.assignment_id == assignment.id, Grade.student_id == student_id)

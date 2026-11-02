@@ -134,6 +134,80 @@ export const newFileSchema = z.array(
     }),
 );
 
+export const newSchoolSchema = z.object({
+  id: z.number().optional(),
+  title: z.string().trim().min(1, "Please enter a name"),
+  description: z.string().optional().nullable(),
+  logo: z.file().optional(),
+  banner: z.file().optional(),
+  address: z.string().optional().nullable(),
+  email: z.email("Please enter a valid email").optional().nullable(), //TODO: add principle
+  number: z
+    .string()
+    .trim()
+    .min(10, "Please enter a valid phone number")
+    .superRefine((n, ctx) => {
+      if (Number(n) % 1 !== 0)
+        ctx.addIssue("Please enter a valid phone number");
+    })
+    .optional()
+    .nullable(),
+  socials: z.array(
+    z.object({
+      id: z.number().optional(),
+      name: z.string().trim().min(1, "Please enter a social name"),
+      link: z
+        .string()
+        .transform((h) =>
+          h.includes("http://") || h.includes("https://") ? h : "https://" + h,
+        )
+        .pipe(
+          z.url({
+            hostname: z.regexes.domain,
+            error: "Please enter a valid social URL",
+          }),
+        ),
+    }),
+  ),
+});
+
+export const settingsSchema = z.object({
+  id: z.number().optional(),
+  features: z.array(z.string()),
+  archive: z.object({
+    number: z
+      .number()
+      .int("Archive time has to be an integer")
+      .min(1, "Archive time has to be at least 1")
+      .max(30),
+    duration: z.string(),
+    never: z.boolean(),
+  }),
+  messages: z.object({
+    number: z
+      .number()
+      .int("Delete time has to be an integer")
+      .min(1, "Delete time has to be at least 1")
+      .max(30),
+    duration: z.string(),
+    never: z.boolean(),
+  }),
+  slow: z.object({
+    number: z
+      .number()
+      .int("Slow mode time has to be an integer")
+      .min(1, "Slow mode time has to be at least 1")
+      .max(59),
+    duration: z.string(),
+    enabled: z.boolean(),
+  }),
+  censored: z.object({
+    words: z.array(z.string().trim().min(1, "Please enter a valid word")),
+    sensitive: z.boolean(),
+  }),
+  paused: z.boolean().optional().nullable(),
+});
+
 export type LoginType = z.infer<typeof loginSchema>;
 export type PostType = z.infer<typeof postSchema>;
 export type NewUserType = z.infer<typeof newUserSchema>;
@@ -149,6 +223,8 @@ export type FileType = Omit<z.infer<typeof newFileSchema.element>, "file"> & {
   file?: File;
 };
 export type FileOptionType = z.infer<typeof fileTypes>;
+export type SchoolType = z.infer<typeof newSchoolSchema>;
+export type SettingsType = z.infer<typeof settingsSchema>;
 
 export const reportOptions = reportTypes.options;
 export const fileOptions = fileTypes.options;

@@ -14,7 +14,9 @@ from app.models import (
     Report,
     Link,
     File,
-    NotificationType
+    NotificationType,
+    InfoSocial,
+    Info,
 )
 from app.schemas import (
     MapUploadResponse,
@@ -27,6 +29,8 @@ from app.schemas import (
     LinkResponse,
     FileResponse,
     FileUploadResponse,
+    SchoolRequest,
+    SchoolResponse,
 )
 from app.dependencies import require_admin, manager
 from app.s3 import s3_client, s3_internal, BUCKET_NAME, ENDPOINT
@@ -114,9 +118,9 @@ def get_search(
     db: Session = Depends(get_db),
     current_user: User = Depends(manager),
 ):
-    if l == 0 or q == "":
+    if l <= 0 or q == "":
         raise HTTPException(
-            status_code=501, detail="Please provide a valid seaarch query and limit"
+            status_code=400, detail="Please provide a valid seaarch query and limit"
         )
     limit = 20 if l > 20 else l
     query = f"%{q}%"
@@ -130,7 +134,7 @@ def get_search(
                 User.title.ilike(query),
             )
         )
-        .limit(l)
+        .limit(limit)
         .all()
     )
     announcements = (
@@ -147,13 +151,13 @@ def get_search(
                 Announcement.content.ilike(query),
             ),
         )
-        .limit(l)
+        .limit(limit)
         .all()
     )
     events = (
         db.query(Event)
         .filter(or_(Event.title.ilike(query), Event.description.ilike(query)))
-        .limit(l)
+        .limit(limit)
         .all()
     )
     clubs = (
@@ -165,12 +169,12 @@ def get_search(
                 func.array_to_string(Club.categories, " ").ilike(query),
             )
         )
-        .limit(l)
+        .limit(limit)
         .all()
     )
 
     classes = (
-        db.query(ClassSection).filter(ClassSection.name.ilike(query)).limit(l).all()
+        db.query(ClassSection).filter(ClassSection.name.ilike(query)).limit(limit).all()
     )
 
     return {
@@ -209,6 +213,7 @@ def get_reports(
         for r in reports
     ]
 
+
 @router.post("/reports", status_code=204)
 def submit_report(
     report: ReportResponse,
@@ -235,6 +240,7 @@ def submit_report(
         )
     db.commit()
 
+
 @router.delete("/reports/{report_id}", status_code=204)
 def delete_report(
     report_id: int,
@@ -247,6 +253,7 @@ def delete_report(
     db.delete(report)
     db.commit()
 
+
 @router.post("/reports/{report_id}", response_model=ReportResponse)
 def resolved_report(
     report_id: int,
@@ -255,11 +262,12 @@ def resolved_report(
 ):
     report = db.query(Report).filter(Report.id == report_id).first()
     if report is None:
-            raise HTTPException(status_code=404, detail="Report not found.")
+        raise HTTPException(status_code=404, detail="Report not found.")
     report.resolved = not report.resolved
     db.commit()
     db.refresh(report)
     return report
+
 
 @router.get("/links", response_model=list[LinkResponse])
 def get_links(db: Session = Depends(get_db), _current_user: User = Depends(manager)):
@@ -291,7 +299,7 @@ def get_files(db: Session = Depends(get_db), _current_user: User = Depends(manag
 def upload_files(
     files: list[FileResponse],
     db: Session = Depends(get_db),
-    _current_user: User = Depends(manager),
+    _current_user: User = Depends(require_admin),
 ):
     db.query(File).delete()
 
@@ -312,3 +320,46 @@ def upload_files(
     db.commit()
 
     return {"uploads": uploads}
+
+
+@router.get("/school", response_model=SchoolRequest)
+def get_school(db: Session = Depends(get_db), _current_user=Depends(manager)):
+    school = db.query(Info).first()
+    return school
+
+
+@router.post("/school", SchoolResponse)
+def save_school(
+    school: SchoolRequest,
+    db: Session = Depends(get_db),
+    _current_user=Depends(require_admin),
+):
+    db.query(Info).delete()
+    db.query(InfoSocial).delete()
+    info = Info(
+        title=school.title,
+        description=school.description,
+        address=school.address,
+        email=school.email,
+        number=school.number,
+    )
+    db.add(info)
+
+    logo_url = s3_client.generate_presigned_url(
+        ClientMethod="put_object",
+        Params={"Bucket": BUCKET_NAME, "Key": "school/logo"},
+        ExpiresIn=120,
+    ).replace(ENDPOINT, "")
+    banner_url = s3_client.generate_presigned_url(
+        ClientMethod="put_object",
+        Params={"Bucket": BUCKET_NAME, "Key": "school/banner"},
+        ExpiresIn=120,
+    ).replace(ENDPOINT, "")
+
+    new_socials = []
+    for social in school.socials:
+        new_socials.append(InfoSocial(name=social.name, link=social.link))
+    db.add_all(new_socials)
+    db.commit()
+
+    return {"logo": logo_url, "banner": banner_url}

@@ -28,7 +28,7 @@ async function Page({ params }: { params: Promise<{ username: string }> }) {
   const user = parseUser(userData);
 
   return (
-    <div className="flex gap-x-10 px-50 py-10">
+    <div className="flex flex-col md:flex-row gap-y-6 md:gap-x-10 px-4 sm:px-10 lg:px-50 py-10">
       <div className="border border-zinc-800 w-70 flex flex-col gap-y-5 p-5 text-sm">
         <Avatar
           image={user.image ? profileUrl(user.username) : undefined}

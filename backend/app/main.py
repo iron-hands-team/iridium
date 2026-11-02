@@ -1,5 +1,8 @@
 import os
-from fastapi import Depends, FastAPI, HTTPException, Response
+from fastapi import Depends, FastAPI, HTTPException, Request, Response
+from slowapi import _rate_limit_exceeded_handler
+from app.limiter import limiter
+from slowapi.errors import RateLimitExceeded
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy import text
 from sqlalchemy.orm import Session
@@ -16,7 +19,14 @@ from app.routers import users, announcements, clubs, events, schedule, classes, 
 IS_PROD = os.getenv("ENVIRONMENT", "development") == "production"
 FRONTEND_URL = os.getenv("FRONTEND_URL", "http://localhost:3000")
 
-app = FastAPI(title="Iridium API")
+app = FastAPI(
+    title="Iridium API",
+    docs_url=None if IS_PROD else "/docs",
+    redoc_url=None,
+    openapi_url=None if IS_PROD else "/openapi.json",
+)
+app.state.limiter = limiter
+app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 
 app.add_middleware(
         CORSMiddleware,
@@ -34,7 +44,6 @@ app.include_router(schedule.router)
 app.include_router(classes.router)
 app.include_router(info.router)
 app.include_router(grades.router)
-app.include_router(attendance.router)
 app.include_router(attendance.router)
 app.include_router(messages.router)
 app.include_router(chat.router)
@@ -55,11 +64,17 @@ def health_db(db: Session=Depends(get_db)):
 
 #TODO: add health endpoint for garage storage
 
+DUMMY_HASH = hash_password("not-a-real-password")
+
 @app.post("/login", response_model=TokenResponse)
-def login(credentials: LoginRequest,response:Response, db: Session = Depends(get_db)):
+@limiter.limit("5/minute")
+def login(request: Request, credentials: LoginRequest, response: Response, db: Session = Depends(get_db)):
     user = db.query(User).filter(User.username == credentials.username).first()
 
-    if user is None or not verify_password(credentials.password, user.hashed_password):
+    password_ok = verify_password(
+        credentials.password, user.hashed_password if user else DUMMY_HASH
+    )
+    if user is None or not password_ok:
         raise HTTPException(status_code=401, detail='Incorrect username or password')
 
     token = manager.create_access_token(data={"sub":user.username})

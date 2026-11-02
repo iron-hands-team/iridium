@@ -16,7 +16,7 @@ function ChannelSidebar({
   showNewChannelBtn,
 }: ChannelSidebarProps) {
   return (
-    <div className="w-60 py-3 pr-5 border-r border-zinc-800 flex flex-col gap-y-3 h-[calc(100vh-57px)] overflow-auto">
+    <div className="w-28 sm:w-60 py-3 pr-2 sm:pr-5 border-r border-zinc-800 flex flex-col gap-y-3 h-[calc(100vh-57px)] overflow-auto">
       <h2 className="font-bold text-lg px-4 my-2">Channels</h2>
       {channels.length > 0 ? (
         channels.map((c) => (
