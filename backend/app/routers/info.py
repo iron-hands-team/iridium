@@ -328,7 +328,7 @@ def get_school(db: Session = Depends(get_db), _current_user=Depends(manager)):
     return school
 
 
-@router.post("/school", SchoolResponse)
+@router.post("/school", response_model=SchoolResponse)
 def save_school(
     school: SchoolRequest,
     db: Session = Depends(get_db),
