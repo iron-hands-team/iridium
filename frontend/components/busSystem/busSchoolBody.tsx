@@ -5,7 +5,7 @@ import {bs} from "@/lib/busStore";
 
 import Header from "@/components/layout/header";
 import Btn from "@/components/ui/btn";
-import AboutPopup from "@/components/layout/busesAboutPopup";
+import AboutPopup from "@/components/busSystem/busesAboutPopup";
 
 // school's account
 

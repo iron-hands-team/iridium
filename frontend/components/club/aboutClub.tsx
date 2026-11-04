@@ -11,7 +11,8 @@ export default function aboutClub() {
 
  return (
    <div className="fixed inset-0 flex h-full w-full justify-center items-center bg-black/90" onClick={()=>setAboutPopup(false)}>
-    <div className="h-[750px] w-3/4 z-10 overflow-y-auto flex flex-col justify-start items-start border-1 border-zinc-400 bg-black text-[30px] p-[10px] " onClick={(e)=>e.stopPropagation()}>
+    <div className="h-[750px] w-3/4 z-10 overflow-y-auto flex flex-col justify-start items-start border-1 border-zinc-400 bg-black text-[20px] p-[10px] relative" onClick={(e)=>e.stopPropagation()}>
+      <button onClick={()=>setAboutPopup(false)}  className="cursor-pointer absolute top-5 right-5 border-1 border-zinc-600 p-[10px]"><p>Exit</p></button>
      <p className="text-[45px]">Club Dasboard help:</p>
      <p>Note: This is for the school system, not for teacher nor students</p>
      <br></br>

@@ -6,6 +6,8 @@ import { redirect } from "next/navigation";
 import { parseUser } from "@/lib/helpers";
 import Clubs from "./clubs";
 
+
+
 export const metadata: Metadata = {
   title: "Manage Clubs",
   description:
@@ -48,7 +50,7 @@ async function Page() {
       </h2>
       <Clubs clubs={clubs} />
     </div>
-  );
+  );*/
 }
 
 export default Page;
