@@ -27,6 +27,7 @@ class User(Base):
     title = Column(String, nullable=False)
     requesting = Column(Boolean, nullable=True)
     requesting_delete = Column(Boolean, nullable=True)
+    token_version = Column(Integer, nullable=False, default=0, server_default="0")
 
     announcements = relationship("Announcement", back_populates="author", cascade="all, delete-orphan")
     clubs_sponsored = relationship("Club", back_populates="sponsor")

@@ -77,7 +77,7 @@ def login(request: Request, credentials: LoginRequest, response: Response, db: S
     if user is None or not password_ok:
         raise HTTPException(status_code=401, detail='Incorrect username or password')
 
-    token = manager.create_access_token(data={"sub":user.username})
+    token = manager.create_access_token(data={"sub":f"{user.username}:{user.token_version}"})
 
     response.set_cookie(key="access-token",value=token,httponly=True,samesite="lax",secure=IS_PROD) # TODO: increase expiration time?
 
@@ -88,7 +88,15 @@ def read_current_user(current_user: User = Depends(manager)):
     return current_user
 
 @app.post("/logout")
-def logout(response: Response):
+def logout(
+    response: Response,
+    db: Session = Depends(get_db),
+    current_user: User | None = Depends(manager.optional),
+):
+    if current_user is not None:
+        user = db.query(User).filter(User.id == current_user.id).first()
+        user.token_version += 1
+        db.commit()
     response.delete_cookie(key="access-token")
     return {"message": "Logged out."}
 
