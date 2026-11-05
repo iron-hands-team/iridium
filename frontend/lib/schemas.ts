@@ -208,6 +208,19 @@ export const settingsSchema = z.object({
   paused: z.boolean().optional().nullable(),
 });
 
+export const guideSchema = z.object({
+  id: z.number().optional(),
+  title: z.string().trim().min(1, "Please enter a valid title"),
+  description: z.string().optional().nullable(),
+  sections: z.array(
+    z.object({
+      subheading: z.string().trim().min(1, "Please enter a valid subheading"),
+      text: z.string().trim().min(1, "Please enter valid text"),
+    }),
+  ),
+  label: z.string().optional().nullable(),
+});
+
 export type LoginType = z.infer<typeof loginSchema>;
 export type PostType = z.infer<typeof postSchema>;
 export type NewUserType = z.infer<typeof newUserSchema>;
@@ -225,6 +238,7 @@ export type FileType = Omit<z.infer<typeof newFileSchema.element>, "file"> & {
 export type FileOptionType = z.infer<typeof fileTypes>;
 export type SchoolType = z.infer<typeof newSchoolSchema>;
 export type SettingsType = z.infer<typeof settingsSchema>;
+export type GuideType = z.infer<typeof guideSchema>;
 
 export const reportOptions = reportTypes.options;
 export const fileOptions = fileTypes.options;

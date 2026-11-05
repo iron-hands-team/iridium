@@ -474,3 +474,27 @@ class SettingsRequest(BaseModel):
 
     class Config:
         from_attributes = True
+
+class GuideSection(BaseModel):
+    subheading: str
+    text: str
+
+class GuideRequest(BaseModel):
+    id: int | None = None
+    title: str
+    description: str | None = None
+    sections: list[GuideSection]
+    label: str | None = None
+
+    class Config:
+        from_attributes = True
+
+class GuideEditRequest(BaseModel):
+    id: int | None = None
+    title: str | None = None
+    description: str | None = None
+    sections: list[GuideSection]
+    label: str | None = None
+
+    class Config:
+        from_attributes = True

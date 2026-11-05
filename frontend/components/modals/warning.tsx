@@ -51,7 +51,7 @@ function WarningModal({
         <div className="flex gap-x-3">
           <Btn
             text={loading ? "Loading..." : "Confirm"}
-            onclick={() => (password ? password(pass) : confirm)}
+            onclick={() => (password ? password(pass) : confirm())}
             styles="text-sm bg-red-500! border-red-500! text-white!"
             primary
           />

@@ -5,7 +5,6 @@ import { ThemeProvider } from "next-themes";
 import ToastProvider from "@/components/layout/toast-provider";
 import LoginForm from "@/components/auth/login-form";
 import Nav from "@/components/layout/nav";
-
 import "./globals.css";
 
 const inter = Inter({

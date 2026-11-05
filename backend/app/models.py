@@ -367,4 +367,13 @@ class Settings(Base):
     id = Column(Integer, primary_key=True, index=True)
     data = Column(JSONB, nullable=False, default=dict)
     updated_at = Column(DateTime(timezone=True), default=utcnow, nullable=False)
+
+class Guide(Base):
+    __tablename__ = "guides"
+    id = Column(Integer, primary_key=True, index=True)
+    title = Column(String, nullable=False)
+    description = Column(String, nullable=True)
+    sections = Column(JSONB, nullable=False, default=list)
+    label = Column(String, nullable=True)
+    created_at = Column(DateTime(timezone=True), default=utcnow, nullable=False)
     
