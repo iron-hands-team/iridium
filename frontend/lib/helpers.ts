@@ -3,6 +3,7 @@ import type {
   NotificationResponse,
   NotificationType,
 } from "@/types/notification";
+import { redirect } from "next/navigation";
 
 export function parseNotification(n: NotificationResponse): NotificationType {
   return {
@@ -52,4 +53,23 @@ export function getTime(time: Date) {
   return time.getTime() > new Date(now.toLocaleDateString()).getTime()
     ? time.toLocaleTimeString([], { hour: "numeric", minute: "2-digit" })
     : time.toLocaleDateString();
+}
+
+export async function getEnabled(feature: string, cookie: string) {
+  const enabled: string[] = await fetch(
+    `${process.env.INTERNAL_API_URL}/settings`,
+    {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${cookie}`,
+        "Content-Type": "application/json",
+      },
+      cache: "no-store",
+    },
+  )
+    .then((res) => res.json())
+    .then((data) => (data && data.id ? data.features : null));
+  if (enabled && !enabled.find((f) => f === feature)) {
+    redirect("/");
+  }
 }

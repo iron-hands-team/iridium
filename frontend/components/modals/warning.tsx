@@ -41,6 +41,7 @@ function WarningModal({
             placeholder="Enter your password"
             value={pass}
             setValue={(p) => setPass(p)}
+            type="password"
           />
         )}
         {error && (

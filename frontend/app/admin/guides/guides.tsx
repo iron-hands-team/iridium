@@ -19,7 +19,6 @@ function Guides({ guides }: { guides: GuideType[] }) {
     name: sorts[1],
     ascending: false,
   });
-  console.log(guides);
   const displayed = guides
     ?.filter((g) =>
       [g.id, g.title, g.description, g.label]

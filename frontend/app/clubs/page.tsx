@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import type { ClubResponse, ClubType } from "@/types/clubs";
 import { FaBasketball } from "react-icons/fa6";
 import { getSession } from "@/lib/auth";
-import { parseUser } from "@/lib/helpers";
+import { getEnabled, parseUser } from "@/lib/helpers";
 import Clubs from "./clubs";
 
 export const metadata: Metadata = {
@@ -21,9 +21,10 @@ export const metadata: Metadata = {
     images: [{ url: "/logo.png", width: 100, height: 100 }],
     type: "website",
   },
-};                                                                                      
+};
 async function Page() {
   const { cookie } = await getSession();
+  await getEnabled("Clubs", cookie.value);
   const clubs: ClubType[] = (
     await fetch(`${process.env.INTERNAL_API_URL}/clubs`, {
       method: "GET",
