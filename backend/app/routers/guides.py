@@ -11,11 +11,7 @@ router = APIRouter(prefix="/guides", tags=["guides"])
 
 @router.get("", response_model=list[GuideRequest])
 def get_guides(db: Session = Depends(get_db), _current_user=Depends(manager)):
-    guides = db.query(Guide).all()
-    return guides
-    for guide in guides:
-        guide = GuideRequest.model_validate(guide)
-    return guides
+    return db.query(Guide).order_by(Guide.created_at, Guide.id).all()
 
 
 @router.post("", status_code=204)
@@ -48,7 +44,11 @@ def edit_guide(
         raise HTTPException(
             status_code=404, detail=f"Guide with ID {guide_id} not found."
         )
-    for field, value in updates.model_dump(exclude_unset=True).items():
+    data = updates.model_dump(mode="json", exclude_unset=True)
+    for required in ("title", "sections"):
+        if required in data and data[required] is None:
+            raise HTTPException(status_code=422, detail=f"{required} can't be empty.")
+    for field, value in data.items():
         setattr(existing, field, value)
     db.commit()
 

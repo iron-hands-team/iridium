@@ -476,25 +476,24 @@ class SettingsRequest(BaseModel):
         from_attributes = True
 
 class GuideSection(BaseModel):
-    subheading: str
-    text: str
+    subheading: str = Field(max_length=200)
+    text: str = Field(max_length=10000)
 
 class GuideRequest(BaseModel):
     id: int | None = None
-    title: str
-    description: str | None = None
-    sections: list[GuideSection]
-    label: str | None = None
+    title: str = Field(max_length=200)
+    description: str | None = Field(default=None, max_length=1000)
+    sections: list[GuideSection] = Field(max_length=50)
+    label: str | None = Field(default=None, max_length=50)
 
     class Config:
         from_attributes = True
 
 class GuideEditRequest(BaseModel):
-    id: int | None = None
-    title: str | None = None
-    description: str | None = None
-    sections: list[GuideSection]
-    label: str | None = None
+    title: str | None = Field(default=None, min_length=1, max_length=200)
+    description: str | None = Field(default=None, max_length=1000)
+    sections: list[GuideSection] | None = Field(default=None, max_length=50)
+    label: str | None = Field(default=None, max_length=50)
 
     class Config:
         from_attributes = True
