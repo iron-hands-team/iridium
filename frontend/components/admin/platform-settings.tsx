@@ -31,6 +31,7 @@ function PlatformSettings() {
   const [settings, setSettings] = useState<SettingsType>({
     features,
     archive: { number: 30, duration: "Days", never: false },
+    posts: { number: 30, duration: "Days", never: true },
     messages: { number: 30, duration: "Days", never: false },
     slow: { number: 30, duration: "Seconds", enabled: false },
     censored: { words: [], sensitive: false },
@@ -218,6 +219,47 @@ function PlatformSettings() {
                           setSettings({
                             ...settings,
                             archive: { ...settings.archive, duration },
+                          })
+                        }
+                        values={durations}
+                        right
+                      />
+                    </div>
+                  )}
+                </div>
+              </div>
+              <div className={labelStyles}>
+                Auto-delete archived announcements after
+                <div className="flex flex-col gap-y-2">
+                  <Checkbox
+                    text="Never"
+                    checked={settings.posts.never}
+                    setChecked={(never) =>
+                      setSettings({
+                        ...settings,
+                        posts: { ...settings.posts, never },
+                      })
+                    }
+                  />
+                  {!settings.posts.never && (
+                    <div className="flex gap-x-3">
+                      <Input
+                        type="number"
+                        value={settings.posts.number.toString()}
+                        setValue={(n) =>
+                          setSettings({
+                            ...settings,
+                            posts: { ...settings.posts, number: Number(n) },
+                          })
+                        }
+                        full
+                      />
+                      <Dropdown
+                        value={settings.posts.duration}
+                        setValue={(duration) =>
+                          setSettings({
+                            ...settings,
+                            posts: { ...settings.posts, duration },
                           })
                         }
                         values={durations}

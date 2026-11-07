@@ -87,6 +87,7 @@ class AnnouncementResponse(BaseModel):
     content: str
     author: UserResponse
     created_at: datetime
+    archived_at: datetime | None = None
     pinned: bool
     archived: bool
     role: str
@@ -454,6 +455,11 @@ class ArchiveSetting(BaseModel):
     duration: str = "Days"
     never: bool = False
 
+class PostSetting(BaseModel):
+    number: int = 30
+    duration: str = "Days"
+    never: bool = True
+
 class SlowSetting(BaseModel):
     number: int = 30
     duration: str = "Seconds"
@@ -467,6 +473,7 @@ class SettingsRequest(BaseModel):
     id: int | None = None
     features: list[str] = []
     archive: ArchiveSetting = Field(default_factory=ArchiveSetting)
+    posts: PostSetting = Field(default_factory=PostSetting)
     messages: ArchiveSetting = Field(default_factory=ArchiveSetting)
     slow: SlowSetting = Field(default_factory=SlowSetting)
     censored: CensoredSetting = Field(default_factory=CensoredSetting)
