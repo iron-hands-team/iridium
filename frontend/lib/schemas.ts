@@ -183,6 +183,15 @@ export const settingsSchema = z.object({
     duration: z.string(),
     never: z.boolean(),
   }),
+  posts: z.object({
+    number: z
+      .number()
+      .int("Delete time has to be an integer")
+      .min(1, "Delete time has to be at least 1")
+      .max(30),
+    duration: z.string(),
+    never: z.boolean(),
+  }),
   messages: z.object({
     number: z
       .number()

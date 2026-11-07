@@ -13,6 +13,7 @@ class Announcement(Base):
     id = Column(Integer, primary_key=True, index=True)
     created_at = Column(DateTime(timezone=True), default=utcnow, nullable=False)
     archived = Column(Boolean, nullable=False, default=False)
+    archived_at = Column(DateTime(timezone=True), nullable=True)
 
 
 class Message(Base):

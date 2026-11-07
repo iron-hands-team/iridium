@@ -1,3 +1,4 @@
+from datetime import datetime
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 
@@ -71,6 +72,9 @@ def update_announcement(
 
     for field, value in updates.model_dump(exclude_unset=True).items():
         setattr(announcement, field, value)
+        
+    if updates.archived and announcement.archived_at is None:
+        announcement.archived_at = datetime.now()
 
     db.commit()
     db.refresh(announcement)
