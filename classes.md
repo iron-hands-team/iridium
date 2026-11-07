@@ -1,4 +1,4 @@
-How the CLass Works:
+# How the Class Works:
 
 - It's all stored in a class(name) class(data).(For the teacher's account.)
 - The class will be pasted to the python database.

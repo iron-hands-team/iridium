@@ -3,6 +3,7 @@ import type { EventType } from "@/types/event";
 import { redirect } from "next/navigation";
 import { getSession } from "@/lib/auth";
 import { FaCalendar } from "react-icons/fa";
+import { getEnabled } from "@/lib/helpers";
 import CalendarGrid from "@/components/calendar/calendar-grid";
 import NewEvent from "@/components/admin/new-event";
 
@@ -28,6 +29,7 @@ async function Page() {
   //TODO: search params to directly navigate to date
   const { user, cookie } = await getSession();
   if (!user) redirect("/");
+  await getEnabled("Calendar", cookie.value);
 
   const events: EventType[] = await fetch(
     `${process.env.INTERNAL_API_URL}/events`,

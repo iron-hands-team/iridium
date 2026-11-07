@@ -450,31 +450,59 @@ class SchoolResponse(BaseModel):
     banner: str
 
 class ArchiveSetting(BaseModel):
-    number: int
-    duration: str
-    never: bool | None = None
+    number: int = 30
+    duration: str = "Days"
+    never: bool = False
 
 class SlowSetting(BaseModel):
-    number: int
-    duration: str
-    enabled: bool | None = None
+    number: int = 30
+    duration: str = "Seconds"
+    enabled: bool = False
 
 class CensoredSetting(BaseModel):
-    words: list[str]
-    sensitive: bool | None = None
+    words: list[str] = []
+    sensitive: bool = False
 
 class SettingsRequest(BaseModel):
     id: int | None = None
-    features: list[str]
-    archive: ArchiveSetting
-    messages: ArchiveSetting
-    slow: SlowSetting
-    censored: CensoredSetting
+    features: list[str] = []
+    archive: ArchiveSetting = Field(default_factory=ArchiveSetting)
+    messages: ArchiveSetting = Field(default_factory=ArchiveSetting)
+    slow: SlowSetting = Field(default_factory=SlowSetting)
+    censored: CensoredSetting = Field(default_factory=CensoredSetting)
     paused: bool | None = None
 
     class Config:
         from_attributes = True
 
+class GuideSection(BaseModel):
+    subheading: str = Field(max_length=200)
+    text: str = Field(max_length=10000)
+
+class GuideRequest(BaseModel):
+    id: int | None = None
+    title: str = Field(max_length=200)
+    description: str | None = Field(default=None, max_length=1000)
+    sections: list[GuideSection] = Field(max_length=50)
+    label: str | None = Field(default=None, max_length=50)
+
+    class Config:
+        from_attributes = True
+
+class GuideEditRequest(BaseModel):
+    title: str | None = Field(default=None, min_length=1, max_length=200)
+    description: str | None = Field(default=None, max_length=1000)
+    sections: list[GuideSection] | None = Field(default=None, max_length=50)
+    label: str | None = Field(default=None, max_length=50)
+
+    class Config:
+        from_attributes = True
+
+class SlowResponse(BaseModel):
+    seconds: int
+
+class ClearRequest(BaseModel):
+    password: str
 
 # class Destination(BaseModel): 
 #     location: str

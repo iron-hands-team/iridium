@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { getSession } from "@/lib/auth";
+import { getEnabled } from "@/lib/helpers";
 import ClassBody from "@/components/layout/ClassTeacher";
 
 export const metadata: Metadata = {
@@ -22,10 +23,11 @@ export const metadata: Metadata = {
 };
 
 async function Page() {
-  const { user } = await getSession();
+  const { user, cookie } = await getSession();
   if (!user || (user.role !== "teacher" && user.role !== "admin")) {
     redirect("/");
   }
+  await getEnabled("Classes", cookie.value);
 
   return <ClassBody />;
 }

@@ -10,6 +10,8 @@ import {
   FaLightbulb,
   FaExclamationCircle,
   FaSchool,
+  FaBus,
+  FaBook,
 } from "react-icons/fa";
 import { FaGear } from "react-icons/fa6";
 import { useState, useEffect, useRef } from "react";
@@ -124,6 +126,14 @@ function NavUser({ user }: { user: UserType }) {
               <Link href="/school" className={optionStyles}>
                 <FaSchool size={18} className={iconStyles} />
                 School
+              </Link>
+              <Link href="/bus" className={optionStyles}>
+                <FaBus size={18} className={iconStyles} />
+                Bus
+              </Link>
+              <Link href="/guides" className={optionStyles}>
+                <FaBook size={18} className={iconStyles} />
+                Guides
               </Link>
               <div className={optionStyles} onClick={handleTip}>
                 <FaLightbulb size={18} className={iconStyles} />

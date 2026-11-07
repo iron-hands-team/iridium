@@ -84,6 +84,7 @@ async function Page() {
           <Btn text="Manage schedules" link="/admin/schedule" primary />
           <Btn text="View reports" link="/admin/reports" />
           <PlatformSettings />
+          <Btn text="Manage guides" link="/admin/guides" />
         </div>
       </div>
       <div className="flex-1 min-w-full lg:min-w-[40%] flex flex-col gap-y-5">

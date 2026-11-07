@@ -29,6 +29,20 @@ async function Nav() {
           .catch(() => 0)
       : 0;
 
+  const enabled: string[] = await fetch(
+    `${process.env.INTERNAL_API_URL}/settings`,
+    {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${cookie.value}`,
+        "Content-Type": "application/json",
+      },
+      cache: "no-store",
+    },
+  )
+    .then((res) => res.json())
+    .then((data) => (data && data.id ? data.features : null));
+
   const [notificationsRaw, unreadNotificationCount]: [
     NotificationResponse[],
     number,
@@ -64,8 +78,20 @@ async function Nav() {
 
   const links: NavLink[] = [
     ...(user.role === "admin" ? [{ href: "/admin", label: "Manage" }] : []),
-    ...(user.role !== "student" ? [{ href: "/classes", label: "Classes" }] : []),
-    { href: "/schedule", label: "Schedule" },
+    ...(user.role !== "student"
+      ? [
+          {
+            href: "/classes",
+            label: "Classes",
+            displayed: enabled?.includes("Classes"),
+          },
+        ]
+      : []),
+    {
+      href: "/schedule",
+      label: "Schedule",
+      displayed: enabled?.includes("Schedule"),
+    },
     ...(user.role === "student"
       ? [
           { href: "/grades", label: "Grades" },
@@ -75,10 +101,19 @@ async function Nav() {
     ...(user.role === "teacher"
       ? [{ href: "/admin/reports", label: "View reports" }]
       : []),
-    { href: "/calendar", label: "Calendar" },
-    { href: "/clubs", label: "Clubs" },
-    { href: "/messages", label: "Messages", badge: unreadCount },
-    { href: "/chat", label: "Chat" },
+    {
+      href: "/calendar",
+      label: "Calendar",
+      displayed: enabled?.includes("Calendar"),
+    },
+    { href: "/clubs", label: "Clubs", displayed: enabled?.includes("Clubs") },
+    {
+      href: "/messages",
+      label: "Messages",
+      badge: unreadCount,
+      displayed: enabled?.includes("Messages"),
+    },
+    { href: "/chat", label: "Chat", displayed: enabled?.includes("Chat") },
   ];
 
   return (
@@ -97,14 +132,13 @@ async function Nav() {
           />
           Iridium
         </Link>
-        <NavSearch/>
-        <div className="flex-1"/>
-        <NavLinks links={links}/>
+        <NavSearch />
+        <NavLinks links={links} />
         <Notifications
           notifications={notifications}
           unreadCount={unreadNotificationCount}
         />
-        <NavUser user={user}/>
+        <NavUser user={user} />
       </nav>
     </div>
   );

@@ -190,6 +190,7 @@ def reset_password(
 
     if not req.clear:
         user.hashed_password = hash_password(req.password)
+        user.token_version += 1
     
     user.requesting = False
 

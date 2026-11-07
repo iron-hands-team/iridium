@@ -12,10 +12,16 @@ if not SECRET_KEY:
 manager = LoginManager(token_url="/login", secret=SECRET_KEY, use_cookie=True, cookie_name="access-token")
 
 @manager.user_loader()
-def load_user(username: str):
+def load_user(identity: str):
+    username, _, version = identity.rpartition(":")
+    if not username or not version.isdigit():
+        return None
     db = SessionLocal()
     try:
-        return db.query(User).filter(User.username == username).first()
+        user = db.query(User).filter(User.username == username).first()
+        if user is None or user.token_version != int(version):
+            return None
+        return user
     finally:
         db.close()
 

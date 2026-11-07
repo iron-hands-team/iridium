@@ -18,15 +18,16 @@ logger = logging.getLogger(__name__)
 
 
 def get_cutoff(type: str):
-    settings = db.query(Settings).first()
-    amount = settings.data.get(type, {})
-    if not amount.get("never", {}):
-        amount_res = (
-            amount.get("number", {}) * DURATION_DAYS[amount.get("duration", {})]
-        )
-        return datetime.now(timezone.utc) - timedelta(days=amount_res)
-    else:
-        return None
+    with SessionLocal() as db:
+        settings = db.query(Settings).first()
+        amount = settings.data.get(type, {})
+        if not amount.get("never", {}):
+            amount_res = (
+                amount.get("number", {}) * DURATION_DAYS[amount.get("duration", {})]
+            )
+            return datetime.now(timezone.utc) - timedelta(days=amount_res)
+        else:
+            return None
 
 
 @app.task

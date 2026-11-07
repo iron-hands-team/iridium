@@ -12,9 +12,9 @@ from app.database import get_db
 from app.auth import manager,verify_password,hash_password
 from app.models import User, UserRole
 from app.schemas import LoginRequest, UserCreateRequest, UserResponse, TokenResponse
-from app.dependencies import require_admin
+from app.dependencies import require_admin, pause_guard
 from app.seed import init_db_and_seed_admin
-from app.routers import users, announcements, clubs, events, schedule, classes, info, grades, attendance, messages, chat, notifications
+from app.routers import users, announcements, clubs, events, schedule, classes, info, grades, attendance, messages, chat, notifications, guides, settings
 
 IS_PROD = os.getenv("ENVIRONMENT", "development") == "production"
 FRONTEND_URL = os.getenv("FRONTEND_URL", "http://localhost:3000")
@@ -24,6 +24,7 @@ app = FastAPI(
     docs_url=None if IS_PROD else "/docs",
     redoc_url=None,
     openapi_url=None if IS_PROD else "/openapi.json",
+    dependencies=[Depends(pause_guard)]
 )
 app.state.limiter = limiter
 app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
@@ -48,6 +49,8 @@ app.include_router(attendance.router)
 app.include_router(messages.router)
 app.include_router(chat.router)
 app.include_router(notifications.router)
+app.include_router(guides.router)
+app.include_router(settings.router)
 
 @app.get("/")
 def root():
@@ -77,7 +80,7 @@ def login(request: Request, credentials: LoginRequest, response: Response, db: S
     if user is None or not password_ok:
         raise HTTPException(status_code=401, detail='Incorrect username or password')
 
-    token = manager.create_access_token(data={"sub":user.username})
+    token = manager.create_access_token(data={"sub":f"{user.username}:{user.token_version}"})
 
     response.set_cookie(key="access-token",value=token,httponly=True,samesite="lax",secure=IS_PROD) # TODO: increase expiration time?
 
@@ -88,7 +91,15 @@ def read_current_user(current_user: User = Depends(manager)):
     return current_user
 
 @app.post("/logout")
-def logout(response: Response):
+def logout(
+    response: Response,
+    db: Session = Depends(get_db),
+    current_user: User | None = Depends(manager.optional),
+):
+    if current_user is not None:
+        user = db.query(User).filter(User.id == current_user.id).first()
+        user.token_version += 1
+        db.commit()
     response.delete_cookie(key="access-token")
     return {"message": "Logged out."}
 

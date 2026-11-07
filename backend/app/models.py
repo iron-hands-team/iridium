@@ -27,6 +27,7 @@ class User(Base):
     title = Column(String, nullable=False)
     requesting = Column(Boolean, nullable=True)
     requesting_delete = Column(Boolean, nullable=True)
+    token_version = Column(Integer, nullable=False, default=0, server_default="0")
 
     announcements = relationship("Announcement", back_populates="author", cascade="all, delete-orphan")
     clubs_sponsored = relationship("Club", back_populates="sponsor")
@@ -366,6 +367,15 @@ class Settings(Base):
     id = Column(Integer, primary_key=True, index=True)
     data = Column(JSONB, nullable=False, default=dict)
     updated_at = Column(DateTime(timezone=True), default=utcnow, nullable=False)
+
+class Guide(Base):
+    __tablename__ = "guides"
+    id = Column(Integer, primary_key=True, index=True)
+    title = Column(String, nullable=False)
+    description = Column(String, nullable=True)
+    sections = Column(JSONB, nullable=False, default=list)
+    label = Column(String, nullable=True)
+    created_at = Column(DateTime(timezone=True), default=utcnow, nullable=False)
     
 
 # class Destination(Base): 

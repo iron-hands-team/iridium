@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from sqlalchemy import or_, func
 
@@ -17,6 +17,7 @@ from app.models import (
     NotificationType,
     InfoSocial,
     Info,
+    Guide,
 )
 from app.schemas import (
     MapUploadResponse,
@@ -31,6 +32,7 @@ from app.schemas import (
     FileUploadResponse,
     SchoolRequest,
     SchoolResponse,
+    GuideRequest,
 )
 from app.dependencies import require_admin, manager
 from app.s3 import s3_client, s3_internal, BUCKET_NAME, ENDPOINT
