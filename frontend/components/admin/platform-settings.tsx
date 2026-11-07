@@ -5,6 +5,7 @@ import { useState, useEffect } from "react";
 import { FaExclamationTriangle } from "react-icons/fa";
 import { FaXmark } from "react-icons/fa6";
 import { AnimatePresence } from "framer-motion";
+import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 import Modal from "../ui/modal";
 import Input from "../ui/input";
@@ -39,6 +40,8 @@ function PlatformSettings() {
   const [censored, setCensored] = useState<string>("");
   const [pausing, setPausing] = useState<boolean>(false);
   const [clearing, setClearing] = useState<boolean>(false);
+  const [resetting, setResetting] = useState<boolean>(false);
+  const router = useRouter();
 
   function handleCensor(e: React.SubmitEvent) {
     e.preventDefault();
@@ -67,11 +70,32 @@ function PlatformSettings() {
     }
   }
 
-  async function handlePause(password: string) {
-    const res = await fetch("/api/pause", { method: "POST", body: password });
+  async function handleReset() {
+    const res = await fetch("/api/settings", { method: "DELETE" });
     if (res.ok) {
       setError(null);
-      toast.success("Operations paused successfully!");
+      toast.success("Settings reset successfully!");
+      window.open("/", "_self");
+      setResetting(false);
+    } else {
+      setError("Something went wrong, please try again");
+    }
+  }
+
+  async function handlePause(password: string) {
+    const res = await fetch("/api/pause", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ password }),
+    });
+    if (res.ok) {
+      setError(null);
+      toast.success(
+        `Operations ${settings.paused ? "resumed" : "paused"} successfully!`,
+      );
+      router.refresh();
       setPausing(false);
     } else {
       setError("Something went wrong, please try again");
@@ -79,11 +103,19 @@ function PlatformSettings() {
   }
 
   async function handleClear(password: string) {
-    const res = await fetch("/api/clear", { method: "DELETE", body: password });
+    const res = await fetch("/api/clear", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ password }),
+    });
     if (res.ok) {
       setError(null);
-      window.open("/", "_self");
-      setClearing(false);
+      toast.success("Iridium data successfully cleared!");
+      setTimeout(() => {
+        window.open("/", "_self");
+      }, 1000);
     } else {
       setError("Something went wrong, please try again");
     }
@@ -103,6 +135,7 @@ function PlatformSettings() {
       });
       if (res.ok) {
         toast.success("Settings updated successfully!");
+        router.refresh();
         setOpen(false);
       } else {
         setError("Something went wrong, please try again");
@@ -114,6 +147,11 @@ function PlatformSettings() {
   }
 
   useEffect(() => {
+    async function fetchSettings() {
+      const res = await fetch("/api/settings").then((res) => res.json());
+      if (res && res.id) setSettings(res);
+    }
+    if (open) fetchSettings();
     setError(null);
   }, [open]);
 
@@ -329,7 +367,13 @@ function PlatformSettings() {
                 </div>
               </div>
               <Btn
-                text="Pause operations"
+                text="Reset defaults"
+                onclick={() => setResetting(true)}
+                styles="text-sm bg-red-500! border-red-500! text-white! w-fit"
+                primary
+              />
+              <Btn
+                text={`${settings.paused ? "Resume" : "Pause"} operations`}
                 onclick={() => setPausing(true)}
                 styles="text-sm bg-red-500! border-red-500! text-white! w-fit"
                 primary
@@ -358,10 +402,21 @@ function PlatformSettings() {
         )}
       </AnimatePresence>
       <AnimatePresence>
+        {resetting && (
+          <WarningModal
+            title="Reset settings"
+            description="Are you sure you want to permanently reset all Iridium platform settings back to defaults? This action is irreversible."
+            confirm={handleReset}
+            closeModal={() => setResetting(false)}
+            error={error || undefined}
+          />
+        )}
+      </AnimatePresence>
+      <AnimatePresence>
         {pausing && (
           <WarningModal
-            title="Pause operations"
-            description="Are you sure you want to temporarily pause all backend operations and stop users from interacting with Iridium? Only use this if the platform is undergoing maintenance or if there is an emergency. You can unpause it anytime. Please confirm your admin password to continue."
+            title={`${settings.paused ? "Resume" : "Pause"} operations`}
+            description={`Are you sure you want to ${settings.paused ? "resume" : "temporarily pause"} all backend operations and ${settings.paused ? "let users start" : "stop users from"} interacting with Iridium? Only use this if the platform is undergoing maintenance or if there is an emergency. You can ${settings.paused ? "repause" : "unpause"} it anytime. Please confirm your admin password to continue.`}
             confirm={() => undefined}
             closeModal={() => setPausing(false)}
             error={error || undefined}

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import type { ChannelType as ChannelT } from "@/lib/schemas";
 import type { ClubType } from "@/types/clubs";
 import { getSession } from "@/lib/auth";
+import { getEnabled } from "@/lib/helpers";
 import ChannelSidebar from "./channel-sidebar";
 
 export const metadata: Metadata = {
@@ -26,6 +27,7 @@ export type ChannelType = Omit<ChannelT, "club"> & { club: ClubType };
 
 async function Page() {
   const { user, cookie } = await getSession();
+  await getEnabled("Chat", cookie.value);
   const channelData = await fetch(
     `${process.env.INTERNAL_API_URL}/chat/channels`,
     {

@@ -3,7 +3,7 @@ import type { MessageResponse, MessageType } from "@/types/message";
 import type { UserResponse, UserType } from "@/types/user";
 import { redirect } from "next/navigation";
 import { getSession } from "@/lib/auth";
-import { parseUser } from "@/lib/helpers";
+import { getEnabled, parseUser } from "@/lib/helpers";
 import Messages from "./messages";
 
 export const metadata: Metadata = {
@@ -39,6 +39,7 @@ function parseMessage(m: MessageResponse): MessageType {
 async function Page() {
   const { user, cookie } = await getSession();
   if (!user) redirect("/");
+  await getEnabled("Messages", cookie.value);
 
   const [inboxRaw, sentRaw, staffRaw] = await Promise.all([
     fetch(`${process.env.INTERNAL_API_URL}/messages`, {

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { FaClock } from "react-icons/fa";
 import { getSession } from "@/lib/auth";
+import { getEnabled } from "@/lib/helpers";
 
 export const metadata: Metadata = {
   title: "Schedule",
@@ -41,6 +42,7 @@ function formatTime(t: string | null) {
 async function Page() {
   const { user, cookie } = await getSession();
   if (!user) redirect("/");
+  await getEnabled("Schedule", cookie.value);
 
   const schedule: ScheduleItem[] = await fetch(
     `${process.env.INTERNAL_API_URL}/schedule/me`,

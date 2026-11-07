@@ -12,9 +12,9 @@ from app.database import get_db
 from app.auth import manager,verify_password,hash_password
 from app.models import User, UserRole
 from app.schemas import LoginRequest, UserCreateRequest, UserResponse, TokenResponse
-from app.dependencies import require_admin
+from app.dependencies import require_admin, pause_guard
 from app.seed import init_db_and_seed_admin
-from app.routers import users, announcements, clubs, events, schedule, classes, info, grades, attendance, messages, chat, notifications, guides
+from app.routers import users, announcements, clubs, events, schedule, classes, info, grades, attendance, messages, chat, notifications, guides, settings
 
 IS_PROD = os.getenv("ENVIRONMENT", "development") == "production"
 FRONTEND_URL = os.getenv("FRONTEND_URL", "http://localhost:3000")
@@ -24,6 +24,7 @@ app = FastAPI(
     docs_url=None if IS_PROD else "/docs",
     redoc_url=None,
     openapi_url=None if IS_PROD else "/openapi.json",
+    dependencies=[Depends(pause_guard)]
 )
 app.state.limiter = limiter
 app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
@@ -49,6 +50,7 @@ app.include_router(messages.router)
 app.include_router(chat.router)
 app.include_router(notifications.router)
 app.include_router(guides.router)
+app.include_router(settings.router)
 
 @app.get("/")
 def root():

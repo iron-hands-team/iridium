@@ -36,7 +36,6 @@ function NewGuideModal({ existing, closeModal, toast }: GuideModalProps) {
     if (validated.success) {
       setError(null);
       setLoading(true);
-      console.log(validated.data);
       const res = existing
         ? await fetch(`/api/guides/${existing.id}`, {
             method: "PATCH",

@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from sqlalchemy import func, or_
 from collections import defaultdict
-from datetime import datetime
+from datetime import datetime, timezone
 
 from app.database import get_db
 from app.models import (
@@ -22,6 +22,7 @@ from app.schemas import (
     MessageSendRequest,
     ChatMessageResponse,
     ChatReactionRequest,
+    SettingsRequest,
 )
 from app.dependencies import require_admin, manager
 
@@ -204,21 +205,36 @@ def send_message(
             raise HTTPException(status_code=400, detail="Invalid reply target.")
 
     settings = db.query(Settings).first()
-    slow = settings.get("slow", {})  # TODO: censored word/phrase detection
+    settings = SettingsRequest.model_validate(settings.data if settings else {})
+    slow = settings.slow
+    censored = settings.censored
     if slow.enabled:
-        minimum = slow.get("number", {}) * DURATION_SECONDS[slow.get("duration", {})]
+        minimum = slow.number * DURATION_SECONDS[slow.duration]
         prev = (
             db.query(ChatMessage)
             .filter(ChatMessage.user_id == current_user.id)
             .order_by(ChatMessage.created_at.desc())
             .first()
         )
-        diff = (datetime.now() - prev.created_at).total_seconds()
-        if prev is not None and diff.total_seconds() < minimum:
+        diff = (datetime.now(timezone.utc) - prev.created_at).total_seconds()
+        if prev is not None and diff < minimum:
             raise HTTPException(
                 status_code=403,
                 detail=f"Slow mode enabled, please wait {minimum-diff} more seconds before sending another message!",
             )
+    if any(
+        (word if censored.sensitive else word.lower())
+        in (
+            message.message.split()
+            if censored.sensitive
+            else message.message.lower().split()
+        )
+        for word in censored.words
+    ):
+        raise HTTPException(
+            status_code=403,
+            detail="Message censored, please try again with a different word!",
+        )
     chat_message = ChatMessage(
         text=message.message,
         channel_id=message.channel_id,
