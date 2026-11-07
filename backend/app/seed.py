@@ -1,5 +1,12 @@
 from app.database import Base, engine, SessionLocal
-from app.models import User, UserRole
+from app.models import (
+    User, 
+    UserRole,
+    Announcement,
+    AnnouncementLike,
+    Club,
+    ClubMembership,
+)
 from app.auth import hash_password
 
 def init_db_and_seed_admin():

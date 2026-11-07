@@ -12,6 +12,7 @@ from pydantic import BaseModel
 from app.database import get_db
 from app.auth import manager,verify_password,hash_password
 from app.models import User, UserRole
+from app.s3 import s3_internal, BUCKET_NAME
 from app.schemas import LoginRequest, UserCreateRequest, UserResponse, TokenResponse
 from app.dependencies import require_admin, pause_guard
 from app.seed import init_db_and_seed_admin
