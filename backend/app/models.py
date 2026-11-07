@@ -367,3 +367,41 @@ class Settings(Base):
     data = Column(JSONB, nullable=False, default=dict)
     updated_at = Column(DateTime(timezone=True), default=utcnow, nullable=False)
     
+
+# class Destination(Base): 
+#     __tablename__ = "destinations"
+#     location: str
+#     before_school_time: str
+#     after_school_time: str
+#     color: str
+#     bus_id: Column(Integer, ForeignKey("buses.id"))
+#     bus: relationship("Bus", back_populates="destinations")
+
+# class Bus(Base):
+#     __tablename__ = "buses"
+#     id = Column(Integer, primary_key=True, index=True)
+#     name = Column(String, nullable=False, unique=True)
+#     description = Column(Text, nullable=True)
+#     destinations = relationship("Destination", back_populates="bus")
+
+    #sponsor = relationship("User", back_populates="clubs_sponsored")
+    #members = relationship("ClubMembership", back_populates="club")
+
+
+
+# class Club(Base):
+#     __tablename__ = "clubs"
+#     id = Column(Integer, primary_key=True, index=True)
+#     name = Column(String, nullable=False, unique=True)
+#     description = Column(Text, nullable=True)
+#     sponsor_id = Column(Integer, ForeignKey("users.id"), nullable=True)
+#     categories = Column(ARRAY(String), nullable=False, default=list)
+
+#     sponsor = relationship("User", back_populates="clubs_sponsored")
+#     members = relationship("ClubMembership", back_populates="club")
+#     channel = relationship("Channel", back_populates="club", uselist=False)
+#     favorite_records = relationship("ClubFavorite", back_populates="club", cascade="all, delete-orphan")
+
+#     @property
+#     def favorite(self):
+#         return [fav.user.username for fav in self.favorite_records]

@@ -474,3 +474,18 @@ class SettingsRequest(BaseModel):
 
     class Config:
         from_attributes = True
+
+
+# class Destination(BaseModel): 
+#     location: str
+#     before_school_time: str
+#     after_school_time: str
+#     color: str
+    
+
+
+# class Bus(BaseModel):
+#     id: int | None = None
+#     name: str
+#     description: str | None = None
+#     destination: list[Destination]
