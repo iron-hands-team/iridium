@@ -1,13 +1,18 @@
-from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi import APIRouter, Depends, HTTPException
+from pydantic import BaseModel
 from sqlalchemy.orm import Session
 
 from app.auth import verify_password
 from app.database import get_db, Base
 from app.models import User, Settings
 from app.schemas import SettingsRequest, SettingsResponse
-from app.dependencies import require_admin, manager
+from app.dependencies import require_admin
 
 router = APIRouter()
+
+
+class PasswordConfirm(BaseModel):
+    password: str
 
 
 @router.get("/settings", response_model=SettingsResponse)
@@ -32,30 +37,30 @@ def save_settings(
 
 @router.post("/pause", status_code=204)
 def pause_operations(
-    password: str,
+    confirm: PasswordConfirm,
     db: Session = Depends(get_db),
     current_user: User = Depends(require_admin),
 ):
-    if not verify_password(password, current_user.hashed_password):
+    if not verify_password(confirm.password, current_user.hashed_password):
         raise HTTPException(status_code=400, detail="Incorrect password")
     settings = db.query(Settings).first()
     if settings is None:
         settings = Settings(data={})
         db.add(settings)
-    data = settings.model_dump(mode="json")
-    data.paused = true
+    data = settings.data if settings.data else {}
+    data["paused"] = True
     settings.data = data
     db.commit()
 
 
 @router.delete("/clear", status_code=204)
 def clear_data(
-    password: str,
+    confirm: PasswordConfirm,
     db: Session = Depends(get_db),
     current_user: User = Depends(require_admin),
 ):
-    if not verify_password(passwoord, current_user.hashed_password):
-        raise HTTPException(password, current_user.hashed_password)
+    if not verify_password(confirm.password, current_user.hashed_password):
+        raise HTTPException(status_code=400, detail="Incorrect password")
     for table in reversed(Base.metadata.sorted_tables):
         if table.name == "alembic_version":
             continue

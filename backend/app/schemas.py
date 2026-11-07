@@ -475,6 +475,9 @@ class SettingsRequest(BaseModel):
     class Config:
         from_attributes = True
 
+class SettingsResponse(SettingsRequest):
+    pass
+
 class GuideSection(BaseModel):
     subheading: str = Field(max_length=200)
     text: str = Field(max_length=10000)
