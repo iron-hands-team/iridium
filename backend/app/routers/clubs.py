@@ -33,7 +33,11 @@ def create_club(
     existing = db.query(Club).filter(Club.name == new_club.name).first()
     if existing is not None:
         raise HTTPException(status_code=400, detail="Club already exists.")
-    club = Club(**new_club.model_dump()) # TODO: only allow sponsor to be teacher or admin (add multiple sponsors?)
+    if new_club.sponsor_id is not None:
+        sponsor = db.query(User).filter(User.id == new_club.sponsor_id).first()
+        if sponsor is None or sponsor.role not in (UserRole.teacher, UserRole.admin):
+            raise HTTPException(status_code=400, detail="Sponsor must be a teacher or admin.")
+    club = Club(**new_club.model_dump())
     db.add(club)
     db.commit()
     db.refresh(club)
@@ -57,6 +61,10 @@ def update_club(
         name_taken = db.query(Club).filter(Club.name == data["name"]).first()
         if name_taken is not None:
             raise HTTPException(status_code=400, detail="Club already exists.")
+    if "sponsor_id" in data and data["sponsor_id"] is not None:
+        sponsor = db.query(User).filter(User.id == data["sponsor_id"]).first()
+        if sponsor is None or sponsor.role not in (UserRole.teacher, UserRole.admin):
+            raise HTTPException(status_code=400, detail="Sponsor must be a teacher or admin.")
 
     for field, value in data.items():
         setattr(club, field, value)

@@ -74,6 +74,8 @@ To host Iridium for your school or for other purposes, simply follow these steps
 
 8. Navigate to https://localhost (port 80) to use the fully functional web interface and access the API at https://localhost/api
 
+> **Note**: the Celery service doesn't automatically update/hot reload, you have to run `docker compose up celery --build` to rebuild the service and reflect the changes.
+
 ## Contribution
 
 Any kind of contribution is welcome, but please follow the guideline below!

@@ -1,4 +1,5 @@
-from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi import APIRouter, Depends, HTTPException
+from pydantic import BaseModel
 from sqlalchemy.orm import Session
 
 from app.auth import verify_password
@@ -68,7 +69,7 @@ def clear_data(
 ):
     password = clear.password
     if not verify_password(password, current_user.hashed_password):
-        raise HTTPException(password, current_user.hashed_password)
+        raise HTTPException(status_code=400, detail="Incorrect password")
     for table in reversed(Base.metadata.sorted_tables):
         if table.name == "alembic_version":
             continue

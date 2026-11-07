@@ -1,4 +1,5 @@
 import os
+from datetime import timedelta
 from fastapi import Depends, FastAPI, HTTPException, Request, Response
 from slowapi import _rate_limit_exceeded_handler
 from app.limiter import limiter
@@ -11,6 +12,7 @@ from pydantic import BaseModel
 from app.database import get_db
 from app.auth import manager,verify_password,hash_password
 from app.models import User, UserRole
+from app.s3 import s3_internal, BUCKET_NAME
 from app.schemas import LoginRequest, UserCreateRequest, UserResponse, TokenResponse
 from app.dependencies import require_admin, pause_guard
 from app.seed import init_db_and_seed_admin
@@ -65,7 +67,13 @@ def health_db(db: Session=Depends(get_db)):
     db.execute(text("SELECT 1"))
     return {"status": "ok", "database":"connected"}
 
-#TODO: add health endpoint for garage storage
+@app.get("/health/storage")
+def health_storage():
+    try:
+        s3_internal.head_bucket(Bucket=BUCKET_NAME)
+    except Exception:
+        raise HTTPException(status_code=503, detail="Storage unavailable.")
+    return {"status": "ok", "storage": "connected"}
 
 DUMMY_HASH = hash_password("not-a-real-password")
 
@@ -80,9 +88,19 @@ def login(request: Request, credentials: LoginRequest, response: Response, db: S
     if user is None or not password_ok:
         raise HTTPException(status_code=401, detail='Incorrect username or password')
 
-    token = manager.create_access_token(data={"sub":f"{user.username}:{user.token_version}"})
+    token_expiry = timedelta(minutes=45) 
+    token = manager.create_access_token(
+        data={"sub": f"{user.username}:{user.token_version}"},expires=token_expiry
+    )
 
-    response.set_cookie(key="access-token",value=token,httponly=True,samesite="lax",secure=IS_PROD) # TODO: increase expiration time?
+    response.set_cookie(
+        key="access-token",
+        value=token,
+        httponly=True,
+        samesite="lax",
+        secure=IS_PROD,
+        max_age=int(token_expiry.total_seconds()),
+    ) 
 
     return TokenResponse(access_token=token, user=user)
 

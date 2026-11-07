@@ -59,6 +59,7 @@ class Announcement(Base):
     pinned = Column(Boolean, nullable=False, default=False)
     archived = Column(Boolean, nullable=False, default=False)
     role = Column(String, nullable=False, default="all")  # "all", "student", "teacher", or "admin"
+    archived_at = Column(DateTime(timezone=True), nullable=True)
 
     author = relationship("User", back_populates="announcements")
     like_records = relationship(
