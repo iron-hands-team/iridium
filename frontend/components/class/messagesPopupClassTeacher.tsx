@@ -1,6 +1,5 @@
 "use client";
 
-import { useState } from "react";
 import { cs } from "@/lib/classStore";
 import Btn from "@/components/ui/btn";
 
@@ -54,11 +53,7 @@ export default function SettingsPopupClassTeacher() {
             <div className="w-1/3 my-[20px] border-1 border-yellow-800">
               <Btn
                 onclick={() => {
-                  addClassAnnouncement(
-                    settingsClassIndex,
-                    announcementInput,
-                    untitledCount,
-                  );
+                  addClassAnnouncement(settingsClassIndex, announcementInput);
                   addAnnouncementsToStudents(
                     settingsClassIndex,
                     announcementInput,

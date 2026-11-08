@@ -2,259 +2,48 @@
 
 import { useState } from "react";
 import { bs } from "@/lib/busStore";
-import Header from "@/components/layout/header";
 import Btn from "@/components/ui/btn";
+import { AnimatePresence } from "framer-motion";
+import EditBus from "./edit-bus";
 
-export default function Buses() {
+export default function Buses({ isAdmin }: { isAdmin: boolean }) {
   const buses = bs((state) => state.buses);
-  const updateFrame = bs((state) => state.updateFrame);
   const addBus = bs((state) => state.addBus);
-  const deleteBus = bs((state) => state.deleteBus);
   const setBus = bs((state) => state.setBus);
   const clearBuses = bs((state) => state.clearBuses);
-  const addDestination = bs((state) => state.addDestination);
-  const deleteDestination = bs((state) => state.deleteDestination);
-  const setDestination = bs((state) => state.setDestination);
-  const [editPopup, setEditPopup] = useState(false);
-  const [busIndexPopup, setBusIndexPopup] = useState(-1);
+  const [index, setIndex] = useState<number | null>(null);
+  const [loading, setLoading] = useState<boolean>(false);
 
-  const buttonColors: Record<string, string> = {
-    blue: "bg-blue-400",
-    red: "bg-red-400",
-    green: "bg-green-400",
-    yellow: "bg-yellow-400",
-    purple: "bg-purple-400",
-    gray: "bg-zinc-400",
-  };
-
-  function functionEditPopup(busIndex: number) {
-    setEditPopup(true);
-    setBusIndexPopup(busIndex);
-  }
-
-  function SettingsUI<T>(variableName: string, value: T, headingName: string) {
-    return (
-      <div className="flex h-[70px]  items-center gap-[10px]">
-        <p>
-          <b>{headingName}:</b>
-        </p>
-        <input
-          value={buses[busIndexPopup][variableName] as string}
-          onChange={(e) => setBus(busIndexPopup, variableName, e.target.value)}
-          placeholder={`Enter ${variableName} Here`}
-          className="text-white w-1/3 h-12 p-2 border border-zinc-800 hover:border-white text-[18px] font-sans"
-        />
-      </div>
-    );
-  }
-
-  function DestinationUI<T>(
-    destinationIndex: number,
-    variableName: string,
-    value: T,
-    headingName: string,
-  ) {
-    return (
-      <div className="flex gap-[10px] h-[50px] items-center">
-        <p>{headingName}</p>
-        <input
-          value={
-            buses[busIndexPopup].destinations[destinationIndex][variableName]
-          }
-          onChange={(e) => {
-            buses[busIndexPopup].destinations = setDestination(
-              buses[busIndexPopup].destinations,
-              destinationIndex,
-              variableName,
-              e.target.value,
-            );
-            updateFrame();
-          }}
-          className="text-white h-[40px] w-[120px]"
-        ></input>
-      </div>
-    );
+  async function handleSave() {
+    setLoading(true);
+    console.log(buses);
+    setLoading(false);
   }
 
   return (
-    <div className="flex items-center flex-col bg-black h-[100vh]">
-      {editPopup && (
-        <div
-          className="z-100 fixed flex h-full w-full justify-center items-center bg-black/90 overflow-y-auto  flex-col flex-wrap"
-          onClick={() => setEditPopup(false)}
-        >
-          <div
-            className="bg-black/90  z-10 h-2/3 w-2/3  flex flex-col justify-between items-start border-1 border-zinc-400 overflow-y-auto p-[10px]"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div className="flex flex-col w-full items">
-              <div className="flex w-full h-[100px] items-center justify-between ">
-                <p className="text-[30px]">
-                  Edit {buses[busIndexPopup].name}&apos;s Information
-                </p>
-                <Btn onclick={() => setEditPopup(false)} text="Close" />
-              </div>
-              {SettingsUI("name", buses[busIndexPopup].name, "Name")}
-              {SettingsUI("desc", buses[busIndexPopup].desc, "Description")}
-
-              <p>Bus Stops </p>
-              <div className="w-1/3">
-                {" "}
-                <Btn
-                  onclick={() => {
-                    buses[busIndexPopup].destinations = addDestination(
-                      buses[busIndexPopup].destinations,
-                    );
-                    updateFrame();
-                  }}
-                  text="Add Destination"
-                />
-              </div>
-              <br></br>
-              {buses[busIndexPopup].destinations.length > 0 && (
-                <div className="w-full flex flex-col items-center gap-[10px] bg-blue-700 p-[10px] rounded-xl border-1 border-zinc-600">
-                  {buses[busIndexPopup].destinations.map(
-                    (destinationItem, destinationIndex) => (
-                      <div
-                        key={destinationIndex}
-                        className="w-full flex items-center gap-[20px]"
-                      >
-                        {DestinationUI(
-                          destinationIndex,
-                          "location",
-                          "dih",
-                          "Location",
-                        )}
-                        {DestinationUI(
-                          destinationIndex,
-                          "beforeSchoolTime",
-                          "dih",
-                          "Before School Time",
-                        )}
-                        {DestinationUI(
-                          destinationIndex,
-                          "afterSchoolTime",
-                          "dih",
-                          "After School Time",
-                        )}
-                        <p>Color:</p>
-                        <div className="flex items-center justify-center gap-[10px]">
-                          {Object.entries(buttonColors).map(
-                            ([name, value], index) => (
-                              <div
-                                key={index}
-                                className={
-                                  "w-[30px] h-[30px] rounded-md cursor-pointer " +
-                                  value
-                                }
-                                onClick={() => {
-                                  buses[busIndexPopup].destinations =
-                                    setDestination(
-                                      buses[busIndexPopup].destinations,
-                                      destinationIndex,
-                                      "color",
-                                      value,
-                                    );
-                                  updateFrame();
-                                }}
-                              ></div>
-                            ),
-                          )}
-                        </div>
-                        <Btn
-                          onclick={() => {
-                            buses[busIndexPopup].destinations =
-                              deleteDestination(
-                                buses[busIndexPopup].destinations,
-                                destinationIndex,
-                              );
-                            updateFrame();
-                          }}
-                          text="Delete"
-                        />
-                      </div>
-                    ),
-                  )}
-                </div>
-              )}
-
-              <br></br>
-              <div className="flex  w-full items-start gap-[10px] ">
-                <p>
-                  <b>Color:</b>
-                </p>
-                <div className="h-[100px] w-1/3  border-zinc-600 flex flex-wrap gap-[10px]">
-                  {Object.entries(buttonColors).map(([name, value], index) => (
-                    <div key={index} className="w-1/4">
-                      <button
-                        className={
-                          " w-full h-full py-2 border-1 cursor-pointer " +
-                          buttonColors[name]
-                        }
-                        onClick={() => {
-                          setBus(busIndexPopup, "color", value);
-                          console.log(value);
-                        }}
-                      >
-                        <p>{name}</p>
-                      </button>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
-            <br></br>
-            <Btn
-              onclick={() => {
-                deleteBus(busIndexPopup);
-                setEditPopup(false);
-              }}
-              text="Delete"
-            />
-            <br></br>
-            <Btn onclick={() => setEditPopup(false)} text="Close" />
-            <br></br>
+    <>
+      <div className="flex flex-col gap-y-3">
+        {isAdmin && (
+          <div className="flex gap-x-3">
+            <Btn onclick={() => addBus()} text="Add Bus" primary />
+            <Btn onclick={() => clearBuses()} text="Clear Buses" />
           </div>
-        </div>
-      )}
-
-      <div className="sticky top-0 z-50 bg-gray-800 w-full shadow-md">
-        <div className="flex w-full gap-[10px] border-b-1 border-t-1 border-white items-center bg-gray-800 p-[10px] justify-start">
-          <Btn onclick={() => addBus()} text="Add Bus" />
-          <Btn onclick={() => clearBuses()} text="Clear Buses" />
-          <Btn
-            onclick={() => {
-              setAboutPopup(true);
-              console.log("asdlkmasl dkm");
-            }}
-            text="About"
-          />
-        </div>
-      </div>
-      <div className=" w-full bg-black flex flex-col items-center justify-center">
-        <div className="w-full flex flex-col items-center justify-center">
-          <div className="bg-gray-800 w-full h-[100px] border-1 border-zinc-600 flex justify-between">
-            <div className="flex items-center justify-center w-1/4">
-              <p>
-                <b>Spot Number</b>
-              </p>
-            </div>
-            <div className="flex items-center justify-center w-1/4">
-              <p>
-                <b>Bus Name</b>
-              </p>
-            </div>
-            <div className="flex items-center justify-center w-1/4">
-              <p>
-                <b>Route</b>
-              </p>
-            </div>
-            <div className="flex items-center justify-center w-1/4">
-              <p>
-                <b>Settings</b>
-              </p>
-            </div>
+        )}
+        <div className="flex">
+          <div className="flex-1 cursor-pointer font-bold px-4 py-2 hover:bg-zinc-200 dark:hover:bg-zinc-900 flex items-center gap-x-3">
+            Number
           </div>
+          <div className="flex-1 cursor-pointer font-bold px-4 py-2 hover:bg-zinc-200 dark:hover:bg-zinc-900 flex items-center gap-x-3">
+            Name
+          </div>
+          <div className="flex-1 cursor-pointer font-bold px-4 py-2 hover:bg-zinc-200 dark:hover:bg-zinc-900 flex items-center gap-x-3">
+            Route
+          </div>
+          {isAdmin && (
+            <div className="flex-1 cursor-pointer font-bold px-4 py-2 hover:bg-zinc-200 dark:hover:bg-zinc-900 flex items-center gap-x-3">
+              Settings
+            </div>
+          )}
         </div>
         {buses.map((busItem, busIndex) => (
           <div
@@ -265,11 +54,11 @@ export default function Buses() {
             className={"w-full flex flex-col items-center justify-center "}
           >
             <div
-              className={`bg-gray-800 w-full border border-zinc-600 flex justify-between transition-all duration-300 ease-in-out overflow-hidden ${
+              className={`w-full flex justify-between transition-all duration-300 ease-in-out overflow-hidden ${
                 busItem.isClicking ? "max-h-[500px]" : "max-h-[50px]"
               }`}
             >
-              <div className="flex items-center justify-center w-1/4 text-[20px] border-l-1 border-r-1 border-zinc-600">
+              <div className="flex items-center justify-center w-1/4 text-[20px]">
                 <p>
                   <b>{busIndex}</b>
                 </p>
@@ -277,7 +66,7 @@ export default function Buses() {
               <div className="w-1/4 flex items-center justify-center ">
                 <div
                   className={
-                    "h-full w-3/4  flex justify-center items-center rounded-xl border-1 border-zinc-600 p-[10px] " +
+                    "h-full w-3/4  flex justify-center items-center p-[10px] " +
                     buses[busIndex].color
                   }
                 >
@@ -289,7 +78,7 @@ export default function Buses() {
                   ></input>
                 </div>
               </div>
-              <div className="flex flex-col items-center justify-start w-1/4 p-[10px] overflow-y-auto gap-[10px] border-l-1 border-r-1 border-zinc-600 ">
+              <div className="flex flex-col items-center justify-start w-1/4 p-[10px] overflow-y-auto gap-[10px]">
                 {busItem.isClicking && (
                   <p className="text-[20px]">
                     <b>{busItem.destinations.length} Stops</b>
@@ -332,34 +121,41 @@ export default function Buses() {
                     ),
                   )}
                 {busItem.isClicking && busItem.destinations.length === 0 && (
-                  <p>No Routes Made.</p>
+                  <p>None</p>
                 )}
                 {!busItem.isClicking && (
                   <p>
-                    Click to View <b>({busItem.destinations.length} Stops)</b>
+                    Click to view <b>({busItem.destinations.length} stops)</b>
                   </p>
                 )}
               </div>
-              <div className="flex items-center justify-center w-1/4 bg-gray-400 gap-[10px]">
-                <Btn onclick={() => functionEditPopup(busIndex)} text="Edit" />
-                <Btn onclick={() => nothing()} text="Move" />
-              </div>
+              {isAdmin && (
+                <div className="flex items-center w-1/4 gap-[10px]">
+                  <Btn text="Edit" onclick={() => setIndex(busIndex)} primary />
+                </div>
+              )}
             </div>
           </div>
         ))}
+        {buses.length == 0 && (
+          <p className="text-zinc-700 dark:text-zinc-300 text-sm text-center py-10">
+            No buses created yet. Make one by using the button above!
+          </p>
+        )}
       </div>
-      <br></br>
-      {buses.length == 0 && (
-        <p className="text-[30px] flex w-full justify-center">
-          No buses created yet. Make one by using the button below!
-        </p>
+      {isAdmin && (
+        <Btn
+          onclick={handleSave}
+          text={loading ? "Saving..." : "Save"}
+          primary
+          styles="w-fit"
+        />
       )}
-      <div className="flex h-[100px] items-center gap-[10px]">
-        <p>Add New Bus Here: </p>
-        <Btn onclick={() => addBus()} text="Add Bus" />
-      </div>
-    </div>
+      <AnimatePresence>
+        {index !== null && (
+          <EditBus index={index} closeModal={() => setIndex(null)} />
+        )}
+      </AnimatePresence>
+    </>
   );
 }
-
-// /
