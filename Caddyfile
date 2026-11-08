@@ -3,6 +3,10 @@ iridium.tonymac.net, localhost {
         reverse_proxy fastapi-backend:8000
     }
 
+    handle /s3/files/submissions/* {
+        respond 403
+    }
+
     handle_path /s3/files/* {
         header {
             Content-Security-Policy "sandbox; default-src 'none'"

@@ -28,8 +28,11 @@ def save_settings(
     db: Session = Depends(get_db),
     _current_user: User = Depends(require_admin),
 ):
+    existing = db.query(Settings).first()
+    paused = bool(existing.data.get("paused")) if existing else False
     db.query(Settings).delete()
     data = settings.model_dump(mode="json")
+    data["paused"] = paused
     db.add(Settings(data=data))
     db.commit()
 
