@@ -9,14 +9,14 @@ app.conf.timezone = "UTC"
 app.conf.beat_schedule = {
     "archive_posts": {
         "task": "tasks.archive_posts",
-        "schedule": 20,
+        "schedule": 600,
     },
     "delete_posts": {
         "task": "tasks.delete_posts",
-        "schedule": 20,
+        "schedule": 600,
     },
     "delete_messages": {
         "task": "tasks.delete_messages",
-        "schedule": 20,
+        "schedule": 600,
     },
 }

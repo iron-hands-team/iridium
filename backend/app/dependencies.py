@@ -1,4 +1,4 @@
-from fastapi import Depends, HTTPException, status
+from fastapi import Depends, HTTPException, status, Request
 from sqlalchemy.orm import Session
 from app.auth import manager
 from app.models import User, UserRole, Settings

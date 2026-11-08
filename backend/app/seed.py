@@ -1,3 +1,4 @@
+from sqlalchemy import text
 from datetime import date, datetime, time, timedelta, timezone
 
 from app.database import Base, engine, SessionLocal
@@ -37,10 +38,12 @@ from app.auth import hash_password
 def init_db_and_seed_admin():
     Base.metadata.create_all(bind=engine)
 
+    with engine.begin() as conn:
+        conn.execute(text("ALTER TABLE announcement ADD COLUMN IF NOT EXISTS archived_at TIMESTAMP WITH TIME ZONE"))
+
     db = SessionLocal()
     try:
         if db.query(User).filter(User.username == "admin").first() is not None:
-            # already seeded on a previous run; don't duplicate demo data
             return
 
         now = datetime.now(timezone.utc)
