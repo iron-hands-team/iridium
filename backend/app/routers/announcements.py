@@ -4,7 +4,7 @@ from sqlalchemy.orm import Session
 
 from app.database import get_db
 from app.auth import manager
-from app.models import Announcement, AnnouncementLike, User, UserRole, NotificationType
+from app.models import Announcement, AnnouncementLike, AnnouncementStar, User, UserRole, NotificationType
 from app.schemas import AnnouncementCreateRequest, AnnouncementUpdateRequest, AnnouncementResponse
 from app.dependencies import require_staff
 from app.notify import create_notification
@@ -145,5 +145,45 @@ def unlike_announcement(
 router.post("/{announcement_id}/star",response_model=AnnouncementResponse)
 def star_announcement(
     announcement_id: int,
-    db: 
-)
+    db: Session = Depends(get_db),
+    current_user: User = Depends(manager),
+):
+    announcement = db.query(Announcement).filter(Announcement.id == announcement_id).first()
+    if announcement is None:
+        raise HTTPException(status_code=404, detail="Announcement not found.")
+
+    existing = (
+        db.query(AnnouncementStar).filter(
+            AnnouncementStar.id == announcement_id,
+            AnnouncementStar.user_id == current_user.id
+        )
+        .first()
+    )
+    if existing is None:
+        db.add(AnnouncementStar(announcement_id=announcement_id, user_id=current_user.id))
+        db.commit()
+        db.refresh(announcement)
+    return announcement
+
+@router.delete("/{announcement_id}/star", response_model=AnnouncementResponse)
+def unstar_announcement(
+    announcement_id: int,
+    db: Session = Depends(get_db),
+    current_user = User = Depends(manager),
+):
+    announcement = db.query(Announcement).filter(Announcement.id == announcement_id).first()
+    if announcement is None:
+        raise HTTPException(status_code=404, detail="Announcement not found.")
+
+    existing = (
+        db.query(AnnouncementStar).filter(
+            AnnouncementStar.id == announcement_id,
+            AnnouncementStar.user_id == current_user.id
+        )
+        .first()
+    )
+    if existing is None:
+        db.add(AnnouncementStar(announcement_id=announcement_id, user_id=current_user.id))
+        db.commit()
+        db.refresh(announcement)
+    return announcement    
