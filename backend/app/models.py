@@ -377,8 +377,8 @@ class Destination(Base):
     before_school_time: str
     after_school_time: str
     color: str
-    bus_id: Column(Integer, ForeignKey("buses.id"))
-    bus: relationship("Bus", back_populates="destinations")
+    bus_id = Column(Integer, ForeignKey("buses.id"))
+    bus = relationship("Bus", back_populates="destinations")
 
     
 
@@ -390,13 +390,13 @@ class Bus(Base):
     destinations = relationship("Destination", back_populates="bus")
 
 class QuizQuestion():
-    id: Column(String)
-    name: Column(String, nullable=False, unique=True)
-    choices: Column(ARRAY(String), nullable=False)
-    answers: Column(ARRAY(String), nullable=False)
-    can_show: Column(Boolean, nullable=False)
+    id = Column(String)
+    name = Column(String, nullable=False, unique=True)
+    choices = Column(ARRAY(String), nullable=False)
+    answers = Column(ARRAY(String), nullable=False)
+    can_show = Column(Boolean, nullable=False)
 
-    quiz: relationship("Quiz", back_populates="questions")
+    quiz = relationship("Quiz", back_populates="questions")
     
     
     
