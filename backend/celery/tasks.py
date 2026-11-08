@@ -4,7 +4,7 @@ from datetime import date, datetime, timedelta, timezone
 from app import app
 from database import SessionLocal
 from sqlalchemy import select
-from models import Announcement, AnnouncementLike, Message, ChatReaction, Settings
+from models import Announcement, AnnouncementLike, Message, ChatReaction, Settings 
 from schemas import SettingsRequest
 
 DURATION_DAYS = {

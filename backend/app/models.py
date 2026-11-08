@@ -70,15 +70,6 @@ class Announcement(Base):
     def likes(self):
         return [like.user.username for like in self.like_records]
 
-class AnnouncementLike(Base):
-    __tablename__ = "announcement_likes"
-    id = Column(Integer, primary_key=True, index=True)
-    announcement_id = Column(Integer, ForeignKey("announcements.id"), nullable=False)
-    user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
-
-    announcement = relationship("Announcement", back_populates="like_records")
-    user = relationship("User", back_populates="announcement_likes")
-
 class Club(Base):
     __tablename__ = "clubs"
     id = Column(Integer, primary_key=True, index=True)
@@ -236,16 +227,6 @@ class MapItem(Base):
     __tablename__ = "map_items"
     id = Column(Integer, primary_key=True, index=True)
     label = Column(String, nullable=True)
-
-class AnnouncementLike(Base):
-    __tablename__ = "announcement_likes"
-    id = Column(Integer, primary_key=True, index=True)
-    announcement_id = Column(Integer)
-
-class ChatReaction(Base):
-    __tablename__ = "chat_reactions"
-    id = Column(Integer, primary_key=True, index=True)
-    message_id = Column(Integer)
 
 class Message(Base):
     __tablename__ = "messages"
