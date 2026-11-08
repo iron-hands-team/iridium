@@ -141,3 +141,9 @@ def unlike_announcement(
         db.commit()
         db.refresh(announcement)
     return announcement
+
+router.post("/{announcement_id}/star",response_model=AnnouncementResponse)
+def star_announcement(
+    announcement_id: int,
+    db: 
+)

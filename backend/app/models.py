@@ -65,6 +65,9 @@ class Announcement(Base):
     like_records = relationship(
         "AnnouncementLike", back_populates="announcement", cascade="all, delete-orphan"
     )
+    star_records = relationship(
+        "AnnouncementStar", back_populates="announcements", cascade="all, delete-orphan"
+    )
 
     @property
     def likes(self):
@@ -78,6 +81,15 @@ class AnnouncementLike(Base):
 
     announcement = relationship("Announcement", back_populates="like_records")
     user = relationship("User", back_populates="announcement_likes")
+
+class AnnouncementStar(Base):
+    __tablename__ = "announcment_stars"
+    id = Column(Integer, primary_key=True, index=True)
+    announcement_id = Column(Integer, ForeignKey("announcements.id"), nullable=False)
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+
+    announcement = relationship("Announcement", back_populates="star_records")
+    user = relationship("User", back_populates="announcement_stars")
 
 class Club(Base):
     __tablename__ = "clubs"

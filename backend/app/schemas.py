@@ -92,6 +92,7 @@ class AnnouncementResponse(BaseModel):
     archived: bool
     role: str
     likes: list[str]
+    stars: list[str]
 
     class Config:
         from_attributes = True
