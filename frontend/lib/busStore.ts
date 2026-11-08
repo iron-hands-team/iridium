@@ -65,36 +65,34 @@ updateFrame: () => set((state) => ({
   )
  })),
 
-insertBus: (busSwappingIndex, busVictimIndex) => set((state) => {
-    const buses = [...state.buses];
+  insertBus: (busSwappingIndex, busVictimIndex) => set((state) => {
+      const buses = [...state.buses];
 
-    const [bus] = buses.splice(busVictimIndex, 1);
-    buses.splice(busSwappingIndex, 0, bus);
+      const [bus] = buses.splice(busVictimIndex, 1);
+      buses.splice(busSwappingIndex, 0, bus);
 
-    return { buses };
-}),
-addDestination: (destinations): Destination[] => {
- return [...destinations, {
-  location: "",
-  beforeSchoolTime: "",
-  afterSchoolTime: "",
-  color: "",
- }]
-},
-deleteDestination: (destinations, destinationIndex): Destination[] => {
-  return destinations.filter((_, i) => i !== destinationIndex);
-},
-setDestination: (destinations, destinationTargetIndex, variableName, value): Destination[] => {
- return destinations.map((destinationItem, destinationIndex) => (
-   destinationIndex === destinationTargetIndex ? {...destinationItem, [variableName] : value} : destinationItem
- ));
-},
+      return { buses };
+  }),
+  addDestination: (destinations): Destination[] => {
+  return [...destinations, {
+    location: "",
+    beforeSchoolTime: "",
+    afterSchoolTime: "",
+    color: "",
+  }]
+  },
+  deleteDestination: (destinations, destinationIndex): Destination[] => {
+    return destinations.filter((_, i) => i !== destinationIndex);
+  },
+  setDestination: (destinations, destinationTargetIndex, variableName, value): Destination[] => {
+  return destinations.map((destinationItem, destinationIndex) => (
+    destinationIndex === destinationTargetIndex ? {...destinationItem, [variableName] : value} : destinationItem
+  ));
+  },
 
-clearBuses: () => set((state)=> ({
- buses: []
-}))
-
-
+  clearBuses: () => set((state)=> ({
+  buses: []
+  }))
 
  
 }))

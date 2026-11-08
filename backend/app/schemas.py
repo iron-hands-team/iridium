@@ -514,16 +514,39 @@ class SlowResponse(BaseModel):
 class ClearRequest(BaseModel):
     password: str
 
-# class Destination(BaseModel): 
-#     location: str
-#     before_school_time: str
-#     after_school_time: str
-#     color: str
-    
 
 
-# class Bus(BaseModel):
-#     id: int | None = None
-#     name: str
-#     description: str | None = None
-#     destination: list[Destination]
+class Destination(BaseModel): 
+    location: str
+    before_school_time: str
+    after_school_time: str
+    color: str
+
+class BusResponse(BaseModel):
+    id: int | None = None
+    name: str
+    description: str | None = None
+    destinations: list[Destination]
+    systemName: str
+
+    class Config:
+        from_attributes = True
+
+class BusCreateRequest(BaseModel):
+    name: str
+    description: str | None = None
+    sponsor_id: int | None = None
+    categories: list[str] = []
+
+
+class QuizQuestion(BaseModel):
+    name: str
+    choices: list[str]
+    answers: list[str]
+    can_show: bool
+
+class QuizResponse(BaseModel):
+    id: int | None = None
+    name: str
+    questions: list[QuizQuestion]
+    class_section_id: int
