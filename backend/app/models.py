@@ -397,8 +397,10 @@ class Bus(Base):
     name = Column(String, nullable=False, unique=True)
     description = Column(Text, nullable=True)
     destinations = relationship("Destination", back_populates="bus")
+    is_clicking = Column(Boolean)
 
 class QuizQuestion():
+    __tablename__ = "questions"
     id: Column(String)
     name: Column(String, nullable=False, unique=True)
     choices: Column(ARRAY(String), nullable=False)
@@ -407,15 +409,13 @@ class QuizQuestion():
 
     quiz: relationship("Quiz", back_populates="questions")
     
-    
-    
 
 
 class Quiz(Base):
     __tablename__ = "buses"
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String, nullable=False, unique=True)
-    questions = relationship("Question", back_populates="")
+    questions = relationship("Question", back_populates="Quiz")
 
     class_section_id = Column(Integer, ForeignKey=("class_section.id"))
 

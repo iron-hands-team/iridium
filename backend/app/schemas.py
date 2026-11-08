@@ -528,6 +528,7 @@ class BusResponse(BaseModel):
     name: str
     description: str | None = None
     destinations: list[Destination]
+    isClicking: bool
     systemName: str
 
     class Config:

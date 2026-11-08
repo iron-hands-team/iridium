@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { bs } from "@/lib/busStore";
 import Btn from "@/components/ui/btn";
 import { AnimatePresence } from "framer-motion";
@@ -14,19 +14,27 @@ export default function Buses({ isAdmin }: { isAdmin: boolean }) {
   const [index, setIndex] = useState<number | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
 
+  const fetchBuses = bs((state) => state.fetchBuses);
+  const saveBuses = bs((state) =>state.saveBuses);
+
   async function handleSave() {
     setLoading(true);
     console.log(buses);
+    saveBuses();
     setLoading(false);
   }
+
+  useEffect(() => {
+    fetchBuses();
+  }, [fetchBuses])
 
   return (
     <>
       <div className="flex flex-col gap-y-3">
         {isAdmin && (
           <div className="flex gap-x-3">
-            <Btn onclick={() => addBus()} text="Add Bus" primary />
-            <Btn onclick={() => clearBuses()} text="Clear Buses" />
+            <Btn onclick={() => {addBus(); saveBuses()}} text="Add Bus" primary />
+            <Btn onclick={() => {clearBuses(); saveBuses()}} text="Clear Buses" />
           </div>
         )}
         <div className="flex">
@@ -50,6 +58,7 @@ export default function Buses({ isAdmin }: { isAdmin: boolean }) {
             key={busIndex}
             onClick={() => {
               setBus(busIndex, "isClicking", !busItem.isClicking);
+              saveBuses();
             }}
             className={"w-full flex flex-col items-center justify-center "}
           >
@@ -74,7 +83,7 @@ export default function Buses({ isAdmin }: { isAdmin: boolean }) {
                     className="text-black  w-full resize-none h-[50px] p-2   hover:border-zinc-600 text-[18px] font-sans font-bold text-center"
                     placeholder="Bus Name"
                     value={busItem.name}
-                    onChange={(e) => setBus(busIndex, "name", e.target.value)}
+                    onChange={(e) => {setBus(busIndex, "name", e.target.value); saveBuses()}}
                   ></input>
                 </div>
               </div>
@@ -149,6 +158,7 @@ export default function Buses({ isAdmin }: { isAdmin: boolean }) {
           text={loading ? "Saving..." : "Save"}
           primary
           styles="w-fit"
+          
         />
       )}
       <AnimatePresence>

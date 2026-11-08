@@ -1,4 +1,5 @@
 import { create } from "zustand";
+import { useRouter } from "next/navigation";
 
 // school account's side
 
@@ -11,6 +12,8 @@ export type Bus = {
   isClicking: boolean;
 };
 
+
+
 type Destination = {
   location: string;
   beforeSchoolTime: string;
@@ -20,6 +23,10 @@ type Destination = {
 
 type busStore = {
   buses: Bus[];
+
+  fetchBuses: ()=> Promise<void>;
+  saveBuses: ()=> Promise<void>;
+
   addBus: () => void;
   updateFrame: () => void;
   deleteBus: (busindex: number) => void;
@@ -43,11 +50,54 @@ type busStore = {
   setAboutPopup: (aboutPopup: boolean) => void;
 };
 
-export const bs = create<busStore>((set) => ({
+const API  = process.env.NEXT_PUBLIC_API_URL;
+
+export const bs = create<busStore>((set, get) => ({
   aboutPopup: false,
   setAboutPopup: (aboutPopup) => set({ aboutPopup }),
 
   buses: [],
+
+  fetchBuses: async () => {
+    const response = await fetch(`api/buses`,  {
+        credentials: "include"
+    })
+
+    const data = await response.json();
+    set({
+      buses: data.map((bus:any) => ({
+        id: bus.id,
+        name: bus.name,
+        desc: bus.description,
+        color: bus.color,
+        destinations: bus.destinations,
+        isClicking: false
+      }))
+    })
+  },
+
+  saveBuses: async () => {
+    const response = await fetch(`${API}/buses`,  {
+      method: "POST",
+      credentials: "include",
+      headers: {"Content-Type": "application/json"},
+      body: JSON.stringify(
+        get().buses.map((bus) => ({
+          name: bus.name,
+          description: bus.desc,
+          destinations: bus.destinations,
+          isClicking: bus.isClicking
+        }))
+      )
+    })
+
+    if(!response.ok)
+        throw new Error("No Buses :(");
+
+    await get().fetchBuses();
+  },
+
+
 
   updateFrame: () =>
     set((state) => ({
