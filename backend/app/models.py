@@ -70,6 +70,15 @@ class Announcement(Base):
     def likes(self):
         return [like.user.username for like in self.like_records]
 
+class AnnouncementLike(Base):
+    __tablename__ = "announcement_likes"
+    id = Column(Integer, primary_key=True, index=True)
+    announcement_id = Column(Integer, ForeignKey("announcements.id"), nullable=False)
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+
+    announcement = relationship("Announcement", back_populates="like_records")
+    user = relationship("User", back_populates="announcement_likes")
+
 class Club(Base):
     __tablename__ = "clubs"
     id = Column(Integer, primary_key=True, index=True)
@@ -371,43 +380,44 @@ class Guide(Base):
     created_at = Column(DateTime(timezone=True), default=utcnow, nullable=False)
     
 
-class Destination(Base): 
-    __tablename__ = "destinations"
-    location: str
-    before_school_time: str
-    after_school_time: str
-    color: str
-    bus_id = Column(Integer, ForeignKey("buses.id"))
-    bus = relationship("Bus", back_populates="destinations")
-
-    
-
 class Bus(Base):
     __tablename__ = "buses"
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String, nullable=False, unique=True)
     description = Column(Text, nullable=True)
-    destinations = relationship("Destination", back_populates="bus")
+    destinations = relationship(
+        "Destination", back_populates="bus", cascade="all, delete-orphan"
+    )
 
-class QuizQuestion():
-    id = Column(String)
-    name = Column(String, nullable=False, unique=True)
-    choices = Column(ARRAY(String), nullable=False)
-    answers = Column(ARRAY(String), nullable=False)
-    can_show = Column(Boolean, nullable=False)
 
-    quiz = relationship("Quiz", back_populates="questions")
-    
-    
-    
+class Destination(Base):
+    __tablename__ = "destinations"
+    id = Column(Integer, primary_key=True, index=True)
+    location = Column(String, nullable=False)
+    before_school_time = Column(String, nullable=False)
+    after_school_time = Column(String, nullable=False)
+    color = Column(String, nullable=False)
+    bus_id = Column(Integer, ForeignKey("buses.id"), nullable=False)
+    bus = relationship("Bus", back_populates="destinations")
 
 
 class Quiz(Base):
-    __tablename__ = "buses"
+    __tablename__ = "quizzes"
     id = Column(Integer, primary_key=True, index=True)
-    name = Column(String, nullable=False, unique=True)
-    questions = relationship("Question", back_populates="")
-
-    class_section_id = Column(Integer, ForeignKey=("class_section.id"))
-
+    name = Column(String, nullable=False)
+    class_section_id = Column(Integer, ForeignKey("class_sections.id"), nullable=False)
     class_section = relationship("ClassSection", back_populates="quizzes")
+    questions = relationship(
+        "QuizQuestion", back_populates="quiz", cascade="all, delete-orphan"
+    )
+
+
+class QuizQuestion(Base):
+    __tablename__ = "quiz_questions"
+    id = Column(Integer, primary_key=True, index=True)
+    name = Column(String, nullable=False)
+    choices = Column(ARRAY(String), nullable=False)
+    answers = Column(ARRAY(String), nullable=False)
+    can_show = Column(Boolean, nullable=False, default=False)
+    quiz_id = Column(Integer, ForeignKey("quizzes.id"), nullable=False)
+    quiz = relationship("Quiz", back_populates="questions")
