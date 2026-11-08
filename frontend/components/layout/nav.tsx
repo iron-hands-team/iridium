@@ -99,7 +99,10 @@ async function Nav() {
         ]
       : []),
     ...(user.role === "teacher"
-      ? [{ href: "/admin/reports", label: "View reports" }]
+      ? [
+          { href: "/admin/reports", label: "Reports" },
+          { href: "/quizzes", label: "Quizzes" },
+        ]
       : []),
     {
       href: "/calendar",

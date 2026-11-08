@@ -1,30 +1,23 @@
 "use client";
+
 import { cs } from "@/lib/classStore";
 import Btn from "@/components/ui/btn";
-import Header from "@/components/layout/header";
-import "@/app/globals.css";
-
 import AssignmentsPopupClassTeacher from "./assignmentsPopupClassTeacher";
 import SettingsPopupClassTeacher from "./settingsPopupClassTeacher";
 import MessagePopupClassTeacher from "./messagesPopupClassTeacher";
 import StudentsPopupClassTeacher from "@/components/class/studentsPopupClassTeacher";
 import QuizPopup from "@/components/class/quizPopupTeacher";
 
-import AboutPopup from "@/components/layout/aboutPopup";
-
 export default function BodyClassTeacher() {
-  const aboutPopup = cs((state) => state.aboutPopup);
   const setAboutPopup = cs((state) => state.setAboutPopup);
 
   const quizPopup = cs((state) => state.quizPopup);
   const setQuizPopup = cs((state) => state.setQuizPopup);
 
-  const quizClassIndex = cs((state) => state.quizClassIndex);
   const setQuizClassIndex = cs((state) => state.setQuizClassIndex);
 
   const settingsPopup = cs((state) => state.settingsPopup);
   const setSettingsPopup = cs((state) => state.setSettingsPopup);
-  const settingsClassIndex = cs((state) => state.settingsClassIndex);
 
   const setSettingsClassIndex = cs((state) => state.setSettingsClassIndex);
   const studentsPopup = cs((state) => state.studentsPopup);
@@ -52,7 +45,6 @@ export default function BodyClassTeacher() {
     setQuizPopup(true);
     setQuizClassIndex(classIndex);
     setSettingsClassIndex(classIndex);
-    console.log(quizClassIndex + " " + quizPopup);
   }
 
   function functionSetSettings(id: number) {
@@ -92,16 +84,6 @@ export default function BodyClassTeacher() {
         <StudentsPopupClassTeacher />
       )}
       {quizPopup && <QuizPopup />}
-      {aboutPopup && <AboutPopup />}
-
-      <Header
-        headerText={
-          <p className="text-[30px]">
-            <b>Welcome Back, Dih</b>
-          </p>
-        }
-      />
-
       <div className="flex w-full gap-[10px] border-b-1 border-t-1 border-white items-center bg-gray-800 p-[10px] justify-between">
         <div className="flex">
           <div className="flex border-1 border-white p-[10px] items-center justify-center ">

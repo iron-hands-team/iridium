@@ -161,6 +161,7 @@ class ClassSection(Base):
     attendance_records = relationship(
         "AttendanceRecord", back_populates="class_section", cascade="all, delete-orphan"
     )
+    quizzes = relationship("Quiz", back_populates="class_section", cascade="all, delete-orphan")
 
 class Assignment(Base):
     __tablename__ = "assignments"
@@ -370,40 +371,43 @@ class Guide(Base):
     created_at = Column(DateTime(timezone=True), default=utcnow, nullable=False)
     
 
-# class Destination(Base): 
-#     __tablename__ = "destinations"
-#     location: str
-#     before_school_time: str
-#     after_school_time: str
-#     color: str
-#     bus_id: Column(Integer, ForeignKey("buses.id"))
-#     bus: relationship("Bus", back_populates="destinations")
+class Destination(Base): 
+    __tablename__ = "destinations"
+    location: str
+    before_school_time: str
+    after_school_time: str
+    color: str
+    bus_id: Column(Integer, ForeignKey("buses.id"))
+    bus: relationship("Bus", back_populates="destinations")
 
-# class Bus(Base):
-#     __tablename__ = "buses"
-#     id = Column(Integer, primary_key=True, index=True)
-#     name = Column(String, nullable=False, unique=True)
-#     description = Column(Text, nullable=True)
-#     destinations = relationship("Destination", back_populates="bus")
+    
 
-    #sponsor = relationship("User", back_populates="clubs_sponsored")
-    #members = relationship("ClubMembership", back_populates="club")
+class Bus(Base):
+    __tablename__ = "buses"
+    id = Column(Integer, primary_key=True, index=True)
+    name = Column(String, nullable=False, unique=True)
+    description = Column(Text, nullable=True)
+    destinations = relationship("Destination", back_populates="bus")
+
+class QuizQuestion():
+    id: Column(String)
+    name: Column(String, nullable=False, unique=True)
+    choices: Column(ARRAY(String), nullable=False)
+    answers: Column(ARRAY(String), nullable=False)
+    can_show: Column(Boolean, nullable=False)
+
+    quiz: relationship("Quiz", back_populates="questions")
+    
+    
+    
 
 
+class Quiz(Base):
+    __tablename__ = "buses"
+    id = Column(Integer, primary_key=True, index=True)
+    name = Column(String, nullable=False, unique=True)
+    questions = relationship("Question", back_populates="")
 
-# class Club(Base):
-#     __tablename__ = "clubs"
-#     id = Column(Integer, primary_key=True, index=True)
-#     name = Column(String, nullable=False, unique=True)
-#     description = Column(Text, nullable=True)
-#     sponsor_id = Column(Integer, ForeignKey("users.id"), nullable=True)
-#     categories = Column(ARRAY(String), nullable=False, default=list)
+    class_section_id = Column(Integer, ForeignKey=("class_section.id"))
 
-#     sponsor = relationship("User", back_populates="clubs_sponsored")
-#     members = relationship("ClubMembership", back_populates="club")
-#     channel = relationship("Channel", back_populates="club", uselist=False)
-#     favorite_records = relationship("ClubFavorite", back_populates="club", cascade="all, delete-orphan")
-
-#     @property
-#     def favorite(self):
-#         return [fav.user.username for fav in self.favorite_records]
+    class_section = relationship("ClassSection", back_populates="quizzes")

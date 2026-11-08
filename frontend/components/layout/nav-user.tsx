@@ -9,11 +9,9 @@ import {
   FaSun,
   FaLightbulb,
   FaExclamationCircle,
-  FaSchool,
   FaBus,
   FaBook,
 } from "react-icons/fa";
-import { FaGear } from "react-icons/fa6";
 import { useState, useEffect, useRef } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
@@ -123,10 +121,6 @@ function NavUser({ user }: { user: UserType }) {
                 )}
                 Theme
               </div>
-              <Link href="/school" className={optionStyles}>
-                <FaSchool size={18} className={iconStyles} />
-                School
-              </Link>
               <Link href="/bus" className={optionStyles}>
                 <FaBus size={18} className={iconStyles} />
                 Bus
@@ -142,10 +136,6 @@ function NavUser({ user }: { user: UserType }) {
               <Link href="/report" className={optionStyles}>
                 <FaExclamationCircle size={18} className={iconStyles} />
                 Report
-              </Link>
-              <Link href="/settings" className={optionStyles}>
-                <FaGear size={18} className={iconStyles} />
-                Settings
               </Link>
               <div className={optionStyles} onClick={handleLogout}>
                 <FaSignOutAlt size={18} className={iconStyles} />

@@ -9,7 +9,7 @@ import {
   FaLink,
   FaTrash,
 } from "react-icons/fa";
-import { fileUrl } from "@/lib/helpers";
+import { schoolUrl } from "@/lib/helpers";
 import toast from "react-hot-toast";
 import Btn from "../ui/btn";
 import Input from "../ui/input";
@@ -19,6 +19,8 @@ import Image from "next/image";
 
 const labelStyles = "text-sm flex flex-col gap-y-1";
 
+//TODO: add option to clear banner/logo images
+
 function SchoolInfo() {
   const [school, setSchool] = useState<SchoolType>({ title: "", socials: [] });
   const [editing, setEditing] = useState<boolean>(false);
@@ -26,10 +28,17 @@ function SchoolInfo() {
   const [loading, setLoading] = useState<boolean>(false);
   const [loaded, setLoaded] = useState<boolean>(false);
 
-  function handleUpload(e: React.ChangeEvent<HTMLInputElement>) {
+  function handleUpload(
+    e: React.ChangeEvent<HTMLInputElement>,
+    type: "logo" | "banner",
+  ) {
     const file = e.target.files?.[0];
     if (!file) return;
-    setSchool({ ...school, logo: file });
+    setSchool({
+      ...school,
+      logo: type === "logo" ? file : school.logo,
+      banner: type === "banner" ? file : school.banner,
+    });
   }
 
   async function handleSave() {
@@ -46,20 +55,24 @@ function SchoolInfo() {
       });
       if (res.ok) {
         const uploads = await res.json();
-        await fetch(uploads.logo_url, {
-          method: "PUT",
-          headers: {
-            "Content-Type": school.logo!.type,
-          },
-          body: school.logo,
-        });
-        await fetch(uploads.banner_url, {
-          method: "PUT",
-          headers: {
-            "Content-Type": school.banner!.type,
-          },
-          body: school.banner,
-        });
+        if (school.logo) {
+          await fetch("/s3/" + uploads.logo, {
+            method: "PUT",
+            headers: {
+              "Content-Type": school.logo!.type,
+            },
+            body: school.logo,
+          });
+        }
+        if (school.banner) {
+          await fetch("/s3/" + uploads.banner, {
+            method: "PUT",
+            headers: {
+              "Content-Type": school.banner!.type,
+            },
+            body: school.banner,
+          });
+        }
         toast.success("School information updated successfully!");
         setEditing(false);
       } else {
@@ -107,7 +120,7 @@ function SchoolInfo() {
                         src={
                           school.logo
                             ? URL.createObjectURL(school.logo)
-                            : fileUrl(school.id as number) //TODO: upload school logo to different url
+                            : schoolUrl("logo")
                         }
                         alt="Uploaded logo"
                         width={150}
@@ -136,7 +149,7 @@ function SchoolInfo() {
                   <input
                     type="file"
                     className="hidden"
-                    onChange={(e) => handleUpload(e)}
+                    onChange={(e) => handleUpload(e, "logo")}
                   />
                 </label>
               </div>
@@ -152,7 +165,7 @@ function SchoolInfo() {
                         src={
                           school.banner
                             ? URL.createObjectURL(school.banner)
-                            : fileUrl(school.id as number) //TODO: upload school banner to different url
+                            : schoolUrl("banner")
                         }
                         alt="Uploaded banner"
                         width={150}
@@ -181,7 +194,7 @@ function SchoolInfo() {
                   <input
                     type="file"
                     className="hidden"
-                    onChange={(e) => handleUpload(e)}
+                    onChange={(e) => handleUpload(e, "banner")}
                   />
                 </label>
               </div>

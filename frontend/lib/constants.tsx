@@ -12,4 +12,16 @@ export const tips: TipType[] = [
     icon: <FaExclamationCircle size={17} />,
     text: "Submit a report from the nav user menu",
   },
+  {
+    icon: <FaBook size={20} />,
+    text: "Make sure to do your work so teach doesn't get mad",
+  },
+  {
+    icon: <FaExclamationCircle size={1000}/>,
+    text: "🤨🤨🤨🤨"
+  },
+  {
+    icon: <FaBook size={20}/>,
+    text: "🤤🤤🤤🤤"
+  }
 ]; //TODO: if you ran out of ideas, add some tips about using iridium here
