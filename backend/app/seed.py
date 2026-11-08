@@ -58,8 +58,8 @@ def init_db_and_seed_admin():
         teacher = User(
             username="teacher",
             hashed_password=hash_password("teacher123"),
-            first_name="teacher",
-            last_name="teacher",
+            first_name="Jane",
+            last_name="Doe",
             role=UserRole.teacher,
             title="AP Calculus BC Teacher",
         )
