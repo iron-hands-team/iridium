@@ -1,4 +1,5 @@
-"use state";
+"use client";
+
 import { cs } from "@/lib/classStore";
 import "@/app/globals.css";
 
@@ -31,49 +32,39 @@ export default function QuizBody() {
     return false;
   }
 
+  async function handleSave() {
+    console.log(classes);
+    //TODO: post/save to db
+  }
+
   return (
     <div
-      className="fixed flex h-full w-full justify-center items-center bg-black/90 overflow-y-auto  flex-col flex-wrap"
+      className="fixed flex h-full w-full justify-center items-center overflow-y-auto  flex-col flex-wrap"
       onClick={() => setQuizPopup(false)}
     >
       <div
-        className="bg-black/90  z-10 overflow-y-auto w-2/3  flex justify-center items-center border-1 border-zinc-400 "
+        className=" z-10 overflow-y-auto w-2/3  flex justify-center items-center"
         onClick={(e) => e.stopPropagation()}
       >
         <div className=" h-[700px] w-3/4 bg-blue">
-          <br></br>
           <div className="flex justify-between items-center">
-            <p className="text-[30px]">
-              <b>{classes[settingsClassIndex].className}&apos;s</b> Quizzes
+            <p className="text-[30px] pb-5">
+              <b>{classes[settingsClassIndex].className || ""}&apos;s</b>{" "}
+              Quizzes
             </p>
-            <Btn onclick={() => setQuizPopup(false)} text="Close" />
           </div>
           <Btn
             onclick={() => addClassQuiz(settingsClassIndex)}
             text="Add Quiz"
           />
-          <br></br> <br></br>
-          {classes[settingsClassIndex].quizzes.length == 0 && (
-            <div className="w-full items-center justify-center">
-              <p>
-                No Quizzes currently. Create one by pressing the button here!
-              </p>
-              <div className="w-2/3 h-full">
-                {" "}
-                <Btn
-                  onclick={() => addClassQuiz(settingsClassIndex)}
-                  text="Add Quiz"
-                />
-              </div>
+          {classes[settingsClassIndex]?.quizzes.length == 0 && (
+            <div className="w-full text-center py-5 text-sm text-zinc-700 dark:text-zinc-300">
+              No Quizzes currently. Create one by pressing the button here!
             </div>
           )}
-          <div className="">
-            {classes[settingsClassIndex].quizzes.map((quizItem, quizIndex) => (
-              <div
-                key={quizIndex}
-                className="mb-[20px] border-1 border-zinc-600 p-[10px] bg-gray-900
-									"
-              >
+          <div className="flex py-5 flex-col gap-y-3">
+            {classes[settingsClassIndex]?.quizzes.map((quizItem, quizIndex) => (
+              <div key={quizIndex} className="border-1 border-zinc-800 p-2">
                 <div className="flex w-full h-full bg-grey-50 justify-between">
                   <div className="flex">
                     <div className="gap-[10px] flex flex-col">
@@ -144,10 +135,10 @@ export default function QuizBody() {
                     {quizItem.questions.map((questionItem, questionIndex) => (
                       <div
                         key={questionIndex}
-                        className="flex flex-col mb-[20px] bg-blue-700 p-[10px] rounded-md"
+                        className="flex flex-col mb-[20px] bg-zinc-900 p-[10px] rounded-md"
                       >
                         <div className="flex items-center justify-between">
-                          <div className="flex item-center justify-center gap-[10px]">
+                          <div className="flex item-center justify-center gap-[10px] mb-3">
                             <p className="flex items-center">
                               <b>Question {questionIndex}:</b>{" "}
                             </p>
@@ -166,7 +157,6 @@ export default function QuizBody() {
                               placeholder="Enter Question Name"
                             ></input>
                           </div>
-
                           <Btn
                             onclick={() =>
                               deleteQuizQuestion(
@@ -178,13 +168,12 @@ export default function QuizBody() {
                             text="Delete Question"
                           />
                         </div>
-                        <br></br>
-                        <div className="flex">
+                        <div className="flex gap-x-3">
                           <Btn
                             onclick={() => {
                               questionItem.choices = addQuizChoice(
                                 questionItem.choices,
-                                "Asdsda",
+                                "",
                               );
                               questionItem.canShow = true;
                               setQuizQuestion(
@@ -214,8 +203,6 @@ export default function QuizBody() {
                             }
                           />
                         </div>
-                        <br></br>
-
                         {questionItem.canShow && (
                           <p>
                             Choices:{" "}
@@ -283,7 +270,6 @@ export default function QuizBody() {
                                     }
                                   />
                                 </div>
-
                                 <Btn
                                   onclick={() => {
                                     questionItem.choices = deleteQuizChoice(
@@ -312,6 +298,7 @@ export default function QuizBody() {
               </div>
             ))}
           </div>
+          <Btn text="Save" onclick={handleSave} primary />
         </div>
       </div>
     </div>

@@ -325,7 +325,7 @@ def upload_files(
 
 
 @router.get("/school", response_model=SchoolRequest)
-def get_school(db: Session = Depends(get_db), _current_user=Depends(manager)):
+def get_school(db: Session = Depends(get_db), _current_user: User = Depends(manager)):
     school = db.query(Info).first()
     return school
 
@@ -336,8 +336,8 @@ def save_school(
     db: Session = Depends(get_db),
     _current_user=Depends(require_admin),
 ):
-    db.query(Info).delete()
     db.query(InfoSocial).delete()
+    db.query(Info).delete()
     info = Info(
         title=school.title,
         description=school.description,
@@ -346,6 +346,7 @@ def save_school(
         number=school.number,
     )
     db.add(info)
+    db.flush()
 
     logo_url = s3_client.generate_presigned_url(
         ClientMethod="put_object",
@@ -360,7 +361,9 @@ def save_school(
 
     new_socials = []
     for social in school.socials:
-        new_socials.append(InfoSocial(name=social.name, link=social.link))
+        new_socials.append(
+            InfoSocial(name=social.name, link=social.link, info_id=info.id)
+        )
     db.add_all(new_socials)
     db.commit()
 

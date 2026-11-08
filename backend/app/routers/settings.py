@@ -14,9 +14,7 @@ DURATIONS = {"Seconds": 1, "Minutes": 60, "Hours": 3600}
 
 
 @router.get("/settings", response_model=SettingsRequest)
-def get_settings(
-    db: Session = Depends(get_db), _current_user: User = Depends(require_admin)
-):
+def get_settings(db: Session = Depends(get_db), _current_user: User = Depends(manager)):
     settings = db.query(Settings).first()
     data = settings.data if settings else {}
     return {**data, "id": settings.id if settings else None}

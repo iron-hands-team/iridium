@@ -432,9 +432,16 @@ def init_db_and_seed_admin():
         db.add(
             Settings(
                 data={
-                    "features": [],
+                    "features": [
+                        "Classes",
+                        "Schedule",
+                        "Calendar",
+                        "Clubs",
+                        "Messages",
+                        "Chat",
+                    ],
                     "archive": {"number": 30, "duration": "Days", "never": False},
-                    "messages": {"number": 90, "duration": "Days", "never": False},
+                    "messages": {"number": 30, "duration": "Days", "never": False},
                     "slow": {"number": 5, "duration": "Seconds", "enabled": False},
                     "censored": {"words": [], "sensitive": False},
                     "paused": False,

@@ -1,11 +1,14 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import { FaExclamationTriangle, FaChevronDown, FaChevronRight } from "react-icons/fa";
+import {
+  FaExclamationTriangle,
+  FaChevronDown,
+  FaChevronRight,
+} from "react-icons/fa";
 import Btn from "@/components/ui/btn";
 import Input from "@/components/ui/input";
 import Footer from "@/components/layout/footer";
-import {cs} from "@/lib/classStore";
 
 const ATTENDANCE_STATUSES = ["present", "absent", "tardy", "excused"] as const;
 
@@ -13,11 +16,11 @@ const attendanceStatusStyles: Record<string, string> = {
   present: "bg-green-600 text-white",
   absent: "bg-red-600 text-white",
   tardy: "bg-yellow-600 text-white",
-  excused: "bg-zinc-600 text-white"
+  excused: "bg-zinc-600 text-white",
 };
 
 function todayISO() {
-  return new Date().toISOString().slice(0,10);
+  return new Date().toISOString().slice(0, 10);
 }
 
 interface AttendanceRecord {
@@ -105,9 +108,9 @@ export default function ClassBody() {
   const [attendance, setAttendance] = useState<
     Record<number, AttendanceRecord[]>
   >({});
-  const [attendanceOpen, setAttendanceOpen] = useState<
-    Record<number, boolean>
-  >({});
+  const [attendanceOpen, setAttendanceOpen] = useState<Record<number, boolean>>(
+    {},
+  );
 
   const loadClasses = useCallback(async () => {
     try {
@@ -350,17 +353,15 @@ export default function ClassBody() {
         ),
       }));
     } catch (e) {
-      setError(
-        e instanceof Error ? e.message : "Failed to update attendance.",
-      );
+      setError(e instanceof Error ? e.message : "Failed to update attendance.");
     }
   }
 
   return (
-    <div className="bg-[#131313] min-h-screen text-white">
-      <header className="flex flex-col gap-y-2 items-center py-8 border-t border-b border-zinc-800">
+    <div className="bg-zinc-100 dark:bg-zinc-950 min-h-screen text-black dark:text-white">
+      <header className="flex flex-col gap-y-2 items-center py-8">
         <p className="text-xl font-bold">Your Classes</p>
-        <p className="text-sm text-zinc-400">
+        <p className="text-sm text-zinc-700 dark:text-zinc-300">
           Manage your class sections and rosters
         </p>
       </header>
@@ -492,7 +493,9 @@ export default function ClassBody() {
                   <div className="flex items-center justify-between mt-4">
                     <p className="font-bold text-sm">Gradebook</p>
                     <Btn
-                      text={addingAssignment[section.id] ? "Cancel" : "+ Assignment"}
+                      text={
+                        addingAssignment[section.id] ? "Cancel" : "+ Assignment"
+                      }
                       styles="text-xs"
                       onclick={() =>
                         setAddingAssignment((prev) => ({
@@ -535,9 +538,7 @@ export default function ClassBody() {
                   )}
 
                   {(assignments[section.id] || []).length === 0 ? (
-                    <p className="text-sm text-zinc-500">
-                      No assignments yet.
-                    </p>
+                    <p className="text-sm text-zinc-500">No assignments yet.</p>
                   ) : (
                     <div className="flex flex-col gap-y-2">
                       {assignments[section.id].map((assignment) => {
@@ -644,21 +645,25 @@ export default function ClassBody() {
                     <p className="font-bold text-sm">Attendance</p>
                     <div className="flex items-center gap-x-2">
                       <input
-                          type="date"
-                          value={attendanceDate}
-                          onChange={(e) => changeAttendanceDate(e.target.value)}
-                          className="bg-transparent border border-zinc-800 rounded px-2 py-1 text-xs"
-                       />
-                       <Btn
-                          text={attendanceOpen[section.id] ? "Hide" : "Take Attendance"}
-                          styles="text-xs"
-                          onclick={() => toggleAttendance(section.id)}
-                       />
+                        type="date"
+                        value={attendanceDate}
+                        onChange={(e) => changeAttendanceDate(e.target.value)}
+                        className="bg-transparent border border-zinc-800 rounded px-2 py-1 text-xs"
+                      />
+                      <Btn
+                        text={
+                          attendanceOpen[section.id]
+                            ? "Hide"
+                            : "Take Attendance"
+                        }
+                        styles="text-xs"
+                        onclick={() => toggleAttendance(section.id)}
+                      />
                     </div>
                   </div>
 
-                  {attendanceOpen[section.id] && (
-                    (attendance[section.id] || []).length === 0 ? (
+                  {attendanceOpen[section.id] &&
+                    ((attendance[section.id] || []).length === 0 ? (
                       <p className="text-sm text-zinc-500">
                         No students enrolled to take attendance for.
                       </p>
@@ -697,8 +702,7 @@ export default function ClassBody() {
                           </div>
                         ))}
                       </div>
-                    )
-                  )}
+                    ))}
                 </div>
               )}
             </div>

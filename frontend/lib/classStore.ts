@@ -1,694 +1,929 @@
 import { create } from "zustand";
 
 type Test = {
- id: number;
- name: string;
- text: string;
- grade: string;
- assignments: Assignment[];
- announcements: Announcement[];
+  id: number;
+  name: string;
+  text: string;
+  grade: string;
+  assignments: Assignment[];
+  announcements: Announcement[];
 };
 
 type Class = {
-
- id: number;
- className: string;
- students: Test[];
- color: string;
- canShow : boolean;
- assignments: Assignment[];
- announcements: Announcement[];
-	quizzes: Quiz[];
-	canShowQuizzes: boolean;
-	
+  id: number;
+  className: string;
+  students: Test[];
+  color: string;
+  canShow: boolean;
+  assignments: Assignment[];
+  announcements: Announcement[];
+  quizzes: Quiz[];
+  canShowQuizzes: boolean;
 };
 
 type Assignment = {
-	id: number;
-	name: string;
-	text: string;
-	link: string;
-	grade: number;
-	isDone: boolean;
-}
+  id: number;
+  name: string;
+  text: string;
+  link: string;
+  grade: number;
+  isDone: boolean;
+};
 
 type Announcement = {
-	id: number;
-	text: string;
-	date: string;
-}
+  id: number;
+  text: string;
+  date: string;
+};
 
 type Quiz = {
-	id: number,
-	name: string,
-	questions: QuizQuestion[];
-	canShow: boolean;
-}
+  id: number;
+  name: string;
+  questions: QuizQuestion[];
+  canShow: boolean;
+};
 
 type QuizQuestion = {
-	id: number;
-	question: string,
-	choices: string[]
-	answers: string[],
-	canShow: boolean
-}
-
+  id: number;
+  question: string;
+  choices: string[];
+  answers: string[];
+  canShow: boolean;
+};
 
 type ClassStore = {
- classes: Class[];
-	annoucementInput: string;
+  classes: Class[];
+  annoucementInput: string;
 
-	aboutPopup: boolean;
-	setAboutPopup: (input:boolean)=>void;
+  aboutPopup: boolean;
+  setAboutPopup: (input: boolean) => void;
 
-	// quiz
-	quizPopup: boolean;
-	setQuizPopup: (input:boolean)=>void;
+  // quiz
+  quizPopup: boolean;
+  setQuizPopup: (input: boolean) => void;
 
-	addClassQuiz: (classTargetIndex:number)=>void;
-	deleteClassQuiz: (classTargetIndex:number, quizIndex:number) =>void;
-	setClassQuiz: <T>(classTargetIndex:number, quizIndex:number, value:T, variableName:string)=>void;
+  addClassQuiz: (classTargetIndex: number) => void;
+  deleteClassQuiz: (classTargetIndex: number, quizIndex: number) => void;
+  setClassQuiz: <T>(
+    classTargetIndex: number,
+    quizIndex: number,
+    value: T,
+    variableName: string,
+  ) => void;
 
-	quizClassIndex: number;
-	setQuizClassIndex: (classIndex:number) => void;
-	
-	addQuizQuestion: (classTargetIndex:number, quizTargetIndex:number)=>void;
-	deleteQuizQuestion: (classTargetIndex:number, quizTargetIndex:number, quizQuestionTargetIndex:number) =>void;
-	setQuizQuestion: <T>(classTargetindex:number, quizTargetIndex:number, quizQuestionTargetIndex:number, value:T, variableName:string)=>void;
+  quizClassIndex: number;
+  setQuizClassIndex: (classIndex: number) => void;
 
-	addQuizChoice: (choices:string[], choice:string)=>string[];
-	deleteQuizChoice: (choices:string[], choiceIndex:number)=>string[];
-	setQuizChoice: (choices:string[], choiceIndex:number, choice:string)=>string[];
+  addQuizQuestion: (classTargetIndex: number, quizTargetIndex: number) => void;
+  deleteQuizQuestion: (
+    classTargetIndex: number,
+    quizTargetIndex: number,
+    quizQuestionTargetIndex: number,
+  ) => void;
+  setQuizQuestion: <T>(
+    classTargetindex: number,
+    quizTargetIndex: number,
+    quizQuestionTargetIndex: number,
+    value: T,
+    variableName: string,
+  ) => void;
 
-	addQuizAnswer: (answers:string[], answer:string) => string[];
-	deleteQuizAnswer: (answers:string[], answerIndex:number) => string[];
-	setQuizAnswer: (answers:string[], answerIndex:number, answer:string)=> string[];
+  addQuizChoice: (choices: string[], choice: string) => string[];
+  deleteQuizChoice: (choices: string[], choiceIndex: number) => string[];
+  setQuizChoice: (
+    choices: string[],
+    choiceIndex: number,
+    choice: string,
+  ) => string[];
 
- // settings stuff
- settingsPopup: boolean;
- setSettingsPopup: (input:boolean) => void;
- settingsClassIndex: number;
- setSettingsClassIndex: (settingClassIndex:number)=>void;
+  addQuizAnswer: (answers: string[], answer: string) => string[];
+  deleteQuizAnswer: (answers: string[], answerIndex: number) => string[];
+  setQuizAnswer: (
+    answers: string[],
+    answerIndex: number,
+    answer: string,
+  ) => string[];
 
- // student info
- studentsPopup: boolean;
- setStudentsPopup: (input:boolean) => void;
- settingsStudentsIndex : number;
- setSettingsStudentsIndex: (settingsStudentsIndex:number)=>void;
+  // settings stuff
+  settingsPopup: boolean;
+  setSettingsPopup: (input: boolean) => void;
+  settingsClassIndex: number;
+  setSettingsClassIndex: (settingClassIndex: number) => void;
 
- //assignments info
- assignmentsPopup: boolean;
- setAssignmentsPopup: (input:boolean) => void;
- untitledCount: number;
- setUntitledCount: (untitledCount:number)=>void;
+  // student info
+  studentsPopup: boolean;
+  setStudentsPopup: (input: boolean) => void;
+  settingsStudentsIndex: number;
+  setSettingsStudentsIndex: (settingsStudentsIndex: number) => void;
 
-	update: () => void;
+  //assignments info
+  assignmentsPopup: boolean;
+  setAssignmentsPopup: (input: boolean) => void;
+  untitledCount: number;
+  setUntitledCount: (untitledCount: number) => void;
 
- //messaging info
- messagePopup: boolean;
- setMessagePopup: (input:boolean) => void;
- announcementInput: string;
+  update: () => void;
 
-	setCanShowStudents: (index:number, canShow:boolean) => void;
-	setAnnouncementInput: (input: string) => void;
+  //messaging info
+  messagePopup: boolean;
+  setMessagePopup: (input: boolean) => void;
+  announcementInput: string;
 
- setClasses: (classes: Class[]) => void;
- addClass: () => void;
+  setCanShowStudents: (index: number, canShow: boolean) => void;
+  setAnnouncementInput: (input: string) => void;
 
- addStudent: (students : Test[], classIndex: number) => void;
-	subAddStudent: (students: Test[]) => Test[];
-	deleteStudent: (classIndex : number, studentIndex : number) => void;
-	setStudentName: <T>(index:number, studentIndex:number, text:T, variableName:string) =>void;
+  setClasses: (classes: Class[]) => void;
+  addClass: () => void;
 
-	addAssignments: (classIndex : number, studentIndex : number, untitledCount : number) => void;
+  addStudent: (students: Test[], classIndex: number) => void;
+  subAddStudent: (students: Test[]) => Test[];
+  deleteStudent: (classIndex: number, studentIndex: number) => void;
+  setStudentName: <T>(
+    index: number,
+    studentIndex: number,
+    text: T,
+    variableName: string,
+  ) => void;
 
-	addClassAssignment: (classIndex : number, untitledCount : number) => void;
+  addAssignments: (
+    classIndex: number,
+    studentIndex: number,
+    untitledCount: number,
+  ) => void;
 
-	addAssignmentsToStudents: (classIndex : number, untitledCount : number) => void;
+  addClassAssignment: (classIndex: number, untitledCount: number) => void;
 
-	deleteAssignmentToStudents: (classIndex: number, assignmentName: string) => void;
+  addAssignmentsToStudents: (classIndex: number, untitledCount: number) => void;
 
-	addAnnouncementsToStudents:(classIndex : number, annoucement: string, textInput : string, untitledCount : number) => void;
+  deleteAssignmentToStudents: (
+    classIndex: number,
+    assignmentName: string,
+  ) => void;
 
-	addClassAnnouncement: (classIndex:number, textInput:string) => void;
+  addAnnouncementsToStudents: (
+    classIndex: number,
+    annoucement: string,
+    textInput: string,
+    untitledCount: number,
+  ) => void;
 
- deleteAssignment: (classIndex:number, studentIndex:number, assignmentIndex:number) => void;
+  addClassAnnouncement: (classIndex: number, textInput: string) => void;
 
-	deleteAssignmentClassByName: (classIndex:number, assignmentName:string) => void;
+  deleteAssignment: (
+    classIndex: number,
+    studentIndex: number,
+    assignmentIndex: number,
+  ) => void;
 
-	setAssignmentClass: <T>(classIndex:number, assignmentIndex: number, assignmentName: T, assignmentVariablename: string) => void;
+  deleteAssignmentClassByName: (
+    classIndex: number,
+    assignmentName: string,
+  ) => void;
 
-	setAssignmentStudent: <T>(classIndex:number, assignmentIndex:number, assignmentName:T, assignmentVariableName:string) =>void;
-	setAssignmentIndividualStudent: <T>(classIndex:number, studentIndex:number, assignmentIndex:number, assignmentName:T, assignmentVariableName:string)=>void;
+  setAssignmentClass: <T>(
+    classIndex: number,
+    assignmentIndex: number,
+    assignmentName: T,
+    assignmentVariablename: string,
+  ) => void;
 
-	setAnnouncementClass: <T>(classIndex:number, assignmentIndex:number, assignmentName:T, assignmentVariableName:string) => void;
+  setAssignmentStudent: <T>(
+    classIndex: number,
+    assignmentIndex: number,
+    assignmentName: T,
+    assignmentVariableName: string,
+  ) => void;
+  setAssignmentIndividualStudent: <T>(
+    classIndex: number,
+    studentIndex: number,
+    assignmentIndex: number,
+    assignmentName: T,
+    assignmentVariableName: string,
+  ) => void;
 
+  setAnnouncementClass: <T>(
+    classIndex: number,
+    assignmentIndex: number,
+    assignmentName: T,
+    assignmentVariableName: string,
+  ) => void;
 
-	setAnnouncementStudent: <T>(classIndex:number, assignmentIndex:number, assignmentName:T, assignmentVariableName:string) => void;
+  setAnnouncementStudent: <T>(
+    classIndex: number,
+    assignmentIndex: number,
+    assignmentName: T,
+    assignmentVariableName: string,
+  ) => void;
 
-	setAnnouncementIndividualStudent: <T>(classIndex:number, studentIndex:number, assignmentIndex:number, assignmentName:T,assignmentVariableName:string) => void;
+  setAnnouncementIndividualStudent: <T>(
+    classIndex: number,
+    studentIndex: number,
+    assignmentIndex: number,
+    assignmentName: T,
+    assignmentVariableName: string,
+  ) => void;
 
-	checkClassAssignmentName: (classIndex:number, targetAssignmentname:string, targetindex:number, assignmentName:string, untitledCount:number) => void;
+  checkClassAssignmentName: (
+    classIndex: number,
+    targetAssignmentname: string,
+    targetindex: number,
+    assignmentName: string,
+    untitledCount: number,
+  ) => void;
 
-	changeClassBorderColor: (index:number, color:string) =>void;
-	setClassName: <T>(classIndex:number, className:T, variableName:string)=>void;
-	updateCanShowStudents: (classIndex:number,canShow:boolean)=>void;
-	deleteClass: (classIndex:number) => void;
-}
+  changeClassBorderColor: (index: number, color: string) => void;
+  setClassName: <T>(
+    classIndex: number,
+    className: T,
+    variableName: string,
+  ) => void;
+  updateCanShowStudents: (classIndex: number, canShow: boolean) => void;
+  deleteClass: (classIndex: number) => void;
+};
 
 export const cs = create<ClassStore>((set) => ({
-    classes: [],
+  classes: [
+    {
+      id: 0,
+      className: "Chemistry", //TODO: actually pull class data from backend
+      students: [],
+      color: "",
+      canShow: true,
+      assignments: [],
+      announcements: [],
+      quizzes: [],
+      canShowQuizzes: true,
+    },
+  ],
 
-				annoucementInput: "",
+  annoucementInput: "",
 
-				aboutPopup: false,
+  aboutPopup: false,
 
-				setAboutPopup: (aboutPopup)=> set({aboutPopup}),
+  setAboutPopup: (aboutPopup) => set({ aboutPopup }),
 
-				update: () => set((state) => ({
-					classes: state.classes
-				})),
-				//quiz question
-				addClassQuiz: (classTargetIndex) => set((state) => ({
-					classes: state.classes.map((classItem, classIndex) =>
-						classIndex == classTargetIndex ? {...classItem, quizzes:
-							[...classItem.quizzes, {
-								id: 0,
-								name: "",
-								questions: [],
-								canShow: true,
-							}]
-						} : classItem
-					)
-				})),
+  update: () =>
+    set((state) => ({
+      classes: state.classes,
+    })),
+  //quiz question
+  addClassQuiz: (classTargetIndex) =>
+    set((state) => ({
+      classes: state.classes.map((classItem, classIndex) =>
+        classIndex == classTargetIndex
+          ? {
+              ...classItem,
+              quizzes: [
+                ...classItem.quizzes,
+                {
+                  id: 0,
+                  name: "",
+                  questions: [],
+                  canShow: true,
+                },
+              ],
+            }
+          : classItem,
+      ),
+    })),
 
-				deleteClassQuiz: (classTargetIndex, quizIndex) => set((state) => ({
-					classes: state.classes.map((classItem, classIndex) =>
-					classIndex === classTargetIndex ? {...classItem, quizzes: classItem.quizzes.filter((_,i) => i !== quizIndex)}: classItem)
-				})),
+  deleteClassQuiz: (classTargetIndex, quizIndex) =>
+    set((state) => ({
+      classes: state.classes.map((classItem, classIndex) =>
+        classIndex === classTargetIndex
+          ? {
+              ...classItem,
+              quizzes: classItem.quizzes.filter((_, i) => i !== quizIndex),
+            }
+          : classItem,
+      ),
+    })),
 
-				setClassQuiz: (classTargetIndex, quizTargetIndex, value, variableName) => set((state)=> ({
-					classes: state.classes.map((classItem, classIndex) =>
-					classIndex === classTargetIndex ? {...classItem, quizzes: classItem.quizzes.map((quizItem, quizIndex) => ( quizIndex === quizTargetIndex ? { ...quizItem, [variableName]: value}:quizItem))} : classItem
-				)
-				})),
+  setClassQuiz: (classTargetIndex, quizTargetIndex, value, variableName) =>
+    set((state) => ({
+      classes: state.classes.map((classItem, classIndex) =>
+        classIndex === classTargetIndex
+          ? {
+              ...classItem,
+              quizzes: classItem.quizzes.map((quizItem, quizIndex) =>
+                quizIndex === quizTargetIndex
+                  ? { ...quizItem, [variableName]: value }
+                  : quizItem,
+              ),
+            }
+          : classItem,
+      ),
+    })),
 
+  addQuizQuestion: (classTargetIndex, quizTargetIndex) =>
+    set((state) => ({
+      classes: state.classes.map((classItem, classIndex) =>
+        classIndex === classTargetIndex
+          ? {
+              ...classItem,
+              quizzes: classItem.quizzes.map((quizItem, quizIndex) =>
+                quizIndex === quizTargetIndex
+                  ? {
+                      ...quizItem,
+                      questions: [
+                        ...quizItem.questions,
+                        {
+                          id: 0,
+                          question: "",
+                          choices: [],
+                          answers: [],
+                          canShow: true,
+                        },
+                      ],
+                    }
+                  : quizItem,
+              ),
+            }
+          : classItem,
+      ),
+    })),
 
-				addQuizQuestion: (classTargetIndex, quizTargetIndex) => set((state) => ({
-					classes: state.classes.map((classItem, classIndex) => 
-						classIndex === classTargetIndex ? {...classItem, quizzes: classItem.quizzes.map((quizItem, quizIndex) => ( quizIndex === quizTargetIndex ? { ...quizItem, questions: [...quizItem.questions, {id:0,question:"",choices: [], answers: [], canShow: true}]}:quizItem))} : classItem
-					)
-				})),
+  deleteQuizQuestion: (
+    classTargetIndex,
+    quizTargetIndex,
+    quizQuestionTargetIndex,
+  ) =>
+    set((state) => ({
+      classes: state.classes.map((classItem, classIndex) =>
+        classIndex === classTargetIndex
+          ? {
+              ...classItem,
+              quizzes: classItem.quizzes.map((quizItem, quizIndex) =>
+                quizIndex === quizTargetIndex
+                  ? {
+                      ...quizItem,
+                      questions: quizItem.questions.filter(
+                        (_, i) => i !== quizQuestionTargetIndex,
+                      ),
+                    }
+                  : quizItem,
+              ),
+            }
+          : classItem,
+      ),
+    })),
 
-				deleteQuizQuestion: (classTargetIndex, quizTargetIndex, quizQuestionTargetIndex) => set((state) => ({
-					classes: state.classes.map((classItem, classIndex) =>  classIndex === classTargetIndex ? {...classItem, quizzes: classItem.quizzes.map((quizItem, quizIndex) => quizIndex === quizTargetIndex ? {...quizItem, questions: quizItem.questions.filter((_,i) => i !== quizQuestionTargetIndex)} : quizItem)} : classItem)
-				})),
-
-setQuizQuestion: (
+  setQuizQuestion: (
     classTargetIndex,
     quizTargetIndex,
     quizQuestionTargetIndex,
     value,
-    variableName
-) => set((state) => ({
-    classes: state.classes.map((classItem, classIndex) =>
-        classIndex === classTargetIndex
-            ? {
-                ...classItem,
-                quizzes: classItem.quizzes.map((quizItem, quizIndex) =>
-                    quizIndex === quizTargetIndex
-                        ? {
-                            ...quizItem,
-                            questions: quizItem.questions.map((questionItem, questionIndex) =>
-                                questionIndex === quizQuestionTargetIndex
-                                    ? { ...questionItem, [variableName]: value }
-                                    : questionItem
-                            )
-                        }
-                        : quizItem
-                )
-            }
-            : classItem
-    )
-})),
-
-				quizClassIndex: 0,
-				quizPopup: false,
-
-				setQuizClassIndex: (quizClassIndex) => set({quizClassIndex}),
-				setQuizPopup: (quizPopup) => set({quizPopup}),
-
-
-addQuizChoice: (choices, choice) => {
-    return [...choices, choice];
-},
-				deleteQuizChoice: (choices, choiceIndex): string[] => {
-					return choices.filter((_, index) => index!== choiceIndex);
-				},
-				setQuizChoice: (choices, choiceIndex, choice): string[] => {
-					return choices.map((choiceItem, index) => index === choiceIndex ? choice : choiceItem);
-				},
-
-			addQuizAnswer: (answers, answer): string[] => {
-    return [...answers, answer];
-},
-				deleteQuizAnswer: (answers, answerIndex): string[] => {
-					return answers.filter((_, index) => index!== answerIndex);
-				},
-				setQuizAnswer: (answers, answerIndex, answer): string[] => {
-					return answers.map((answerItem, index) => index === answerIndex ? answer : answerItem);
-				},
-
-    settingsPopup: false,
-    setSettingsPopup: (settingsPopup) => set({settingsPopup}),
-
-    settingsClassIndex: 0,
-    setSettingsClassIndex: (settingsClassIndex) => set({settingsClassIndex}),
-
-    studentsPopup: false,
-    setStudentsPopup: (studentsPopup) => set({studentsPopup}),
-    settingsStudentsIndex: 0,
-    setSettingsStudentsIndex: (settingsStudentsIndex) => set({settingsStudentsIndex}),
-
-    assignmentsPopup: false,
-    setAssignmentsPopup: (assignmentsPopup) => set({assignmentsPopup}),
-    untitledCount: 0,
-    setUntitledCount: (untitledCount) =>set({untitledCount}),
-
-    messagePopup: false,
-    setMessagePopup: (messagePopup) => set({messagePopup}),
-
-    announcementInput: "",
-				setAnnouncementInput: (announcementInput) => set({announcementInput}),
-
-    setClasses: (classes) => set({ classes }),
-
-    addClass: () =>
-     set((state) => ({
-         classes: [...state.classes,
-        	{
-						id: state.classes.length,
-						className: "Untitled",
-						students: [],
-						color: "border-zinc-500",
-						canShow: true,
-						assignments: [],
-						announcements: [],
-						quizzes: [],
-						canShowQuizzes: false
-					},
-      ]
-     })),
-					deleteClass: (classIndex) => set((state) => (
-							{
-								classes: state.classes.filter(((_, i) => i !== classIndex))
-							}
-					)),
-									subAddStudent: (students): Test[] => {
-							return [
-							...students,
-							{
-									id: students.length,
-								name: "Untitled",
-								text: "",
-								grade: "",
-								assignments: [],
-								announcements: [],
-
-							}
-						]
-				},
-
-				updateCanShowStudents:(classIndex, canShow) => set((state)=>(
-						{
-
-												classes: state.classes.map((item, i) =>
-					i === classIndex ? { ...item, canShow : canShow} : item)
-						}
-
-				)),
-				setClassName: (classIndex, className, variableName) =>
+    variableName,
+  ) =>
     set((state) => ({
-        classes: state.classes.map((item, i) =>
-            i === classIndex
-                ? { ...item, [variableName]: className }
-                : item
-        )
+      classes: state.classes.map((classItem, classIndex) =>
+        classIndex === classTargetIndex
+          ? {
+              ...classItem,
+              quizzes: classItem.quizzes.map((quizItem, quizIndex) =>
+                quizIndex === quizTargetIndex
+                  ? {
+                      ...quizItem,
+                      questions: quizItem.questions.map(
+                        (questionItem, questionIndex) =>
+                          questionIndex === quizQuestionTargetIndex
+                            ? { ...questionItem, [variableName]: value }
+                            : questionItem,
+                      ),
+                    }
+                  : quizItem,
+              ),
+            }
+          : classItem,
+      ),
     })),
 
-				addStudent: (students, classIndex) => set((state) =>
-						({
-							classes: state.classes.map((item, i) =>
-										i === classIndex
-												?
-							{...item, students : [							...students,
-							{
-									id: students.length,
-								name: "Untitled",
-								text: "",
-								grade: "",
-								assignments: [],
-								announcements: [],
-								quizzes: [],
-							}]}
-												: item
-								)
-						})
-		 	),
+  quizClassIndex: 0,
+  quizPopup: false,
 
-				// FIX: filter's callback already receives (element, index, array) itself — the
-				// extra studentIndex argument here was being passed as filter's thisArg, which
-				// does nothing for an arrow function (arrow functions ignore thisArg entirely).
-				// Leftover from the old non-API-backed mock; dropped since it had no effect.
-				deleteStudent: (classIndex, studentIndex) => set((state) => ({
-						classes: state.classes.map((item, i)=>
-						i===classIndex ?
-					{
-						...item, students : item.students.filter((_, j)=> j !== studentIndex)} : item
-					)
-				})),
+  setQuizClassIndex: (quizClassIndex) => set({ quizClassIndex }),
+  setQuizPopup: (quizPopup) => set({ quizPopup }),
 
+  addQuizChoice: (choices, choice) => {
+    return [...choices, choice];
+  },
+  deleteQuizChoice: (choices, choiceIndex): string[] => {
+    return choices.filter((_, index) => index !== choiceIndex);
+  },
+  setQuizChoice: (choices, choiceIndex, choice): string[] => {
+    return choices.map((choiceItem, index) =>
+      index === choiceIndex ? choice : choiceItem,
+    );
+  },
 
+  addQuizAnswer: (answers, answer): string[] => {
+    return [...answers, answer];
+  },
+  deleteQuizAnswer: (answers, answerIndex): string[] => {
+    return answers.filter((_, index) => index !== answerIndex);
+  },
+  setQuizAnswer: (answers, answerIndex, answer): string[] => {
+    return answers.map((answerItem, index) =>
+      index === answerIndex ? answer : answerItem,
+    );
+  },
 
-    addAssignments: (classIndex, studentIndex, untitledCount) => set((state)=> ({
-					classes: 			state.classes.map((item, i) =>
-				i === classIndex
-					? {
-							...item,
-							students: item.students.map((student, j) =>
-								j === studentIndex
-									? {
-											...student,
-											assignments: [
-												...student.assignments,
-												{
-													id: student.assignments.length,
-													name: "Untitled Assignment" + untitledCount,
-													text: "",
-													link: "",
-													isDone: Math.random() < 0.5 ? false : true,
-													grade: 0,
-												}
-											]
-										}
-									: student
-							)
-						}
-					: item
-			)
-				})),
+  settingsPopup: false,
+  setSettingsPopup: (settingsPopup) => set({ settingsPopup }),
 
-				addClassAssignment:(classIndex, untitledCount) => set((state) => ({
-						classes: state.classes.map((item, i) =>
-				i === classIndex
-					? {
-							...item,
-							assignments: [
-								...item.assignments,
-								{
-									id: item.assignments.length,
-									name: "Untitled Assignment" + untitledCount,
-									text: "",
-									link: "",
-									isDone: false,
-									grade: 0
-								}
-							]
-						}
-					: item
-			),
-				})),
+  settingsClassIndex: 0,
+  setSettingsClassIndex: (settingsClassIndex) => set({ settingsClassIndex }),
 
-	addAssignmentsToStudents: (classIndex, untitledCount) =>
-					set((state) => ({
-									classes: state.classes.map((item, i) =>
-													i === classIndex
-																	? {
-																					...item,
-																					students: item.students.map((student) => ({
-																									...student,
-																									assignments: [
-																													...student.assignments,
-																													{
-																																	id: student.assignments.length,
-																																	name: "Untitled Assignment" + untitledCount,
-																																	text: "",
-																																	link: "",
-																																	isDone: Math.random() < 0.5,
-																																	grade: 0
-																													}
-																									]
-																					}))
-																	}
-																	: item
-									)
-					})),
+  studentsPopup: false,
+  setStudentsPopup: (studentsPopup) => set({ studentsPopup }),
+  settingsStudentsIndex: 0,
+  setSettingsStudentsIndex: (settingsStudentsIndex) =>
+    set({ settingsStudentsIndex }),
 
-					deleteAssignmentToStudents: (classIndex, assignmentName) => set((state) => ({
-						classes: state.classes.map((item, i) =>
-				i === classIndex
-					? {
-							...item,
-							students: item.students.map((student) => ({
-								...student,
-								assignments: student.assignments.filter(
-									(assignment) => assignment.name !== assignmentName
-								)
-							}))
-						}
-					: item
-			)
-					})),
+  assignmentsPopup: false,
+  setAssignmentsPopup: (assignmentsPopup) => set({ assignmentsPopup }),
+  untitledCount: 0,
+  setUntitledCount: (untitledCount) => set({ untitledCount }),
 
-					addAnnouncementsToStudents: (classIndex, annoucement, textInput) => 					set((state) => ({
-									classes: state.classes.map((item, i) =>
-													i === classIndex
-																	? {
-																					...item,
-																					students: item.students.map((student) => ({
-																									...student,
-																									announcements: [
-																													...student.announcements,
-																													{
-																																	id: student.announcements.length,
-																																text: textInput,
-																																date: "8/4/2067"
-																													}
-																									]
-																					}))
-																	}
-																	: item
-									)
-					})),
+  messagePopup: false,
+  setMessagePopup: (messagePopup) => set({ messagePopup }),
 
-					addClassAnnouncement: (classIndex, textInput) => set((state) => ({
-						classes: state.classes.map((item, i) =>
-								i === classIndex
-									? {
-											...item,
-											announcements: [
-												...item.announcements,
-												{
-																id: item.announcements.length,
-																text: textInput,
-																date: "8/4/2067"
-												}
-											]
-										}
-									: item
-							),
-					})),
+  announcementInput: "",
+  setAnnouncementInput: (announcementInput) => set({ announcementInput }),
 
-					deleteAssignment: (classIndex, studentIndex, assignmentIndex ) => set((state) => ({
-						classes: state.classes.map((item, i) =>
-				i === classIndex
-					? {
-							...item,
-							students: item.students.map((student, j) =>
-								j === studentIndex
-									? {
-											...student,
-											assignments: student.assignments.filter(
-												(_, k) => k !== assignmentIndex
-											)
-										}
-									: student
-							)
-						}
-					: item
-			)
-					})),
+  setClasses: (classes) => set({ classes }),
 
+  addClass: () =>
+    set((state) => ({
+      classes: [
+        ...state.classes,
+        {
+          id: state.classes.length,
+          className: "Untitled",
+          students: [],
+          color: "border-zinc-500",
+          canShow: true,
+          assignments: [],
+          announcements: [],
+          quizzes: [],
+          canShowQuizzes: false,
+        },
+      ],
+    })),
+  deleteClass: (classIndex) =>
+    set((state) => ({
+      classes: state.classes.filter((_, i) => i !== classIndex),
+    })),
+  subAddStudent: (students): Test[] => {
+    return [
+      ...students,
+      {
+        id: students.length,
+        name: "Untitled",
+        text: "",
+        grade: "",
+        assignments: [],
+        announcements: [],
+      },
+    ];
+  },
 
-					deleteAssignmentClassByName: (classIndex, assignmentName) => set((state)=> ({
-							classes: state.classes.map((item, i) =>
-				i === classIndex
-					? {
-							...item,
-							assignments: item.assignments.filter(
-								(assignment) => assignment.name !== assignmentName
-							)
-						}
-					: item
-			)
-					})),
+  updateCanShowStudents: (classIndex, canShow) =>
+    set((state) => ({
+      classes: state.classes.map((item, i) =>
+        i === classIndex ? { ...item, canShow: canShow } : item,
+      ),
+    })),
+  setClassName: (classIndex, className, variableName) =>
+    set((state) => ({
+      classes: state.classes.map((item, i) =>
+        i === classIndex ? { ...item, [variableName]: className } : item,
+      ),
+    })),
 
-					setAssignmentClass: (classIndex, assignmentIndex, assignmentName, assignmentVariableName) => set((state)=>({
-						classes: state.classes.map((classItem, i) =>
-				i === classIndex
-					? {
-						...classItem,
-						assignments: classItem.assignments.map((assignment, j) =>
-							j === assignmentIndex
-								? { ...assignment, [assignmentVariableName]: assignmentName }
-								: assignment
-						)
-					}
-					: classItem
-			)
-					})),
+  addStudent: (students, classIndex) =>
+    set((state) => ({
+      classes: state.classes.map((item, i) =>
+        i === classIndex
+          ? {
+              ...item,
+              students: [
+                ...students,
+                {
+                  id: students.length,
+                  name: "Untitled",
+                  text: "",
+                  grade: "",
+                  assignments: [],
+                  announcements: [],
+                  quizzes: [],
+                },
+              ],
+            }
+          : item,
+      ),
+    })),
 
-					setAssignmentStudent: (classIndex, assignmentIndex, assignmentName, assignmentVariableName: string) => set((state)=>({
-							classes: state.classes.map((classItem, i) =>
-				i === classIndex
-					? {
-						...classItem,
-						students: classItem.students.map(student => ({
-							...student,
-							assignments: student.assignments.map((assignment, j) =>
-								j === assignmentIndex
-									? { ...assignment, [assignmentVariableName]: assignmentName }
-									: assignment
-							)
-						}))
-					}
-					: classItem
-			)
-					})),
+  // FIX: filter's callback already receives (element, index, array) itself — the
+  // extra studentIndex argument here was being passed as filter's thisArg, which
+  // does nothing for an arrow function (arrow functions ignore thisArg entirely).
+  // Leftover from the old non-API-backed mock; dropped since it had no effect.
+  deleteStudent: (classIndex, studentIndex) =>
+    set((state) => ({
+      classes: state.classes.map((item, i) =>
+        i === classIndex
+          ? {
+              ...item,
+              students: item.students.filter((_, j) => j !== studentIndex),
+            }
+          : item,
+      ),
+    })),
 
-					setAssignmentIndividualStudent: (classIndex, studentIndex, assignmentIndex, assignmentName, assignmentVariableName) => set((state)=>({
-						classes: state.classes.map((classItem, i) =>
-				i === classIndex
-					? {
-							...classItem,
-							students: classItem.students.map((student, j) =>
-								j === studentIndex
-									? {
-											...student,
-											assignments: student.assignments.map((assignment, k) =>
-												k === assignmentIndex
-													? {
-															...assignment,
-															[assignmentVariableName]: assignmentName
-														}
-													: assignment
-											)
-										}
-									: student
-							)
-						}
-					: classItem
-			)
-					})),
+  addAssignments: (classIndex, studentIndex, untitledCount) =>
+    set((state) => ({
+      classes: state.classes.map((item, i) =>
+        i === classIndex
+          ? {
+              ...item,
+              students: item.students.map((student, j) =>
+                j === studentIndex
+                  ? {
+                      ...student,
+                      assignments: [
+                        ...student.assignments,
+                        {
+                          id: student.assignments.length,
+                          name: "Untitled Assignment" + untitledCount,
+                          text: "",
+                          link: "",
+                          isDone: Math.random() < 0.5 ? false : true,
+                          grade: 0,
+                        },
+                      ],
+                    }
+                  : student,
+              ),
+            }
+          : item,
+      ),
+    })),
 
-					setAnnouncementClass: (classIndex, assignmentIndex, assignmentName, assignmentVariableName) => set((state=>({
-						classes: state.classes.map((classItem, i) =>
-				i === classIndex
-					? {
-						...classItem,
-						announcements: classItem.announcements.map((annoucement, j) =>
-							j === assignmentIndex
-								? { ...annoucement, [assignmentVariableName]: assignmentName }
-								: annoucement
-						)
-					}
-					: classItem
-			)
-					}))),
+  addClassAssignment: (classIndex, untitledCount) =>
+    set((state) => ({
+      classes: state.classes.map((item, i) =>
+        i === classIndex
+          ? {
+              ...item,
+              assignments: [
+                ...item.assignments,
+                {
+                  id: item.assignments.length,
+                  name: "Untitled Assignment" + untitledCount,
+                  text: "",
+                  link: "",
+                  isDone: false,
+                  grade: 0,
+                },
+              ],
+            }
+          : item,
+      ),
+    })),
 
-					setAnnouncementStudent: (classIndex, assignmentIndex, assignmentName,assignmentVariableName) => set((state)=> ({
-					classes: state.classes.map((classItem, i) =>
-				i === classIndex
-					? {
-						...classItem,
-						students: classItem.students.map(student => ({
-							...student,
-							announcements: student.announcements.map((assignment, j) =>
-								j === assignmentIndex
-									? { ...assignment, [assignmentVariableName]: assignmentName }
-									: assignment
-							)
-						}))
-					}
-					: classItem
-			)
-					})),
+  addAssignmentsToStudents: (classIndex, untitledCount) =>
+    set((state) => ({
+      classes: state.classes.map((item, i) =>
+        i === classIndex
+          ? {
+              ...item,
+              students: item.students.map((student) => ({
+                ...student,
+                assignments: [
+                  ...student.assignments,
+                  {
+                    id: student.assignments.length,
+                    name: "Untitled Assignment" + untitledCount,
+                    text: "",
+                    link: "",
+                    isDone: Math.random() < 0.5,
+                    grade: 0,
+                  },
+                ],
+              })),
+            }
+          : item,
+      ),
+    })),
 
-					setAnnouncementIndividualStudent: (classIndex, studentIndex, assignmentIndex, assignmentName, assignmentVariableName) => set((state) => ({
-							classes: state.classes.map((classItem, i) =>
-				i === classIndex
-					? {
-							...classItem,
-							students: classItem.students.map((student, j) =>
-								j === studentIndex
-									? {
-											...student,
-											announcements: student.announcements.map((assignment, k) =>
-												k === assignmentIndex
-													? {
-															...assignment,
-															[assignmentVariableName]: assignmentName
-														}
-													: assignment
-											)
-										}
-									: student
-							)
-						}
-					: classItem
-			)
-					})),
+  deleteAssignmentToStudents: (classIndex, assignmentName) =>
+    set((state) => ({
+      classes: state.classes.map((item, i) =>
+        i === classIndex
+          ? {
+              ...item,
+              students: item.students.map((student) => ({
+                ...student,
+                assignments: student.assignments.filter(
+                  (assignment) => assignment.name !== assignmentName,
+                ),
+              })),
+            }
+          : item,
+      ),
+    })),
 
-					// FIX: `assignmentName += untitledCount` mutated the closure variable itself
-					// (not just the field being written), so if more than one assignment in the
-					// list matched the duplicate-name check, each later match appended
-					// untitledCount onto the already-mutated string from the previous match
-					// (e.g. "HW3" -> "HW33" -> "HW333") instead of the original name. Build the
-					// new name into its own local instead of reassigning the parameter.
-					checkClassAssignmentName: (classIndex, targetAssignmentName, targetindex, assignmentName, untitledCount) =>set((state)=>({
-						classes: state.classes.map((classItem, i) =>
-				i === classIndex
-					? {
-						...classItem,
-						assignments: classItem.assignments.map((assignment, j) =>
-							assignment.name === targetAssignmentName && j !== targetindex
-								? { ...assignment, name: `${assignmentName}${untitledCount}` }
-								: assignment
-						)
-					}
-					: classItem
-			)
-					})),
+  addAnnouncementsToStudents: (classIndex, annoucement, textInput) =>
+    set((state) => ({
+      classes: state.classes.map((item, i) =>
+        i === classIndex
+          ? {
+              ...item,
+              students: item.students.map((student) => ({
+                ...student,
+                announcements: [
+                  ...student.announcements,
+                  {
+                    id: student.announcements.length,
+                    text: textInput,
+                    date: "8/4/2067",
+                  },
+                ],
+              })),
+            }
+          : item,
+      ),
+    })),
 
-					changeClassBorderColor: (index, color)=>set((state)=>({
-						classes: state.classes.map((item, i) => i == index ? {...item, color : color} : item)
-					})),
+  addClassAnnouncement: (classIndex, textInput) =>
+    set((state) => ({
+      classes: state.classes.map((item, i) =>
+        i === classIndex
+          ? {
+              ...item,
+              announcements: [
+                ...item.announcements,
+                {
+                  id: item.announcements.length,
+                  text: textInput,
+                  date: "8/4/2067",
+                },
+              ],
+            }
+          : item,
+      ),
+    })),
 
-					setCanShowStudents: (index, canShow) => set((state)=> ({
-						classes: state.classes.map((item, i) =>
-					i === index ? { ...item, canShow : canShow} : item
-			)
-					})),
-					setStudentName: (index, studentIndex, text,variableName) => set((state)=> ({
-						classes: state.classes.map((item, i) =>
+  deleteAssignment: (classIndex, studentIndex, assignmentIndex) =>
+    set((state) => ({
+      classes: state.classes.map((item, i) =>
+        i === classIndex
+          ? {
+              ...item,
+              students: item.students.map((student, j) =>
+                j === studentIndex
+                  ? {
+                      ...student,
+                      assignments: student.assignments.filter(
+                        (_, k) => k !== assignmentIndex,
+                      ),
+                    }
+                  : student,
+              ),
+            }
+          : item,
+      ),
+    })),
+
+  deleteAssignmentClassByName: (classIndex, assignmentName) =>
+    set((state) => ({
+      classes: state.classes.map((item, i) =>
+        i === classIndex
+          ? {
+              ...item,
+              assignments: item.assignments.filter(
+                (assignment) => assignment.name !== assignmentName,
+              ),
+            }
+          : item,
+      ),
+    })),
+
+  setAssignmentClass: (
+    classIndex,
+    assignmentIndex,
+    assignmentName,
+    assignmentVariableName,
+  ) =>
+    set((state) => ({
+      classes: state.classes.map((classItem, i) =>
+        i === classIndex
+          ? {
+              ...classItem,
+              assignments: classItem.assignments.map((assignment, j) =>
+                j === assignmentIndex
+                  ? { ...assignment, [assignmentVariableName]: assignmentName }
+                  : assignment,
+              ),
+            }
+          : classItem,
+      ),
+    })),
+
+  setAssignmentStudent: (
+    classIndex,
+    assignmentIndex,
+    assignmentName,
+    assignmentVariableName: string,
+  ) =>
+    set((state) => ({
+      classes: state.classes.map((classItem, i) =>
+        i === classIndex
+          ? {
+              ...classItem,
+              students: classItem.students.map((student) => ({
+                ...student,
+                assignments: student.assignments.map((assignment, j) =>
+                  j === assignmentIndex
+                    ? {
+                        ...assignment,
+                        [assignmentVariableName]: assignmentName,
+                      }
+                    : assignment,
+                ),
+              })),
+            }
+          : classItem,
+      ),
+    })),
+
+  setAssignmentIndividualStudent: (
+    classIndex,
+    studentIndex,
+    assignmentIndex,
+    assignmentName,
+    assignmentVariableName,
+  ) =>
+    set((state) => ({
+      classes: state.classes.map((classItem, i) =>
+        i === classIndex
+          ? {
+              ...classItem,
+              students: classItem.students.map((student, j) =>
+                j === studentIndex
+                  ? {
+                      ...student,
+                      assignments: student.assignments.map((assignment, k) =>
+                        k === assignmentIndex
+                          ? {
+                              ...assignment,
+                              [assignmentVariableName]: assignmentName,
+                            }
+                          : assignment,
+                      ),
+                    }
+                  : student,
+              ),
+            }
+          : classItem,
+      ),
+    })),
+
+  setAnnouncementClass: (
+    classIndex,
+    assignmentIndex,
+    assignmentName,
+    assignmentVariableName,
+  ) =>
+    set((state) => ({
+      classes: state.classes.map((classItem, i) =>
+        i === classIndex
+          ? {
+              ...classItem,
+              announcements: classItem.announcements.map((annoucement, j) =>
+                j === assignmentIndex
+                  ? { ...annoucement, [assignmentVariableName]: assignmentName }
+                  : annoucement,
+              ),
+            }
+          : classItem,
+      ),
+    })),
+
+  setAnnouncementStudent: (
+    classIndex,
+    assignmentIndex,
+    assignmentName,
+    assignmentVariableName,
+  ) =>
+    set((state) => ({
+      classes: state.classes.map((classItem, i) =>
+        i === classIndex
+          ? {
+              ...classItem,
+              students: classItem.students.map((student) => ({
+                ...student,
+                announcements: student.announcements.map((assignment, j) =>
+                  j === assignmentIndex
+                    ? {
+                        ...assignment,
+                        [assignmentVariableName]: assignmentName,
+                      }
+                    : assignment,
+                ),
+              })),
+            }
+          : classItem,
+      ),
+    })),
+
+  setAnnouncementIndividualStudent: (
+    classIndex,
+    studentIndex,
+    assignmentIndex,
+    assignmentName,
+    assignmentVariableName,
+  ) =>
+    set((state) => ({
+      classes: state.classes.map((classItem, i) =>
+        i === classIndex
+          ? {
+              ...classItem,
+              students: classItem.students.map((student, j) =>
+                j === studentIndex
+                  ? {
+                      ...student,
+                      announcements: student.announcements.map(
+                        (assignment, k) =>
+                          k === assignmentIndex
+                            ? {
+                                ...assignment,
+                                [assignmentVariableName]: assignmentName,
+                              }
+                            : assignment,
+                      ),
+                    }
+                  : student,
+              ),
+            }
+          : classItem,
+      ),
+    })),
+
+  // FIX: `assignmentName += untitledCount` mutated the closure variable itself
+  // (not just the field being written), so if more than one assignment in the
+  // list matched the duplicate-name check, each later match appended
+  // untitledCount onto the already-mutated string from the previous match
+  // (e.g. "HW3" -> "HW33" -> "HW333") instead of the original name. Build the
+  // new name into its own local instead of reassigning the parameter.
+  checkClassAssignmentName: (
+    classIndex,
+    targetAssignmentName,
+    targetindex,
+    assignmentName,
+    untitledCount,
+  ) =>
+    set((state) => ({
+      classes: state.classes.map((classItem, i) =>
+        i === classIndex
+          ? {
+              ...classItem,
+              assignments: classItem.assignments.map((assignment, j) =>
+                assignment.name === targetAssignmentName && j !== targetindex
+                  ? { ...assignment, name: `${assignmentName}${untitledCount}` }
+                  : assignment,
+              ),
+            }
+          : classItem,
+      ),
+    })),
+
+  changeClassBorderColor: (index, color) =>
+    set((state) => ({
+      classes: state.classes.map((item, i) =>
+        i == index ? { ...item, color: color } : item,
+      ),
+    })),
+
+  setCanShowStudents: (index, canShow) =>
+    set((state) => ({
+      classes: state.classes.map((item, i) =>
+        i === index ? { ...item, canShow: canShow } : item,
+      ),
+    })),
+  setStudentName: (index, studentIndex, text, variableName) =>
+    set((state) => ({
+      classes: state.classes.map((item, i) =>
         i === index
-          ?
-					{...item, students : item.students.map((student, i) =>
-					i === studentIndex
-							? { ...student, [variableName] : text }
-							: student
-			)}
-          : item
-      )
-					}))
+          ? {
+              ...item,
+              students: item.students.map((student, i) =>
+                i === studentIndex
+                  ? { ...student, [variableName]: text }
+                  : student,
+              ),
+            }
+          : item,
+      ),
+    })),
 }));

@@ -2,7 +2,6 @@ import type { UserResponse } from "@/types/user";
 import { getSession } from "@/lib/auth";
 import { parseUser, profileUrl } from "@/lib/helpers";
 import { notFound } from "next/navigation";
-import { FaUser } from "react-icons/fa";
 import Edit from "@/components/profile/edit";
 import Avatar from "@/components/profile/avatar";
 import Delete from "@/components/profile/delete";
@@ -50,12 +49,7 @@ async function Page({ params }: { params: Promise<{ username: string }> }) {
           currentUser.role !== "admin" && <Delete username={user.username} />}
       </div>
       <div className="flex-1 flex flex-col gap-y-5">
-        <h2 className="text-xl font-bold flex items-center gap-x-3">
-          <FaUser size={20} /> About {user.firstName}
-        </h2>
-        <div className="text-center text-zinc-700 dark:text-zinc-300 text-sm py-5">
-          More stuff coming soon!
-        </div>
+        {/* TODO: add customizable profiles/short bio? */}
       </div>
     </div>
   );

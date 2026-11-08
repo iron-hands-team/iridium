@@ -142,6 +142,12 @@ function ClubModal({ club, closeModal, toast }: ClubModalProps) {
             </div>
           )}
           <div className="flex gap-x-3">
+            <Btn
+              text="Details"
+              link={`/clubs/${club.id}`}
+              styles="text-sm"
+              primary
+            />
             {user.role === "admin" && (
               <>
                 <Btn

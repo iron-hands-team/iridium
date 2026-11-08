@@ -1,5 +1,17 @@
 from fastapi import Depends, HTTPException, status, Request
 from sqlalchemy.orm import Session
+import logging
+import sys
+
+# 1. Configure the logger to send output directly to stdout
+logging.basicConfig(
+    stream=sys.stdout,
+    level=logging.INFO,
+    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+)
+
+logger = logging.getLogger("my_fastapi_app")
+
 from app.auth import manager
 from app.models import User, UserRole, Settings
 from app.schemas import SettingsRequest
@@ -29,6 +41,7 @@ def pause_guard(
     settings = db.query(Settings).first()
     if settings is None:
         return
+    logger.info(settings.data)
     settings = SettingsRequest.model_validate(settings.data)
     if not settings.paused or user.role == UserRole.admin:
         return
