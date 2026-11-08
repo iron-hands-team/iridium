@@ -55,9 +55,7 @@ function SchoolInfo() {
       });
       if (res.ok) {
         const uploads = await res.json();
-        console.log(uploads);
         if (school.logo) {
-          console.log(uploads.logo_url);
           await fetch("/s3/" + uploads.logo, {
             method: "PUT",
             headers: {

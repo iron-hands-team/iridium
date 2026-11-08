@@ -261,7 +261,6 @@ export default function QuizBody() {
                                         questionItem.question,
                                         "question",
                                       );
-                                      console.log(questionItem.answers);
                                     }}
                                     text={
                                       questionItem.answers.includes(choiceItem)
@@ -283,7 +282,6 @@ export default function QuizBody() {
                                       questionItem.question,
                                       "question",
                                     );
-                                    console.log(questionItem.answers);
                                   }}
                                   text="Delete Choice"
                                 />

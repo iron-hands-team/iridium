@@ -237,16 +237,6 @@ class MapItem(Base):
     id = Column(Integer, primary_key=True, index=True)
     label = Column(String, nullable=True)
 
-class AnnouncementLike(Base):
-    __tablename__ = "announcement_likes"
-    id = Column(Integer, primary_key=True, index=True)
-    announcement_id = Column(Integer)
-
-class ChatReaction(Base):
-    __tablename__ = "chat_reactions"
-    id = Column(Integer, primary_key=True, index=True)
-    message_id = Column(Integer)
-
 class Message(Base):
     __tablename__ = "messages"
     id = Column(Integer, primary_key=True, index=True)
