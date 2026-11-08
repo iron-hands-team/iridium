@@ -5,6 +5,7 @@ import { cs } from "@/lib/classStore";
 import Btn from "@/components/ui/btn";
 
 export default function assignmentsPopupClassTeacher() {
+  function nothing() {}
   const settingsClassIndex = cs((state) => state.settingsClassIndex);
 
   const setAssignmentsPopup = cs((state) => state.setAssignmentsPopup);

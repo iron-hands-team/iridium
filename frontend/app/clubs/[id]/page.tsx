@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import type { ClubResponse, ClubMemberResponse } from "@/types/clubs";
-import type { ChannelType } from "@/lib/schemas";
+import type { ChannelType } from "@/app/chat/page";
 import { notFound } from "next/navigation";
 import { getSession } from "@/lib/auth";
 import { parseUser } from "@/lib/helpers";

@@ -1,4 +1,4 @@
-import type { ChannelType } from "@/lib/schemas";
+import type { ChannelType } from "@/app/chat/page";
 import type { MessageType as MessageT, ReactionType } from "@/types/chat";
 import type { UserResponse } from "@/types/user";
 import { getSession } from "@/lib/auth";

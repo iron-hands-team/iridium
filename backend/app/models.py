@@ -400,7 +400,6 @@ class Destination(Base):
     bus_id = Column(Integer, ForeignKey("buses.id"), nullable=False)
     bus = relationship("Bus", back_populates="destinations")
 
-
 class Quiz(Base):
     __tablename__ = "quizzes"
     id = Column(Integer, primary_key=True, index=True)

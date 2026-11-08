@@ -30,7 +30,7 @@ export default function ClubManagerSystem() {
   const setTime = cls((s) => s.setTime);
 
   function editInputText(
-    variableName: string,
+    variableName: "id" | "location",
     name: string,
     showType: boolean,
   ) {
@@ -44,7 +44,7 @@ export default function ClubManagerSystem() {
         {canEdit ? (
           <Input
             placeholder={"Enter " + name}
-            value={clubs[cti][variableName]}
+            value={String(clubs[cti][variableName])}
             setValue={(e) => {
               setClub(cti, variableName, e);
             }}
@@ -53,7 +53,7 @@ export default function ClubManagerSystem() {
         ) : (
           <p>
             <b>
-              {showType && name + ": "} {clubs[cti][variableName]}
+              {showType && name + ": "} {String(clubs[cti][variableName])}
             </b>
           </p>
         )}
