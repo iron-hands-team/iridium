@@ -26,13 +26,20 @@ export const metadata: Metadata = {
 };
 
 async function Page() {
+  const { user, cookie } = await getSession();
   const school: SchoolType = await fetch(
     `${process.env.INTERNAL_API_URL}/school`,
+    {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${cookie.value}`,
+        "Content-Type": "application/json",
+      },
+    },
   ).then((res) => res.json());
-  const { user } = await getSession();
 
   return (
-    <div className="px-50 flex py-10 gap-x-15 h-[calc(100vh-53px)] overflow-y-auto pb-10">
+    <div className="px-50 py-10 gap-x-15 h-[calc(100vh-53px)] overflow-y-auto pb-10 flex flex-col gap-y-10">
       <Image
         src={schoolUrl("banner")}
         alt="School banner"
@@ -41,20 +48,21 @@ async function Page() {
         unoptimized
         className="w-full h-100"
       />
-      <div className="flex-1 flex flex-col gap-y-5">
+      <div className="flex flex-col gap-y-5">
         <h2 className="text-xl font-bold flex items-center gap-x-3">
           <FaSchool size={18} /> School
         </h2>
       </div>
       {user.role === "admin" && (
-        <Btn link="/admin/manage" text="Edit" primary />
+        <Btn link="/admin" text="Edit" styles="w-fit" primary />
       )}
       <div className="flex gap-x-15">
         <Image
-          src={schoolUrl("banner")}
+          src={schoolUrl("logo")}
           alt="School logo"
           width={200}
           height={200}
+          className="w-50 h-50"
           unoptimized
         />
         <div className="flex flex-col gap-y-3 text-zinc-700 dark:text-zinc-300">
@@ -63,17 +71,24 @@ async function Page() {
           </h2>
           {school.description && <p>{school.description}</p>}
           {school.address && (
-            <p>
+            <p className="flex items-center gap-x-2">
               <FaLocationPin size={15} /> {school.address}
             </p>
           )}
           {school.email && (
-            <a href={`mailto:${school.email}`} target="_blank">
+            <a
+              className="flex items-center gap-x-2"
+              href={`mailto:${school.email}`}
+              target="_blank"
+            >
               <FaEnvelope size={15} /> {school.email}
             </a>
           )}
           {school.number && (
-            <a href={`tel:${school.number}`}>
+            <a
+              className="flex items-center gap-x-2"
+              href={`tel:${school.number}`}
+            >
               <FaPhoneAlt size={15} /> {school.number}
             </a>
           )}

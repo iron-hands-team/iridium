@@ -14,9 +14,7 @@ DURATIONS = {"Seconds": 1, "Minutes": 60, "Hours": 3600}
 
 
 @router.get("/settings", response_model=SettingsRequest)
-def get_settings(
-    db: Session = Depends(get_db), _current_user: User = Depends(require_admin)
-):
+def get_settings(db: Session = Depends(get_db), _current_user: User = Depends(manager)):
     settings = db.query(Settings).first()
     data = settings.data if settings else {}
     return {**data, "id": settings.id if settings else None}
@@ -28,8 +26,11 @@ def save_settings(
     db: Session = Depends(get_db),
     _current_user: User = Depends(require_admin),
 ):
+    existing = db.query(Settings).first()
+    paused = bool(existing.data.get("paused")) if existing else False
     db.query(Settings).delete()
     data = settings.model_dump(mode="json")
+    data["paused"] = paused
     db.add(Settings(data=data))
     db.commit()
 

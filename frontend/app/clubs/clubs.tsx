@@ -7,7 +7,6 @@ import { AnimatePresence } from "framer-motion";
 import toast from "react-hot-toast";
 import Input from "@/components/ui/input";
 import Dropdown from "@/components/ui/dropdown";
-import DatePicker from "@/components/ui/date";
 import ClubModal from "@/components/modals/club";
 
 const types = ["All"];
@@ -20,7 +19,6 @@ function Clubs({ clubs }: { clubs: ClubType[] }) {
     ascending: false,
   });
   const [type, setType] = useState<string>(types[0]);
-  const [date, setDate] = useState<Date | null>(new Date());
   const [club, setClub] = useState<ClubType | null>(null);
   const displayed = clubs
     .filter((c) =>
@@ -67,12 +65,6 @@ function Clubs({ clubs }: { clubs: ClubType[] }) {
 
   return (
     <div>
-      <div className="flex flex-col gap-y-1">
-        Select date
-        <div>
-          <DatePicker date={date} setDate={(d) => setDate(d)} />
-        </div>
-      </div>
       <div className="flex gap-x-10 items-center py-5">
         <Input
           placeholder="Search clubs"

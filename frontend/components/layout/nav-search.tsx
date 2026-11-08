@@ -66,7 +66,7 @@ function NavSearch() {
         clear
       />
       {searching && search.trim().length > 0 && (
-        <div className="absolute top-full bg-zinc-200 dark:bg-zinc-900 w-full p-2 pt-4 pb-6 text-sm text-zinc-700 dark:text-zinc-300 text-center max-h-100 overflow-y-auto flex flex-col gap-y-2">
+        <div className="absolute top-full bg-zinc-200 dark:bg-zinc-900 w-150 p-2 pt-4 pb-6 text-sm text-zinc-700 dark:text-zinc-300 text-center max-h-100 overflow-y-auto flex flex-col gap-y-2">
           {result ? (
             <>
               {result.announcements.length > 0 && (

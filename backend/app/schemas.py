@@ -436,6 +436,7 @@ class SocialRequest(BaseModel):
     link: str
 
 class SchoolRequest(BaseModel):
+    id: int | None = None
     title: str
     description: str | None = None
     address: str | None = None
@@ -477,7 +478,7 @@ class SettingsRequest(BaseModel):
     messages: ArchiveSetting = Field(default_factory=ArchiveSetting)
     slow: SlowSetting = Field(default_factory=SlowSetting)
     censored: CensoredSetting = Field(default_factory=CensoredSetting)
-    paused: bool | None = None
+    paused: bool = False
 
     class Config:
         from_attributes = True

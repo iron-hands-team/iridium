@@ -1,5 +1,6 @@
-from fastapi import Depends, HTTPException, status
+from fastapi import Depends, HTTPException, status, Request
 from sqlalchemy.orm import Session
+
 from app.auth import manager
 from app.models import User, UserRole, Settings
 from app.schemas import SettingsRequest
@@ -20,16 +21,17 @@ def require_staff(current_user: User = Depends(manager)):
 
 
 def pause_guard(
+    request: Request,
     db: Session = Depends(get_db),
     user: User | None = Depends(manager.optional),
 ):
-    if user is None:
+    if user is None or request.url.path == "/logout":
         return
     settings = db.query(Settings).first()
     if settings is None:
         return
     settings = SettingsRequest.model_validate(settings.data)
-    if settings.paused == False or user.role == "admin":
+    if not settings.paused or user.role == UserRole.admin:
         return
     raise HTTPException(
         status_code=503,
