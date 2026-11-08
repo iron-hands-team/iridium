@@ -1,6 +1,7 @@
-import Buses from "@/components/bus/buses";
 import type { Metadata } from "next";
+import { getSession } from "@/lib/auth";
 import { FaBus } from "react-icons/fa";
+import Buses from "@/components/bus/buses";
 
 export const metadata: Metadata = {
   title: "Bus",
@@ -20,13 +21,15 @@ export const metadata: Metadata = {
   },
 };
 
-function Page() {
+async function Page() {
+  const { user } = await getSession();
+
   return (
     <div className="px-4 sm:px-10 lg:px-50 flex py-10 pb-10 flex-col gap-y-5">
       <h2 className="text-xl font-bold flex items-center gap-x-3">
         <FaBus size={18} /> Bus
       </h2>
-      <Buses />
+      <Buses isAdmin={user.role === "admin"} />
     </div>
   );
 }

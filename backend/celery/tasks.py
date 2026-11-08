@@ -24,11 +24,7 @@ def get_cutoff(type: str):
         amount = getattr(data, type)
         if not amount.never:
             amount_res = amount.number * DURATION_DAYS[amount.duration]
-            return (
-                datetime.now(timezone.utc)
-                - timedelta(days=amount_res)
-                + timedelta(days=50)
-            )
+            return datetime.now(timezone.utc) - timedelta(days=amount_res)
         else:
             return None
 

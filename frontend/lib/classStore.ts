@@ -130,7 +130,7 @@ type ClassStore = {
 
 	addAnnouncementsToStudents:(classIndex : number, annoucement: string, textInput : string, untitledCount : number) => void;
 
-	addClassAnnouncement: (classIndex:number, textInput:string, untitledCount:number) => void;
+	addClassAnnouncement: (classIndex:number, textInput:string) => void;
 
  deleteAssignment: (classIndex:number, studentIndex:number, assignmentIndex:number) => void;
 
@@ -481,7 +481,7 @@ addQuizChoice: (choices, choice) => {
 									)
 					})),
 
-					addClassAnnouncement: (classIndex, textInput, untitledCount) => set((state) => ({
+					addClassAnnouncement: (classIndex, textInput) => set((state) => ({
 						classes: state.classes.map((item, i) =>
 								i === classIndex
 									? {

@@ -6,35 +6,19 @@ import Btn from "@/components/ui/btn";
 
 export default function QuizBody() {
   const classes = cs((state) => state.classes);
-
-  const quizPopup = cs((state) => state.quizPopup);
   const setQuizPopup = cs((state) => state.setQuizPopup);
-
   const addClassQuiz = cs((state) => state.addClassQuiz);
   const deleteClassQuiz = cs((state) => state.deleteClassQuiz);
   const setClassQuiz = cs((state) => state.setClassQuiz);
-
   const addQuizQuestion = cs((state) => state.addQuizQuestion);
   const deleteQuizQuestion = cs((state) => state.deleteQuizQuestion);
   const setQuizQuestion = cs((state) => state.setQuizQuestion);
-
   const addQuizChoice = cs((state) => state.addQuizChoice);
   const deleteQuizChoice = cs((state) => state.deleteQuizChoice);
   const setQuizChoice = cs((state) => state.setQuizChoice);
-
   const addQuizAnswer = cs((state) => state.addQuizAnswer);
   const deleteQuizAnswer = cs((state) => state.deleteQuizAnswer);
-  const setQuizAnswer = cs((state) => state.setQuizAnswer);
-
-  const settingsStudentIndex = cs((state) => state.setSettingsStudentsIndex);
-  const setSettingsStudentIndex = cs((state) => state.setSettingsStudentsIndex);
-
   const settingsClassIndex = cs((state) => state.settingsClassIndex);
-  const setSettingsClassIndex = cs((state) => state.setSettingsClassIndex);
-
-  const setClasses = cs((state) => state.setClassName);
-
-  const update = cs((state) => state.update);
 
   function isCorrectAnswer(
     choiceIndex: number,
@@ -60,7 +44,7 @@ export default function QuizBody() {
           <br></br>
           <div className="flex justify-between items-center">
             <p className="text-[30px]">
-              <b>{classes[settingsClassIndex].className}'s</b> Quizzes
+              <b>{classes[settingsClassIndex].className}&apos;s</b> Quizzes
             </p>
             <Btn onclick={() => setQuizPopup(false)} text="Close" />
           </div>
@@ -328,7 +312,6 @@ export default function QuizBody() {
               </div>
             ))}
           </div>
-          <p>Manual FOr</p>
         </div>
       </div>
     </div>
