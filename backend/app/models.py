@@ -38,6 +38,7 @@ class User(Base):
     classes_taught = relationship("ClassSection", back_populates="teacher", cascade="all, delete-orphan")
     class_enrollments = relationship("ClassEnrollment", back_populates="student", cascade="all, delete-orphan")
     announcement_likes = relationship("AnnouncementLike", back_populates="user", cascade="all, delete-orphan")
+    announcement_stars = relationship("AnnouncementStar", back_populates="user", cascade="all, delete-orphan")
     event_rsvps = relationship("EventRSVP", back_populates="user", cascade="all, delete-orphan")
     grades = relationship("Grade", back_populates="student", cascade="all, delete-orphan")
     submissions = relationship("Submission", back_populates="student", cascade="all, delete-orphan")
@@ -66,7 +67,7 @@ class Announcement(Base):
         "AnnouncementLike", back_populates="announcement", cascade="all, delete-orphan"
     )
     star_records = relationship(
-        "AnnouncementStar", back_populates="announcements", cascade="all, delete-orphan"
+        "AnnouncementStar", back_populates="announcement", cascade="all, delete-orphan"
     )
 
     @property
@@ -83,7 +84,7 @@ class AnnouncementLike(Base):
     user = relationship("User", back_populates="announcement_likes")
 
 class AnnouncementStar(Base):
-    __tablename__ = "announcment_stars"
+    __tablename__ = "announcement_stars"
     id = Column(Integer, primary_key=True, index=True)
     announcement_id = Column(Integer, ForeignKey("announcements.id"), nullable=False)
     user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
