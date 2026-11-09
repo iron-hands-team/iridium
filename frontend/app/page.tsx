@@ -26,8 +26,11 @@ async function Page() {
       },
     },
   ).then((res) => res.json());
-  const announcements = announcementData.sort((a, b) =>
-    String(b.pinned).localeCompare(String(a.pinned)),
+  // starred first, then pinned; sort is stable so the server's newest-first order is kept inside each group
+  const announcements = announcementData.sort(
+    (a, b) =>
+      Number(b.starred ?? false) - Number(a.starred ?? false) ||
+      Number(b.pinned) - Number(a.pinned),
   );
   const mapRes = await fetch(`${process.env.INTERNAL_API_URL}/map`, {
     method: "GET",

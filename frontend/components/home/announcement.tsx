@@ -2,7 +2,7 @@
 
 import type { PostType } from "@/lib/schemas";
 import type { UserType } from "@/types/user";
-import { FaArchive, FaHeart } from "react-icons/fa";
+import { FaArchive, FaHeart, FaRegStar, FaStar } from "react-icons/fa";
 import { useState } from "react";
 import { AnimatePresence } from "framer-motion";
 import { useRouter } from "next/navigation";
@@ -33,6 +33,18 @@ function Announcement({ announcement, user }: AnnouncementProps) {
       },
       credentials: "include",
     });
+    router.refresh();
+  }
+
+  async function handleStar() {
+    const res = await fetch(`/api/announcements/${announcement.id}/star`, {
+      method: announcement.starred ? "DELETE" : "POST",
+      headers: {
+        "Content-Type": "application/json",
+      }, 
+      credentials: "include",
+    });
+    if (!res.ok) toast.error("Couldn't update the star. Please try again.");
     router.refresh();
   }
 
@@ -108,7 +120,7 @@ function Announcement({ announcement, user }: AnnouncementProps) {
       <p className="text-sm text-black! dark:text-zinc-300!">
         {announcement.content}
       </p>
-      <div>
+      <div className="flex items-center gap-x-5">
         <div
           className="text-sm flex items-center gap-x-2 cursor-pointer text-zinc-700 dark:text-zinc-300 w-fit group"
           onClick={handleLike}
@@ -121,6 +133,20 @@ function Announcement({ announcement, user }: AnnouncementProps) {
             />
           </div>
           {likes.length}
+        </div>
+        <div
+          className="text-sm flex items-center gap-x-2 cursor-pointer text-zinc-700 dark:text-zinc-300 w-fit group"
+          onClick={handleStar}
+          title={`${announcement.starred ? "Unstar" : "Star"} this announcement`}
+        >
+          <div className="group-hover:-traslate-y-0.5 group-hover:scale-115 transition-transform!">
+            {announcement.starred ? (
+              <FaStar className="text-yellow-500" size={13} />
+            ) : (   
+              <FaRegStar size={13} />
+            )} 
+          </div>
+          {announcement.starred ? "Starred" : "Star"}
         </div>
       </div>
       {user.role === "admin" && (
