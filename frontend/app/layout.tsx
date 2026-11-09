@@ -5,6 +5,9 @@ import { ThemeProvider } from "next-themes";
 import ToastProvider from "@/components/layout/toast-provider";
 import LoginForm from "@/components/auth/login-form";
 import Nav from "@/components/layout/nav";
+
+import LandingPage from "@/components/landingPage/landingPage";
+
 import "./globals.css";
 
 const inter = Inter({
@@ -33,25 +36,36 @@ export const metadata: Metadata = {
 export default async function RootLayout({ children }: LayoutProps<"/">) {
   const { user } = await getSession();
 
+  // return (
+  //   <html
+  //     lang="en"
+  //     className={`${inter.variable} h-full antialiased`}
+  //     suppressHydrationWarning
+  //   >
+  //     <body suppressHydrationWarning>
+  //       <ThemeProvider attribute="class" >
+  //         {user ? (
+  //           <>
+  //             <Nav />
+  //             {children}
+  //           </>
+  //         ) : (
+  //           <LoginForm />
+  //         )}
+  //         <ToastProvider />
+  //       </ThemeProvider>
+  //     </body>
+  //   </html>
+  // );
+
   return (
     <html
-      lang="en"
+          lang="en"
       className={`${inter.variable} h-full antialiased`}
-      suppressHydrationWarning
-    >
-      <body suppressHydrationWarning>
-        <ThemeProvider attribute="class">
-          {user ? (
-            <>
-              <Nav />
-              {children}
-            </>
-          ) : (
-            <LoginForm />
-          )}
-          <ToastProvider />
-        </ThemeProvider>
+      suppressHydrationWarning>
+      <body>
+        <LandingPage/>
       </body>
     </html>
-  );
+  )
 }

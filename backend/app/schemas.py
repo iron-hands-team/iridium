@@ -517,38 +517,38 @@ class ClearRequest(BaseModel):
 
 
 
-class Destination(BaseModel): 
-    location: str
-    before_school_time: str
-    after_school_time: str
-    color: str
+# class Destination(BaseModel): 
+#     location: str
+#     before_school_time: str
+#     after_school_time: str
+#     color: str
 
-class BusResponse(BaseModel):
-    id: int | None = None
-    name: str
-    description: str | None = None
-    destinations: list[Destination]
-    isClicking: bool
-    systemName: str
+# class BusResponse(BaseModel):
+#     id: int | None = None
+#     name: str
+#     description: str | None = None
+#     destinations: list[Destination]
+#     isClicking: bool
+#     systemName: str
 
-    class Config:
-        from_attributes = True
+#     class Config:
+#         from_attributes = True
 
-class BusCreateRequest(BaseModel):
-    name: str
-    description: str | None = None
-    sponsor_id: int | None = None
-    categories: list[str] = []
+# class BusCreateRequest(BaseModel):
+#     name: str
+#     description: str | None = None
+#     sponsor_id: int | None = None
+#     categories: list[str] = []
 
 
-class QuizQuestion(BaseModel):
-    name: str
-    choices: list[str]
-    answers: list[str]
-    can_show: bool
+# class QuizQuestion(BaseModel):
+#     name: str
+#     choices: list[str]
+#     answers: list[str]
+#     can_show: bool
 
-class QuizResponse(BaseModel):
-    id: int | None = None
-    name: str
-    questions: list[QuizQuestion]
-    class_section_id: int
+# class QuizResponse(BaseModel):
+#     id: int | None = None
+#     name: str
+#     questions: list[QuizQuestion]
+#     class_section_id: int

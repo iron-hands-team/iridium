@@ -48,7 +48,7 @@ def archive_posts():
             num = len(posts)
             for post in posts:
                 post.archived = True
-                post.archived_at = datetime.now()
+                # post.archived_at = datetime.now()
             db.commit()
             logger.info(f"{num} posts have been archived")
 
@@ -61,7 +61,7 @@ def delete_posts():
             logger.info("Archived post deletion is disabled")
         else:
             old = select(Announcement.id).where(
-                Announcement.archived_at < cutoff, Announcement.archived == True
+                # Announcement.archived_at < cutoff, Announcement.archived == True
             )
             db.query(AnnouncementLike).filter(
                 AnnouncementLike.announcement_id.in_(old)

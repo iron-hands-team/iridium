@@ -24,8 +24,8 @@ type Destination = {
 type busStore = {
   buses: Bus[];
 
-  fetchBuses: ()=> Promise<void>;
-  saveBuses: ()=> Promise<void>;
+  // fetchBuses: ()=> Promise<void>;
+  // saveBuses: ()=> Promise<void>;
 
   addBus: () => void;
   updateFrame: () => void;
@@ -58,44 +58,47 @@ export const bs = create<busStore>((set, get) => ({
 
   buses: [],
 
-  fetchBuses: async () => {
-    const response = await fetch(`api/buses`,  {
-        credentials: "include"
-    })
+  // fetchBuses: async () => {
+  //   const response = await fetch(`api/buses`,  {
+  //       credentials: "include"
+  //   })
+  //   if(!response.ok) {
+  //     throw new Error("Cant fetch");
+  //   }
 
-    const data = await response.json();
-    set({
-      buses: data.map((bus:any) => ({
-        id: bus.id,
-        name: bus.name,
-        desc: bus.description,
-        color: bus.color,
-        destinations: bus.destinations,
-        isClicking: false
-      }))
-    })
-  },
+  //   const data = await response.json();
+  //   set({
+  //     buses: data.map((bus:any) => ({
+  //       id: bus.id,
+  //       name: bus.name,
+  //       desc: bus.description,
+  //       color: bus.color,
+  //       destinations: bus.destinations,
+  //       isClicking: false
+  //     }))
+  //   })
+  // },
 
-  saveBuses: async () => {
-    const response = await fetch(`${API}/buses`,  {
-      method: "POST",
-      credentials: "include",
-      headers: {"Content-Type": "application/json"},
-      body: JSON.stringify(
-        get().buses.map((bus) => ({
-          name: bus.name,
-          description: bus.desc,
-          destinations: bus.destinations,
-          isClicking: bus.isClicking
-        }))
-      )
-    })
+  // saveBuses: async () => {
+  //   const response = await fetch(`api/buses`,  {
+  //     method: "POST",
+  //     credentials: "include",
+  //     headers: {"Content-Type": "application/json"},
+  //     body: JSON.stringify(
+  //       get().buses.map((bus) => ({
+  //         name: bus.name,
+  //         description: bus.desc,
+  //         destinations: bus.destinations,
+  //         isClicking: bus.isClicking
+  //       }))
+  //     )
+  //   })
 
-    if(!response.ok)
-        throw new Error("No Buses :(");
+  //   if(!response.ok)
+  //       throw new Error("No Buses :(");
 
-    await get().fetchBuses();
-  },
+  //   await get().fetchBuses();
+  // },
 
 
 
