@@ -4,7 +4,7 @@ from datetime import date, datetime, timedelta, timezone
 from app import app
 from database import SessionLocal
 from sqlalchemy import select
-from models import Announcement, AnnouncementLike, Message, ChatReaction, Settings 
+from models import Announcement, AnnouncementLike, AnnouncementStar, Message, ChatReaction, Settings 
 from schemas import SettingsRequest
 
 DURATION_DAYS = {
@@ -66,9 +66,13 @@ def delete_posts():
             db.query(AnnouncementLike).filter(
                 AnnouncementLike.announcement_id.in_(old)
             ).delete(synchronize_session=False)
+            db.query(AnnouncementStar).filter(
+                AnnouncementStar.announcement_id.in_(old)
+            ).delete(synchronize_session=False)
             num = db.query(Announcement).filter(Announcement.id.in_(old)).delete(
                 synchronize_session=False
             )
+            db.commit()
             logger.info(f"{num} archived posts have been deleted")
 
 
@@ -80,10 +84,11 @@ def delete_messages():
             logger.info("Message deletion is disabled")
         else:
             old = select(Message.id).where(Message.created_at < cutoff)
-            db.query(ChatReaction).filter(AnnouncementLike.message_id.in_(old)).delete(
+            db.query(ChatReaction).filter(ChatReaction.message_id.in_(old)).delete(
                 synchronize_session=False
             )
             num = db.query(Message).filter(Message.id.in_(old)).delete(
                 synchronize_session=False
             )
+            db.commit()
             logger.info(f"{num} messages have been deleted")

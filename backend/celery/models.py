@@ -1,7 +1,6 @@
 from datetime import datetime, timezone
 from database import Base
 from sqlalchemy import Column, Integer, String, Text, DateTime, Boolean, ForeignKey
-from sqlalchemy.orm import relationship
 from sqlalchemy.dialects.postgresql import JSONB
 
 
@@ -20,10 +19,11 @@ class AnnouncementLike(Base):
     __tablename__ = "announcement_likes"
     id = Column(Integer, primary_key=True, index=True)
     announcement_id = Column(Integer, ForeignKey("announcements.id"), nullable=False)
-    user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
 
-    announcement = relationship("Announcement", back_populates="like_records")
-    user = relationship("User", back_populates="announcement_likes")
+class AnnouncementStar(Base):
+    __tablename__ = "announcement_stars"
+    id = Column(Integer, primary_key=True, index=True)
+    announcement_id = Column(Integer, ForeignKey("announcements.id"), nullable=False)
 
 class ChatReaction(Base):
     __tablename__ = "chat_reactions"

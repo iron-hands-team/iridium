@@ -92,6 +92,7 @@ class AnnouncementResponse(BaseModel):
     archived: bool
     role: str
     likes: list[str]
+    starred: bool = False
 
     class Config:
         from_attributes = True
@@ -547,8 +548,8 @@ class ClearRequest(BaseModel):
 #     answers: list[str]
 #     can_show: bool
 
-# class QuizResponse(BaseModel):
-#     id: int | None = None
-#     name: str
-#     questions: list[QuizQuestion]
-#     class_section_id: int
+class QuizResponse(BaseModel):
+    id: int | None = None
+    name: str
+    questions: list[QuizQuestion]
+    class_section_id: int

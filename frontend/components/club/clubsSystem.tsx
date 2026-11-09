@@ -63,13 +63,18 @@ export default function ClubsSystem() {
                 a
                 <div className="flex gap-[10px] items-center ">
                   <p>{clubItem.name}</p>
-                  <div
-                    className={`${clubItem.tag.color} p-[10px] rounded-md h-[40px]`}
-                  >
-                    <p>
-                      <b>{clubItem.tag.name}</b>
-                    </p>
-                  </div>
+                  {clubItem.tags
+                    .filter((tag) => !tag.isHidden)
+                    .map((tag, tagIndex) => (
+                      <div
+                        key={tagIndex}
+                        className={`${tag.color} p-[10px] rounded-md h-[40px]`}
+                      >
+                        <p>
+                          <b>{tag.name}</b>
+                        </p>
+                      </div>
+                    ))}
                 </div>
                 <div className="flex gap-[5px]">
                   {clubItem.managers.map((managerItem, _) => (
