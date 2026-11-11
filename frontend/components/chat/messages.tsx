@@ -106,6 +106,7 @@ function Messages({ channel, messages, id, userId, admin }: MessagesProps) {
                 owned={message.user.id === userId}
                 highlighted={highlighted === message.id}
                 admin={admin}
+                above={i > 5}
               />
             </div>
           ))

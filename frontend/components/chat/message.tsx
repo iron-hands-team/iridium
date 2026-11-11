@@ -24,6 +24,7 @@ interface MessageProps {
   owned: boolean;
   highlighted: boolean;
   admin?: boolean;
+  above?: boolean;
 }
 
 function Message({
@@ -35,14 +36,17 @@ function Message({
   owned,
   highlighted,
   admin,
+  above,
 }: MessageProps) {
   const [label, setLabel] = useState("");
   const [editing, setEditing] = useState<string | null>(null);
+  const [open, setOpen] = useState<boolean>(false);
   const messageRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const router = useRouter();
 
   async function handleReact(emoji: string) {
+    setOpen(false);
     const res = await fetch(`/api/chat/react/${message.id}`, {
       method: "POST",
       headers: {
@@ -189,12 +193,19 @@ function Message({
         </>
       )}
       {editing === null && (
-        <div className="pointer-events-none group-hover:pointer-events-auto opacity-0 group-hover:opacity-100 transition-opacity! absolute right-4 top-0 -translate-y-[50%] border border-zinc-800 bg-zinc-200 dark:bg-zinc-950 p-1 flex gap-x-2 text-zinc-700 dark:text-zinc-300">
-          <Emojis setEmoji={handleReact} above>
+        <div
+          className={`group-hover:pointer-events-auto ${!open && "opacity-0 pointer-events-none"} group-hover:opacity-100 transition-opacity! absolute right-4 z-100 top-0 -translate-y-[50%] border border-zinc-800 bg-zinc-200 dark:bg-zinc-950 p-1 flex gap-x-2 text-zinc-700 dark:text-zinc-300`}
+        >
+          <Emojis
+            setEmoji={handleReact}
+            above={above}
+            setOpen={(v) => setOpen(v)}
+          >
             <FaFaceGrin
               size={23}
               className={optionStyles}
               title="React to message"
+              onClick={() => setOpen(true)}
             />
           </Emojis>
           <FaReply

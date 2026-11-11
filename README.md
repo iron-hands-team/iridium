@@ -58,6 +58,7 @@ To host Iridium for your school or for other purposes, simply follow these steps
    docker exec -it garage-storage /garage key create iridium-key
    docker exec -it garage-storage /garage bucket create iridium-uploads
    docker exec -it garage-storage /garage bucket allow --read --write iridium-uploads --key iridium-key
+   docker exec -it garage-storage /garage bucket website --allow iridium-uploads
    ```
 
 6. Copy the Garage access and secret keys to `.env` (`GARAGE_ACCESS_KEY` and `GARAGE_SECRET_KEY`) and start Docker compose:
