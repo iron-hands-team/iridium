@@ -5,36 +5,83 @@ import { bs } from "@/lib/busStore";
 import Btn from "@/components/ui/btn";
 import { AnimatePresence } from "framer-motion";
 import EditBus from "./edit-bus";
+import toast from "react-hot-toast";
+import { FaExclamationTriangle } from "react-icons/fa";
 
-export default function Buses({ isAdmin }: { isAdmin: boolean }) {
+interface BusesProps {
+  isAdmin: boolean;
+  existing?: object[];
+}
+
+export default function Buses({ isAdmin, existing }: BusesProps) {
   const buses = bs((state) => state.buses);
   const addBus = bs((state) => state.addBus);
   const setBus = bs((state) => state.setBus);
+  const setBuses = bs((state) => state.setBuses);
   const clearBuses = bs((state) => state.clearBuses);
   const [index, setIndex] = useState<number | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
-
-  // const fetchBuses = bs((state) => state.fetchBuses);
-  // const saveBuses = bs((state) =>state.saveBuses);
+  const [error, setError] = useState<string | null>(null);
 
   async function handleSave() {
     setLoading(true);
     console.log(buses);
-    // saveBuses();
+    const res = await fetch("/api/buses", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(buses),
+    });
+    if (res.ok) {
+      setError(null);
+      toast.success("Buses updated successfully!");
+    } else {
+      setError("Something went wrong, please try again");
+    }
     setLoading(false);
   }
 
-  // useEffect(() => {
-  //   fetchBuses();
-  // }, [fetchBuses])
+  useEffect(() => {
+    if (existing) {
+      console.log(existing);
+      setBuses(
+        existing.map((bus: any) => ({
+          id: bus.id,
+          name: bus.name,
+          desc: bus.description,
+          color: bus.color,
+          destinations: bus.destinations.map((d) => {
+            return {
+              ...d,
+              beforeSchoolTime: d.before_school_time,
+              afterSchoolTime: d.after_school_time,
+            };
+          }),
+          isClicking: false,
+        })),
+      );
+    }
+  }, [existing, setBuses]);
 
   return (
     <>
       <div className="flex flex-col gap-y-3">
         {isAdmin && (
           <div className="flex gap-x-3">
-            {/* <Btn onclick={() => {addBus(); saveBuses()}} text="Add Bus" primary />
-            <Btn onclick={() => {clearBuses(); saveBuses()}} text="Clear Buses" /> */}
+            <Btn
+              onclick={() => {
+                addBus();
+              }}
+              text="Add Bus"
+              primary
+            />
+            <Btn
+              onclick={() => {
+                clearBuses();
+              }}
+              text="Clear Buses"
+            />
           </div>
         )}
         <div className="flex">
@@ -58,7 +105,6 @@ export default function Buses({ isAdmin }: { isAdmin: boolean }) {
             key={busIndex}
             onClick={() => {
               setBus(busIndex, "isClicking", !busItem.isClicking);
-              // saveBuses();
             }}
             className={"w-full flex flex-col items-center justify-center "}
           >
@@ -83,7 +129,9 @@ export default function Buses({ isAdmin }: { isAdmin: boolean }) {
                     className="text-black  w-full resize-none h-[50px] p-2   hover:border-zinc-600 text-[18px] font-sans font-bold text-center"
                     placeholder="Bus Name"
                     value={busItem.name}
-                    // onChange={(e) => {setBus(busIndex, "name", e.target.value); saveBuses()}}
+                    onChange={(e) => {
+                      setBus(busIndex, "name", e.target.value);
+                    }}
                   ></input>
                 </div>
               </div>
@@ -152,13 +200,17 @@ export default function Buses({ isAdmin }: { isAdmin: boolean }) {
           </p>
         )}
       </div>
+      {error && (
+        <div className="text-red-500 text-sm flex gap-x-3 items-center">
+          <FaExclamationTriangle size={15} /> {error}
+        </div>
+      )}
       {isAdmin && (
         <Btn
           onclick={handleSave}
           text={loading ? "Saving..." : "Save"}
           primary
           styles="w-fit"
-          
         />
       )}
       <AnimatePresence>

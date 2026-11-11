@@ -87,16 +87,15 @@ function EditBus({ index, closeModal }: EditBusProps) {
         <div className={labelStyles}>
           Color
           <div className="flex gap-x-2">
-            {Object.entries(buttonColors).map(([i, value], index) => (
+            {Object.entries(buttonColors).map(([i, value]) => (
               <div
-                key={index + i}
+                key={i}
                 className={
-                  "w-[30px] h-[30px] rounded-md cursor-pointer " + value
+                  "w-[30px] h-[30px] rounded-md cursor-pointer " +
+                  value +
+                  (buses[index].color === value ? " ring-2 ring-white" : "")
                 }
-                onClick={() => {
-                  setBus(index, "color", value);
-                  updateFrame();
-                }}
+                onClick={() => setBus(index, "color", value)}
               />
             ))}
           </div>
@@ -138,26 +137,6 @@ function EditBus({ index, closeModal }: EditBusProps) {
                     "afterSchoolTime",
                     "After School Time",
                   )}
-                  <p>Color</p>
-                  <div className="flex gap-x-2">
-                    {Object.entries(buttonColors).map(([i, value], w) => (
-                      <div
-                        key={w + i}
-                        className={
-                          "w-[30px] h-[30px] rounded-md cursor-pointer " + value
-                        }
-                        onClick={() => {
-                          buses[index].destinations = setDestination(
-                            buses[index].destinations,
-                            destinationIndex,
-                            "color",
-                            value,
-                          );
-                          updateFrame();
-                        }}
-                      ></div>
-                    ))}
-                  </div>
                 </div>
               </div>
             ))}

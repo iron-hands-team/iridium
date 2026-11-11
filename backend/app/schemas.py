@@ -516,40 +516,48 @@ class SlowResponse(BaseModel):
 class ClearRequest(BaseModel):
     password: str
 
+class DestinationRequest(BaseModel):
+    location: str
+    beforeSchoolTime: str
+    afterSchoolTime: str
+    color: str | None = None
 
+class DestinationResponse(BaseModel): 
+    location: str
+    before_school_time: str
+    after_school_time: str
+    color: str | None = None
 
-# class Destination(BaseModel): 
-#     location: str
-#     before_school_time: str
-#     after_school_time: str
-#     color: str
+class BusRequest(BaseModel):
+    name: str
+    desc: str | None = None
+    destinations: list[DestinationRequest]
+    color: str | None = None
 
-# class BusResponse(BaseModel):
-#     id: int | None = None
-#     name: str
-#     description: str | None = None
-#     destinations: list[Destination]
-#     isClicking: bool
-#     systemName: str
+    class Config:
+        from_attributes = True
 
-#     class Config:
-#         from_attributes = True
+class BusResponse(BaseModel):
+    id: int | None = None
+    name: str
+    description: str | None = None
+    destinations: list[DestinationResponse]
+    color: str | None = None
 
-# class BusCreateRequest(BaseModel):
-#     name: str
-#     description: str | None = None
-#     sponsor_id: int | None = None
-#     categories: list[str] = []
+    class Config:
+        from_attributes = True
 
-
-# class QuizQuestion(BaseModel):
-#     name: str
-#     choices: list[str]
-#     answers: list[str]
-#     can_show: bool
+class QuizQuestion(BaseModel):
+    name: str
+    choices: list[str]
+    answers: list[str]
+    can_show: bool
 
 class QuizResponse(BaseModel):
     id: int | None = None
     name: str
     questions: list[QuizQuestion]
     class_section_id: int
+
+    class Config:
+        from_attributes = True

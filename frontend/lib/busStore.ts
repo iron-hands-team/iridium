@@ -12,8 +12,6 @@ export type Bus = {
   isClicking: boolean;
 };
 
-
-
 type Destination = {
   location: string;
   beforeSchoolTime: string;
@@ -31,6 +29,7 @@ type busStore = {
   updateFrame: () => void;
   deleteBus: (busindex: number) => void;
   setBus: <T>(busTargetIndex: number, variableName: string, value: T) => void;
+  setBuses: <T>(buses: Bus[]) => void;
   insertBus: (busSwappingIndex: number, busVictimIndex: number) => void;
   clearBuses: () => void;
 
@@ -50,7 +49,7 @@ type busStore = {
   setAboutPopup: (aboutPopup: boolean) => void;
 };
 
-const API  = process.env.NEXT_PUBLIC_API_URL;
+const API = process.env.NEXT_PUBLIC_API_URL;
 
 export const bs = create<busStore>((set, get) => ({
   aboutPopup: false,
@@ -100,8 +99,6 @@ export const bs = create<busStore>((set, get) => ({
   //   await get().fetchBuses();
   // },
 
-
-
   updateFrame: () =>
     set((state) => ({
       buses: [...state.buses],
@@ -125,6 +122,8 @@ export const bs = create<busStore>((set, get) => ({
     set((state) => ({
       buses: state.buses.filter((_, index) => index !== busIndex),
     })),
+
+  setBuses: (buses) => set(() => ({ buses })),
 
   setBus: (busTargetIndex, variableName, value) =>
     set((state) => ({

@@ -36,36 +36,36 @@ export const metadata: Metadata = {
 export default async function RootLayout({ children }: LayoutProps<"/">) {
   const { user } = await getSession();
 
-  // return (
-  //   <html
-  //     lang="en"
-  //     className={`${inter.variable} h-full antialiased`}
-  //     suppressHydrationWarning
-  //   >
-  //     <body suppressHydrationWarning>
-  //       <ThemeProvider attribute="class" >
-  //         {user ? (
-  //           <>
-  //             <Nav />
-  //             {children}
-  //           </>
-  //         ) : (
-  //           <LoginForm />
-  //         )}
-  //         <ToastProvider />
-  //       </ThemeProvider>
-  //     </body>
-  //   </html>
-  // );
-
   return (
     <html
-          lang="en"
+      lang="en"
       className={`${inter.variable} h-full antialiased`}
-      suppressHydrationWarning>
-      <body>
-        <LandingPage/>
+      suppressHydrationWarning
+    >
+      <body suppressHydrationWarning>
+        <ThemeProvider attribute="class">
+          {user ? (
+            <>
+              <Nav />
+              {children}
+            </>
+          ) : (
+            <LoginForm />
+          )}
+          <ToastProvider />
+        </ThemeProvider>
       </body>
     </html>
-  )
+  );
+
+  // return (
+  //   <html
+  //         lang="en"
+  //     className={`${inter.variable} h-full antialiased`}
+  //     suppressHydrationWarning>
+  //     <body>
+  //       <LandingPage/>
+  //     </body>
+  //   </html>
+  // )
 }

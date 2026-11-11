@@ -392,16 +392,15 @@ class Guide(Base):
     label = Column(String, nullable=True)
     created_at = Column(DateTime(timezone=True), default=utcnow, nullable=False)
     
-
 class Bus(Base):
     __tablename__ = "buses"
     id = Column(Integer, primary_key=True, index=True)
-    name = Column(String, nullable=False, unique=True)
+    name = Column(String, nullable=False, unique=False)
     description = Column(Text, nullable=True)
     destinations = relationship(
         "Destination", back_populates="bus", cascade="all, delete-orphan"
     )
-
+    color = Column(String, nullable=False)
 
 class Destination(Base):
     __tablename__ = "destinations"
@@ -413,38 +412,13 @@ class Destination(Base):
     bus_id = Column(Integer, ForeignKey("buses.id"), nullable=False)
     bus = relationship("Bus", back_populates="destinations")
 
-<<<<<<< HEAD
-
-
-
-class QuizQuestion(Base):
-    __tablename__ = "quiz_questions"
-    id = Column(Integer, primary_key=True, index=True)
-    name = Column(String, nullable=False)
-    choices = Column(ARRAY(String), nullable=False)
-    answers = Column(ARRAY(String), nullable=False)
-    can_show = Column(Boolean, nullable=False, default=False)
-    quiz_id = Column(Integer, ForeignKey("quizzes.id"), nullable=False)
-    quiz = relationship("Quiz", back_populates="questions")
-
-
-
-    destinations = relationship("Destination", back_populates="bus")
-    is_clicking = Column(Boolean)
-
-
-    
-
-
-=======
->>>>>>> 448bca7d7b0e1ae65c8ef42451ab1e604c5da6dd
 class Quiz(Base):
     __tablename__ = "quizzes"
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String, nullable=False, unique=True)
     questions = relationship("Question", back_populates="Quiz")
 
-    class_section_id = Column(Integer, ForeignKey=("class_section.id"))
+    class_section_id = Column(Integer, ForeignKey("class_section.id"))
 
     name = Column(String, nullable=False)
     class_section_id = Column(Integer, ForeignKey("class_sections.id"), nullable=False)
@@ -452,7 +426,6 @@ class Quiz(Base):
     questions = relationship(
         "QuizQuestion", back_populates="quiz", cascade="all, delete-orphan"
     )
-
 
 class QuizQuestion(Base):
     __tablename__ = "quiz_questions"
