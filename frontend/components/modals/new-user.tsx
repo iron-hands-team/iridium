@@ -130,7 +130,9 @@ function NewUserModal({ closeModal, existing, toast }: NewUserModalProps) {
               />
             </label>
             <label className={labelStyles}>
-              Password
+              <div>
+                Password <span className="text-red-500">*</span>
+              </div>
               <Input
                 value={user.password || ""}
                 setValue={(password) => setUser({ ...user, password })}

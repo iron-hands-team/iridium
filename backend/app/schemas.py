@@ -9,7 +9,7 @@ class LoginRequest(BaseModel):
 
 class UserCreateRequest(BaseModel):
     username: str = Field(min_length=1, max_length=40)
-    password: str = Field(min_length=10, max_length=128)
+    password: str = Field(min_length=8, max_length=128)
     role: UserRole
     first_name: str
     last_name: str
