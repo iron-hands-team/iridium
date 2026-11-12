@@ -1,6 +1,7 @@
 "use client";
 
 import { cls } from "@/lib/clubStore";
+import Modal from "../ui/modal";
 import Btn from "@/components/ui/btn";
 import Input from "@/components/ui/input";
 
@@ -61,102 +62,90 @@ export default function TagsSystemPopup() {
   }
 
   return (
-    <div
-      className="z-100 fixed flex h-full w-full justify-center items-center bg-black/90 overflow-y-auto flex-col flex-wrap"
-      onClick={() => setCanEditTags(false)}
-    >
-      <div
-        className="bg-black/90 z-10 h-2/3 w-2/3 flex flex-col justify-between items-start border-1 border-zinc-400 overflow-y-auto p-[10px]"
-        onClick={(e) => e.stopPropagation()}
-      >
-        <div className="flex flex-col w-full items">
-          <p className="text-[30px]">
-            <b>Tags</b>
-          </p>
-          <br></br>
-          <div className="w-[300px] flex items-center gap-[10px]">
-            <p>Add a Tag!</p>
-            <Btn
-              onclick={() => {
-                tags = addTag(tags, { name: "", color: "", isHidden: false });
-                uf(clubs, tags);
-              }}
-              text="Add Tag"
-            />
-          </div>
-          <br></br>
-          <div className="flex flex-col w-full gap-[10px]">
-            {tags.map((tagItem, tagIndex) => (
-              <div
-                key={tagIndex}
-                className="flex w-full justify-start  gap-[10px]"
-              >
-                <div className="items-center flex gap-[10px]">
-                  <p>Name: </p>
-                  <Input
-                    value={tagItem.name}
-                    setValue={(e) => {
-                      matchClubTags(tagItem, {
-                        name: e,
-                        color: tagItem.color,
-                        isHidden: tagItem.isHidden,
-                      });
-                      tags = setTag(tags, tagIndex, "name", e);
-                      uf(clubs, tags);
-                    }}
-                    placeholder={`Enter Tag Name`}
-                  />
-                </div>
-
-                <div className=" flex items-center gap-[10px]">
-                  <p>Color: </p>
-                  <div className="flex gap-[10px]">
-                    {!tagItem.isHidden &&
-                      Object.entries(buttonColors).map(
-                        ([name, value], index) => (
-                          <div
-                            key={index}
-                            className=" w-[25px] h-[25px] flex items-center"
-                          >
-                            <button
-                              className={`w-full h-full py-2 border-1 cursor-pointer ${tagItem.color == value ? value.slice(0, -3) + "200" : value} items-center rounded-md`}
-                              onClick={() => {
-                                matchClubTags(tagItem, {
-                                  name: tagItem.name,
-                                  color: value,
-                                  isHidden: tagItem.isHidden,
-                                });
-                                tags = setTag(tags, tagIndex, "color", value);
-                                uf(clubs, tags);
-                              }}
-                            ></button>
-                          </div>
-                        ),
-                      )}
-                  </div>
-                </div>
-                <Btn
-                  onclick={() => {
-                    deleteClubTags({
-                      name: tagItem.name,
-                      color: "",
-                      isHidden: true,
+    <Modal closeModal={() => setCanEditTags(false)}>
+      <div className="flex flex-col gap-y-5 p-5">
+        <h2 className="text-xl font-bold">Manage tags</h2>
+        <div>
+          Tags help you sort things out and let students find their clubs more
+          easily!
+        </div>
+        <div className="flex flex-col w-full gap-y-5">
+          {tags.map((tagItem, tagIndex) => (
+            <div key={tagIndex} className="flex flex-col gap-y-3">
+              <div className="items-center flex gap-[10px]">
+                Name:
+                <Input
+                  value={tagItem.name}
+                  setValue={(e) => {
+                    matchClubTags(tagItem, {
+                      name: e,
+                      color: tagItem.color,
+                      isHidden: tagItem.isHidden,
                     });
-                    tags = deleteTag(tags, tagIndex);
+                    tags = setTag(tags, tagIndex, "name", e);
                     uf(clubs, tags);
                   }}
-                  text="Delete Tag"
+                  placeholder={`Enter Tag Name`}
                 />
               </div>
-            ))}
-          </div>
-          <br></br>
-          <p>
-            Tags help you sort things out easier. Lets students find their
-            clubs!
-          </p>
+              <div className=" flex items-center gap-[10px]">
+                Color:
+                <div className="flex gap-[10px]">
+                  {!tagItem.isHidden &&
+                    Object.entries(buttonColors).map(([name, value], index) => (
+                      <div
+                        key={index}
+                        className=" w-[25px] h-[25px] flex items-center"
+                      >
+                        <button
+                          className={`w-full h-full py-2 border-1 cursor-pointer ${tagItem.color == value ? value + " border-white" : value + " border-zinc-800"} items-center rounded-md`}
+                          onClick={() => {
+                            matchClubTags(tagItem, {
+                              name: tagItem.name,
+                              color: value,
+                              isHidden: tagItem.isHidden,
+                            });
+                            tags = setTag(tags, tagIndex, "color", value);
+                            uf(clubs, tags);
+                          }}
+                        ></button>
+                      </div>
+                    ))}
+                </div>
+              </div>
+              <Btn
+                onclick={() => {
+                  deleteClubTags({
+                    name: tagItem.name,
+                    color: "",
+                    isHidden: true,
+                  });
+                  tags = deleteTag(tags, tagIndex);
+                  uf(clubs, tags);
+                }}
+                styles="w-fit"
+                text="Delete Tag"
+              />
+            </div>
+          ))}
         </div>
+
+        <div className="w-[300px] flex items-center gap-[10px]">
+          <Btn
+            onclick={() => {
+              tags = addTag(tags, { name: "", color: "", isHidden: false });
+              uf(clubs, tags);
+            }}
+            text="Add Tag"
+          />
+        </div>
+        <Btn
+          text="Save"
+          onclick={() => setCanEditTags(false)}
+          styles="w-fit"
+          primary
+        />
       </div>
-    </div>
+    </Modal>
   );
 }

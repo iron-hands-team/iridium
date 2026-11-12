@@ -4,7 +4,6 @@ import { FaBasketball } from "react-icons/fa6";
 import { getSession } from "@/lib/auth";
 import { getEnabled, parseUser } from "@/lib/helpers";
 import Clubs from "./clubs";
-import ClubTeacherBody from "@/components/club/clubSystemBody";
 
 export const metadata: Metadata = {
   title: "Clubs",
@@ -45,8 +44,7 @@ async function Page() {
       <h2 className="text-xl font-bold flex items-center gap-x-3">
         <FaBasketball size={18} /> Clubs
       </h2>
-      {/* <Clubs clubs={clubs} /> */}
-      <ClubTeacherBody />
+      <Clubs clubs={clubs} />
     </div>
   );
 }

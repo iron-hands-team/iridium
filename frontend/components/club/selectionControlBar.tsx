@@ -47,22 +47,19 @@ export default function SelectionControlBar() {
         window.addEventListener("mousemove", move);
         window.addEventListener("mouseup", stop);
       }}
-      className="fixed flex h-[200px] w-[500px] justify-start items-start bg-slate-600/95 overflow-y-auto flex-col flex-wrap z-100 rounded-lg border-1 border-zinc-400  shadow-[0_4px_10px_rgba(0,0,0,0.5)] cursor-grab p-[10px]"
+      className="fixed flex w-100 justify-start items-start bg-zinc-200/50 dark:bg-zinc-900/50 backdrop-blur-sm overflow-y-auto flex-col flex-wrap z-100 border-1 border-zinc-800  shadow-[0_4px_10px_rgba(0,0,0,0.5)] cursor-grab p-[10px]"
       onClick={() => setSelectionControlBar(false)}
     >
       <div className="flex items-center gap-[10px] ">
-        <p className="text-[30px]">
-          <b>Super Selector </b>
-        </p>
-        <p>
-          <b>({selection.length}) Selected</b>
-        </p>
+        <b className="text-xl">Bulk Selector </b>
+        <b>({selection.length} selected)</b>
       </div>
-      <br></br>
-      <div className="flex gap-[10px] flex-1 w-full justify-center">
+      <div className="flex gap-[10px] flex-1 w-full justify-center my-3">
         <Btn
           onclick={() => deleteEverything()}
           text={"Delete " + selection.length}
+          styles="text-sm bg-red-500! border-red-500! text-white!"
+          primary
         />
         <Btn
           onclick={() => {

@@ -31,7 +31,7 @@ export default function ClubBar({ clubIndex, text }: ClubBarInterface) {
   return (
     <div
       key={clubIndex}
-      className={`flex w-full ${clubTargetIndex === clubIndex && clubIndex != -1 ? "bg-gray-700 h-[" + (clubBarHeight + 50) + "px]" : "bg-gray-800 h-[" + clubBarHeight + "px]"}justify-between items-center cursor-pointer p-[10px] gap-[10px] border-t-1 border-zinc-600 ${clubIndex == clubs.length - 1 ? "border-b-1" : ""}  hover:bg-gray-600`}
+      className={`flex w-full ${clubTargetIndex === clubIndex && clubIndex != -1 ? "h-[" + (clubBarHeight + 50) + "px]" : "h-[" + clubBarHeight + "px]"} justify-between items-center cursor-pointer p-[10px] gap-[10px] border-t-1 border-zinc-800 ${clubIndex == clubs.length - 1 ? "border-b-1" : ""} hover:bg-zinc-200 dark:hover:bg-zinc-900`}
       onClick={() => {
         if (clubTargetIndex === clubIndex) {
           setClubTargetIndex(-1);
@@ -69,22 +69,18 @@ export default function ClubBar({ clubIndex, text }: ClubBarInterface) {
               className={`h-[25px] w-[25px] cursor-pointer ${clubs[clubIndex].isBookedMarked ? "bg-yellow-400" : "bg-gray-500"} rounded-md`}
             ></button>
 
-            <p>{clubs[clubIndex].name}</p>
+            <div>{clubs[clubIndex].name}</div>
             {clubs[clubIndex].tags.map((tagItem, _) => (
               <div
                 key={_}
                 className={`${tagItem.color} p-[10px] rounded-md h-[30px] flex items-center`}
               >
-                <p>
-                  <b>{tagItem.name}</b>
-                </p>
+                <b>{tagItem.name}</b>
               </div>
             ))}
           </>
         ) : (
-          <p>
-            <b>{text}</b>
-          </p>
+          <b>{text}</b>
         )}
       </div>
       <div className="flex gap-[5px]">

@@ -36,11 +36,7 @@ export default function ClubManagerSystem() {
   ) {
     return (
       <div className="flex w-full items-center gap-[10px]">
-        {canEdit && (
-          <p>
-            <b>{name}:</b>
-          </p>
-        )}
+        {canEdit && <b>{name}:</b>}
         {canEdit ? (
           <Input
             placeholder={"Enter " + name}
@@ -51,11 +47,9 @@ export default function ClubManagerSystem() {
             styles=""
           />
         ) : (
-          <p>
-            <b>
-              {showType && name + ": "} {String(clubs[cti][variableName])}
-            </b>
-          </p>
+          <b>
+            {showType && name + ": "} {String(clubs[cti][variableName])}
+          </b>
         )}
       </div>
     );
@@ -70,11 +64,10 @@ export default function ClubManagerSystem() {
   }
 
   return (
-    <div className="flex flex-col w-1/3 h-full bg-gray-800 p-[10px] justify-start gap-[10px] relative border-1 rounded-lg border-zinc-400 overflow-y-auto">
+    <div className="flex flex-col w-100 h-120 p-[10px] justify-start gap-[10px] relative border-l-1 border-zinc-800 overflow-y-auto">
       <div className="absolute top- right-[10px] ">
         <Btn onclick={() => setCanEdit(!canEdit)} text="Edit" />
       </div>
-
       <div className="flex w-full items-end gap-[10px] ">
         {!canEdit && (
           <button
@@ -85,11 +78,7 @@ export default function ClubManagerSystem() {
             className={`h-[25px] w-[25px] cursor-pointer ${clubs[cti].isBookedMarked ? "bg-yellow-500" : "bg-gray-500"} rounded-md`}
           ></button>
         )}
-        {canEdit && (
-          <p>
-            <b>Name:</b>
-          </p>
-        )}
+        {canEdit && <b>Name:</b>}
         {canEdit ? (
           <Input
             placeholder={"Enter Name"}
@@ -99,9 +88,7 @@ export default function ClubManagerSystem() {
             }}
           />
         ) : (
-          <p className="text-[30px]">
-            <b>{clubs[cti].name}</b>
-          </p>
+          <b className="text-2xl">{clubs[cti].name}</b>
         )}
         {!canEdit &&
           clubs[cti].name != "" &&
@@ -110,7 +97,7 @@ export default function ClubManagerSystem() {
               key={tagIndex}
               className={`${tagItem.color} p-[10px] self-start rounded-md h-[40px] flex items-center`}
             >
-              <p>{tagItem.name}</p>
+              {tagItem.name}
             </div>
           ))}
       </div>
@@ -119,9 +106,7 @@ export default function ClubManagerSystem() {
 
       {canEdit ? (
         <div>
-          <p>
-            <b>Description</b>
-          </p>
+          <b>Description</b>
           <Textarea
             placeholder="Enter Description Here:"
             value={clubs[cti].desc}
@@ -130,16 +115,14 @@ export default function ClubManagerSystem() {
         </div>
       ) : (
         <div>
-          <p>
-            <b>Description:</b>
-          </p>
-          <p>{clubs[cti].desc}</p>
+          <b>Description:</b>
+          {clubs[cti].desc}
         </div>
       )}
 
       {canEdit && (
         <div className="w-full ">
-          <p>Choose Tag:</p>
+          Choose Tag:
           <div className="w-full flex flex-wrap gap-[10px]">
             {tags.map((tagItem, tagIndex) => (
               // looping through
@@ -164,21 +147,19 @@ export default function ClubManagerSystem() {
                 }}
                 /*onClick={()=> setClub(cti, "tag", tagItem)}*/
               >
-                <p>{tagItem.name}</p>
+                {tagItem.name}
               </button>
             ))}
 
-            {tags.length == 0 && <p>No Tags Created.</p>}
+            {tags.length == 0 && "No Tags Created."}
           </div>
         </div>
       )}
 
       {canEdit ? (
-        <div className="flex flex-col w-full gap-[10px]  h-[200px] overflow-y-auto justify-start items-start ">
+        <div className="flex flex-col w-full gap-[10px] justify-start items-start ">
           <div className="flex items-center">
-            <p>
-              <b>Managers:</b>
-            </p>
+            <b>Managers:</b>
             <Btn
               onclick={() => {
                 clubs[cti].managers = addPerson(clubs[cti].managers);
@@ -221,34 +202,22 @@ export default function ClubManagerSystem() {
         </div>
       ) : (
         <div className="flex gap-[5px] flex-wrap items-center">
-          <p>Managers:</p>
+          Managers:
           {clubs[cti].managers.map((managerItem, _) => (
             <p key={_}>{managerItem.name}, </p>
           ))}
-          {clubs[cti].managers.length == 0 && (
-            <p>
-              <b>No Managers</b>
-            </p>
-          )}
+          {clubs[cti].managers.length == 0 && <b>No Managers</b>}
         </div>
       )}
-      {canEdit ? (
+      {!canEdit && (
         <div>
-          <p>The</p>
-        </div>
-      ) : (
-        <div>
-          <p>
-            <b>Members: {clubs[cti].students.length}</b>
-          </p>
+          <b>Members: {clubs[cti].students.length}</b>
         </div>
       )}
       {canEdit ? (
         <div>
           <div className="flex items-center">
-            <p>
-              <b>Schedule</b>
-            </p>
+            <b>Schedule</b>
             <Btn
               onclick={() => {
                 clubs[cti].schedule = addTime(clubs[cti].schedule);
@@ -334,38 +303,29 @@ export default function ClubManagerSystem() {
         </div>
       ) : (
         <div className="flex flex-col ">
-          <p className="mb-[10px]">
-            <b>Schedule:</b>
-          </p>
+          <b>Schedule:</b>
           {clubs[cti].schedule.map((scheduleItem, scheduleIndex) => (
             <div
               key={scheduleIndex}
               className="grid grid-cols-3 w-full  h-[40px] items-center border-1 border-zinc-600 "
             >
-              <p className="text-center border-r-1 border-zinc-600">
+              <div className="text-center border-r-1 border-zinc-600">
                 {scheduleItem.day == "" ? "untitled" : scheduleItem.day}
-              </p>
-              <p className="text-center">
+              </div>
+              <div className="text-center">
                 {scheduleItem.startingTime == ""
                   ? "untitled"
                   : scheduleItem.startingTime}
-              </p>
-              <p className="text-center border-l-1 border-zinc-600">
+              </div>
+              <div className="text-center border-l-1 border-zinc-600">
                 {scheduleItem.endingTime == ""
                   ? "untitled"
                   : scheduleItem.endingTime}
-              </p>
+              </div>
             </div>
           ))}
         </div>
       )}
-
-      {!canEdit && (
-        <div>
-          <Btn text="Send Message To Managers" />
-        </div>
-      )}
-
       {canEdit && (
         <div>
           <Btn
