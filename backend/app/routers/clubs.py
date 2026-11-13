@@ -3,11 +3,21 @@ from sqlalchemy.orm import Session
 
 from app.database import get_db
 from app.auth import manager
-from app.models import Club, ClubMembership, User, ClubFavorite, UserRole
-from app.schemas import ClubCreateRequest, ClubUpdateRequest, ClubResponse, ClubMemberResponse
+from app.models import Club, ClubMembership, User, ClubFavorite, UserRole, Channel
+from app.schemas import (
+    ClubCreateRequest,
+    ClubUpdateRequest,
+    ClubResponse,
+    ClubMemberResponse,
+    ClubSystemManager,
+    ClubSystemRequest,
+    ClubSystemSchedule,
+    ClubSystemTag,
+)
 from app.dependencies import require_staff, require_admin
 
 router = APIRouter(prefix="/clubs", tags=["clubs"])
+
 
 @router.get("", response_model=list[ClubResponse])
 def list_clubs(
@@ -15,7 +25,9 @@ def list_clubs(
     current_user: User = Depends(manager),
 ):
     clubs = db.query(Club).order_by(Club.name).all()
-    my_memberships = db.query(ClubMembership).filter(ClubMembership.user_id == current_user.id).all()
+    my_memberships = (
+        db.query(ClubMembership).filter(ClubMembership.user_id == current_user.id).all()
+    )
     my_club_ids = {m.club_id for m in my_memberships}
     results = []
     for club in clubs:
@@ -23,6 +35,7 @@ def list_clubs(
         response.joined = club.id in my_club_ids
         results.append(response)
     return results
+
 
 @router.post("", response_model=ClubResponse)
 def create_club(
@@ -36,12 +49,41 @@ def create_club(
     if new_club.sponsor_id is not None:
         sponsor = db.query(User).filter(User.id == new_club.sponsor_id).first()
         if sponsor is None or sponsor.role not in (UserRole.teacher, UserRole.admin):
-            raise HTTPException(status_code=400, detail="Sponsor must be a teacher or admin.")
+            raise HTTPException(
+                status_code=400, detail="Sponsor must be a teacher or admin."
+            )
     club = Club(**new_club.model_dump())
     db.add(club)
     db.commit()
     db.refresh(club)
     return club
+
+
+@router.post("/bulk", status_code=204)
+def save_clubs(
+    clubs: list[ClubSystemRequest],
+    db: Session = Depends(get_db),
+    _staff: User = Depends(require_staff),
+):
+    db.query(Channel).update({Channel.club_id: None}, synchronize_session=False)
+    db.query(ClubMembership).delete(synchronize_session=False)
+    db.query(ClubFavorite).delete(synchronize_session=False)
+    db.query(Club).delete(synchronize_session=False)
+    new_clubs = []
+    for club in clubs:
+        new_clubs.append(
+            Club(
+                name=club.name,
+                description=club.desc,
+                location=club.location,
+                managers=[m.model_dump(mode="json") for m in club.managers],
+                schedule=[s.model_dump(mode="json") for s in club.schedule],
+                tags=[t.model_dump(mode="json") for t in club.tags],
+            )
+        )
+    db.add_all(new_clubs)
+    db.commit()
+
 
 @router.patch("/{club_id}", response_model=ClubResponse)
 def update_club(
@@ -64,7 +106,9 @@ def update_club(
     if "sponsor_id" in data and data["sponsor_id"] is not None:
         sponsor = db.query(User).filter(User.id == data["sponsor_id"]).first()
         if sponsor is None or sponsor.role not in (UserRole.teacher, UserRole.admin):
-            raise HTTPException(status_code=400, detail="Sponsor must be a teacher or admin.")
+            raise HTTPException(
+                status_code=400, detail="Sponsor must be a teacher or admin."
+            )
 
     for field, value in data.items():
         setattr(club, field, value)
@@ -72,6 +116,7 @@ def update_club(
     db.commit()
     db.refresh(club)
     return club
+
 
 @router.delete("/{club_id}", status_code=204)
 def delete_club(
@@ -85,6 +130,7 @@ def delete_club(
     db.delete(existing)
     db.commit()
 
+
 @router.get("/{club_id}/members", response_model=list[ClubMemberResponse])
 def list_club_members(
     club_id: int,
@@ -92,6 +138,7 @@ def list_club_members(
     _current_user: User = Depends(manager),
 ):
     return db.query(ClubMembership).filter(ClubMembership.club_id == club_id).all()
+
 
 @router.post("/{club_id}/join", response_model=ClubMemberResponse)
 def join_club(
@@ -105,7 +152,9 @@ def join_club(
 
     existing = (
         db.query(ClubMembership)
-        .filter(ClubMembership.club_id == club_id, ClubMembership.user_id == current_user.id)
+        .filter(
+            ClubMembership.club_id == club_id, ClubMembership.user_id == current_user.id
+        )
         .first()
     )
     if existing is not None:
@@ -117,6 +166,7 @@ def join_club(
     db.refresh(membership)
     return membership
 
+
 @router.delete("/{club_id}/leave", status_code=204)
 def leave_club(
     club_id: int,
@@ -125,13 +175,16 @@ def leave_club(
 ):
     membership = (
         db.query(ClubMembership)
-        .filter(ClubMembership.club_id == club_id, ClubMembership.user_id == current_user.id)
+        .filter(
+            ClubMembership.club_id == club_id, ClubMembership.user_id == current_user.id
+        )
         .first()
     )
     if membership is None:
         raise HTTPException(status_code=404, detail="Not a member.")
     db.delete(membership)
     db.commit()
+
 
 @router.post("/{club_id}/favorite", response_model=ClubResponse)
 def favorite_club(
@@ -145,7 +198,9 @@ def favorite_club(
 
     existing = (
         db.query(ClubFavorite)
-        .filter(ClubFavorite.club_id == club_id, ClubFavorite.user_id == current_user.id)
+        .filter(
+            ClubFavorite.club_id == club_id, ClubFavorite.user_id == current_user.id
+        )
         .first()
     )
     if existing is None:
@@ -153,6 +208,7 @@ def favorite_club(
         db.commit()
         db.refresh(club)
     return club
+
 
 @router.delete("/{club_id}/favorite", response_model=ClubResponse)
 def unfavorite_club(
@@ -166,7 +222,9 @@ def unfavorite_club(
 
     existing = (
         db.query(ClubFavorite)
-        .filter(ClubFavorite.club_id == club_id, ClubFavorite.user_id == current_user.id)
+        .filter(
+            ClubFavorite.club_id == club_id, ClubFavorite.user_id == current_user.id
+        )
         .first()
     )
     if existing is not None:

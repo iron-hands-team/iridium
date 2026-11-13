@@ -330,7 +330,7 @@ export default function ClubManagerSystem() {
         <div>
           <Btn
             onclick={() => {
-              deleteClub(cti);
+              deleteClub(clubs[cti].id);
               setcti(-1);
             }}
             text="Delete Club"

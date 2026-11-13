@@ -23,6 +23,7 @@ export default function SelectionControlBar() {
       if (selection.includes(clubItem.id)) {
         deleteClub(clubItem.id);
       }
+      deleteEverythingSelection();
     });
   }
 

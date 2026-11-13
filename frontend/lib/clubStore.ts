@@ -56,6 +56,7 @@ type busStore = {
  setClubTargetIndex: (clubTargetIndex:number) => void;
 
  updateFrame: (clubs:Club[], tags:Tag[]) => void;
+ setClubs: (clubs:Club[]) => void;
  addClub: () => void;
  deleteClub: (clubIndex:number) => void;
  setClub: <T>(clubIndex:number, variableName:string, value:T) => void;
@@ -155,6 +156,7 @@ export const cls = create<busStore>((set) => ({
 
 
 
+ setClubs: (clubs) => set(() => ({ clubs })),
 
  addClub: () => set((state) => ({
   clubs: [...state.clubs, {
@@ -172,7 +174,7 @@ export const cls = create<busStore>((set) => ({
   }]
  })),
  deleteClub: (clubIndex) => set((state) => ({
-  clubs: state.clubs.filter((_, i) => i!==clubIndex)
+  clubs: state.clubs.filter((c) => c.id!==clubIndex)
  })),
  setClub: (clubTargetIndex, variableName, value) => set((state) => ({
     clubs: state.clubs.map((clubItem, clubIndex) => 

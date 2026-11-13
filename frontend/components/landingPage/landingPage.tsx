@@ -61,10 +61,6 @@ export default function LandingPage() {
 }, []);
 
 
-	//this one outputs for some reason
-	useEffect(() => {
-			console.log(arrayTexts);
-	}, [arrayTexts]);
  return (
 	<div className="fixed inset-0 bg-black overflow-auto overflow-x-hidden">			
 		<div className=" h-[450px] p-[10px] flex flex-col justify-center  items-center relative bg-gray-900">

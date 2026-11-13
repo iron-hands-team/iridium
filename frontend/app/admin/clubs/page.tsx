@@ -48,7 +48,7 @@ async function Page() {
         <FaBasketball size={18} /> View clubs
       </h2>
       {/* <Clubs clubs={clubs} /> */}
-      <ClubTeacherBody />
+      <ClubTeacherBody existing={clubs} />
     </div>
   );
 }

@@ -97,6 +97,10 @@ class Club(Base):
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String, nullable=False, unique=True)
     description = Column(Text, nullable=True)
+    location = Column(String, nullable=True)
+    managers = Column(JSONB, nullable=False, default=list, server_default="[]")
+    schedule = Column(JSONB, nullable=False, default=list, server_default="[]")
+    tags = Column(JSONB, nullable=False, default=list, server_default="[]")
     sponsor_id = Column(Integer, ForeignKey("users.id"), nullable=True)
     categories = Column(ARRAY(String), nullable=False, default=list)
 

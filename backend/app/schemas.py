@@ -117,6 +117,11 @@ class ClubResponse(BaseModel):
     sponsor_id: int | None = None
     categories: list[str]
     favorites: list[str] = []
+    location: str | None = None
+    managers: list[dict] | None = None
+    schedule: list[dict] | None = None
+    tags: list[dict] | None = None
+
     joined: bool = False
 
     class Config:
@@ -558,6 +563,30 @@ class QuizResponse(BaseModel):
     name: str
     questions: list[QuizQuestion]
     class_section_id: int
+
+    class Config:
+        from_attributes = True
+
+class ClubSystemManager(BaseModel):
+    name: str
+    desc: str | None = None
+
+class ClubSystemSchedule(BaseModel):
+    day: str
+    startingTime: str
+    endingTime: str
+
+class ClubSystemTag(BaseModel):
+    color: str
+    name: str
+
+class ClubSystemRequest(BaseModel):
+    desc: str | None = None
+    location: str | None = None
+    managers: list[ClubSystemManager]
+    name: str | None = None
+    schedule: list[ClubSystemSchedule]
+    tags: list[ClubSystemTag]
 
     class Config:
         from_attributes = True

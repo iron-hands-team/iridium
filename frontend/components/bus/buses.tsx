@@ -25,7 +25,6 @@ export default function Buses({ isAdmin, existing }: BusesProps) {
 
   async function handleSave() {
     setLoading(true);
-    console.log(buses);
     const res = await fetch("/api/buses", {
       method: "POST",
       headers: {
@@ -44,7 +43,6 @@ export default function Buses({ isAdmin, existing }: BusesProps) {
 
   useEffect(() => {
     if (existing) {
-      console.log(existing);
       setBuses(
         existing.map((bus: any) => ({
           id: bus.id,

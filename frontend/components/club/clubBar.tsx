@@ -25,7 +25,7 @@ export default function ClubBar({ clubIndex, text }: ClubBarInterface) {
   const clubBarHeight = cls((state) => state.clubBarHeight);
 
   function isInSelection() {
-    return selection.includes(clubIndex);
+    return selection.includes(clubs[clubIndex].id);
   }
 
   return (
@@ -47,9 +47,9 @@ export default function ClubBar({ clubIndex, text }: ClubBarInterface) {
             <button
               onClick={(e) => {
                 if (!isInSelection()) {
-                  addSelection(clubIndex);
+                  addSelection(clubs[clubIndex].id);
                 } else {
-                  deleteSelection(clubIndex);
+                  deleteSelection(clubs[clubIndex].id);
                 }
                 e.stopPropagation();
               }}
@@ -66,7 +66,7 @@ export default function ClubBar({ clubIndex, text }: ClubBarInterface) {
                 setCanViewBookMarks(true);
                 e.stopPropagation();
               }}
-              className={`h-[25px] w-[25px] cursor-pointer ${clubs[clubIndex].isBookedMarked ? "bg-yellow-400" : "bg-gray-500"} rounded-md`}
+              className={`h-[25px] w-[25px] cursor-pointer ${clubs[clubIndex]?.isBookedMarked ? "bg-yellow-400" : "bg-gray-500"} rounded-md`}
             ></button>
 
             <div>{clubs[clubIndex].name}</div>

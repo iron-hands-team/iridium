@@ -1,7 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import type { ClubType } from "@/types/clubs";
+import { useState, useEffect } from "react";
 import { cls } from "@/lib/clubStore";
+import { AnimatePresence } from "framer-motion";
+import { useRouter } from "next/navigation";
+import { FaExclamationTriangle } from "react-icons/fa";
 import Btn from "@/components/ui/btn";
 import Input from "@/components/ui/input";
 import TagsSystemPopup from "@/components/club/clubTagsSystem";
@@ -9,10 +13,15 @@ import ClubManagerSystem from "@/components/club/clubManagerSystem";
 import ClubBar from "@/components/club/clubBar";
 import SelectionControlBar from "@/components/club/selectionControlBar";
 import Settings from "@/components/club/clubSettings";
-import { AnimatePresence } from "framer-motion";
+import toast from "react-hot-toast";
 
-export default function ClubTeacherBody() {
+export default function ClubTeacherBody({
+  existing,
+}: {
+  existing?: ClubType[];
+}) {
   const clubs = cls((s) => s.clubs);
+  const setClubs = cls((s) => s.setClubs);
 
   const selection = cls((state) => state.selection);
 
@@ -38,6 +47,9 @@ export default function ClubTeacherBody() {
 
   const canViewBookMarks = cls((state) => state.canViewBookMarks);
 
+  const [error, setError] = useState<string | null>(null);
+  const router = useRouter();
+
   function isOneSelected() {
     return selection.length > 0;
   }
@@ -51,8 +63,41 @@ export default function ClubTeacherBody() {
   }
 
   async function handleSave() {
-    console.log(clubs);
+    setError(null);
+    const res = await fetch("/api/clubs/bulk", {
+      method: "POST",
+      credentials: "include",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(clubs),
+    });
+    if (res.ok) {
+      toast.success(`Clubs saved successfully!`);
+      router.refresh();
+    } else {
+      setError(
+        "Failed to save clubs. Please try again. (club names have to be unique)",
+      );
+    }
   }
+
+  useEffect(() => {
+    if (existing) {
+      setClubs(
+        existing.map((club: any) => ({
+          id: club.id,
+          name: club.name,
+          desc: club.description,
+          group: "",
+          tags: club.tags,
+          managers: club.managers,
+          students: [],
+          isBookedMarked: false,
+          location: club.location,
+          schedule: club.schedule,
+        })),
+      );
+    }
+  }, [existing, setClubs]);
 
   return (
     <div className="flex items-start justify-start flex-col">
@@ -102,13 +147,17 @@ export default function ClubTeacherBody() {
                 />
               </div>
             </div>
-
+            {error && (
+              <div className="text-red-500 text-sm flex gap-x-3 items-center px-4 pt-1 pb-3">
+                <FaExclamationTriangle size={15} /> {error}
+              </div>
+            )}
             <ClubBar clubIndex={-1} text="Bookmarked" />
             {canViewBookMarks &&
               clubs.map(
                 (clubItem, clubIndex) =>
                   clubItem.isBookedMarked && (
-                    <ClubBar key={clubIndex} clubIndex={clubItem.id} text="" />
+                    <ClubBar key={clubIndex} clubIndex={clubIndex} text="" />
                   ),
               )}
 
@@ -129,7 +178,7 @@ export default function ClubTeacherBody() {
                       .toString()
                       .includes(searchClubInput.toLowerCase())) &&
                   !clubItem.isBookedMarked && (
-                    <ClubBar key={clubIndex} clubIndex={clubItem.id} text="" />
+                    <ClubBar key={clubIndex} clubIndex={clubIndex} text="" />
                   ),
               )}
           </div>
