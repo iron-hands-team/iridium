@@ -419,12 +419,8 @@ class Destination(Base):
 class Quiz(Base):
     __tablename__ = "quizzes"
     id = Column(Integer, primary_key=True, index=True)
-    name = Column(String, nullable=False, unique=True)
-    questions = relationship("Question", back_populates="Quiz")
-
-    class_section_id = Column(Integer, ForeignKey("class_section.id"))
-
     name = Column(String, nullable=False)
+    questions = relationship("Question", back_populates="Quiz")
     class_section_id = Column(Integer, ForeignKey("class_sections.id"), nullable=False)
     class_section = relationship("ClassSection", back_populates="quizzes")
     questions = relationship(
@@ -437,6 +433,5 @@ class QuizQuestion(Base):
     name = Column(String, nullable=False)
     choices = Column(ARRAY(String), nullable=False)
     answers = Column(ARRAY(String), nullable=False)
-    can_show = Column(Boolean, nullable=False, default=False)
     quiz_id = Column(Integer, ForeignKey("quizzes.id"), nullable=False)
     quiz = relationship("Quiz", back_populates="questions")

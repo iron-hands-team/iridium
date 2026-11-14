@@ -2,16 +2,15 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 
 from app.database import get_db
-from app.models import ClassSection, ClassEnrollment, User, UserRole, Quiz
+from app.models import ClassSection, ClassEnrollment, User, UserRole, Quiz, QuizQuestion
 from app.schemas import (
     ClassSectionCreateRequest,
     ClassSectionUpdateRequest,
     ClassSectionResponse,
     AddStudentToClassRequest,
     ClassEnrollmentResponse,
-
-    QuizResponse
-    
+    QuizResponse,
+    QuizRequest
 )
 from app.dependencies import require_staff
 
@@ -36,17 +35,29 @@ def list_classes(
     return query.order_by(ClassSection.name).all()
 
 
-@router.get("/{class_id}/quizzes", response_model=list[QuizResponse])
+@router.get("/quizzes", response_model=list[QuizResponse])
 def list_quizzes(
-    class_id: int,
     db: Session = Depends(get_db),
     current_user: User = Depends(require_staff),
 ):
-    query = None
-    get_owned_class(class_id, db, current_user)
-    return (
-        db.query(Quiz).filter(Quiz.class_section_id == class_id).all()
-    )
+    return db.query(Quiz).all()
+
+
+@router.post("/{class_id}/quizzes", status_code=204)
+def post_quizzes(
+    quizzes: list[QuizRequest],
+    db: Session = Depends(get_db),
+    current_user: User = Depends(require_staff),
+):
+    db.query(QuizQuestion).delete()
+    db.query(Quiz).delete()
+    for quiz in quizzes:
+        new_quiz = Quiz(name=quiz.name, class_section_id=quiz.class_section_id)
+        db.add(new_quiz)
+        db.flush()
+        for question in quiz.questions:
+            db.add(QuizQuestion(name=question.name, choices=question.choices, answers=question.answers, quiz_id=new_quiz.id))
+    db.commit()
 
 @router.post("", response_model=ClassSectionResponse)
 def create_class(

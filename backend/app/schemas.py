@@ -552,17 +552,26 @@ class BusResponse(BaseModel):
     class Config:
         from_attributes = True
 
-class QuizQuestion(BaseModel):
-    name: str
-    choices: list[str]
-    answers: list[str]
-    can_show: bool
+class QuizQuestionResponse(BaseModel):
+    name: str | None = None
+    choices: list[str] = []
+    answers: list[str] = []
+    can_show: bool | None = None
+    question: str | None = None
 
 class QuizResponse(BaseModel):
-    id: int | None = None
+    id: int
     name: str
-    questions: list[QuizQuestion]
+    questions: list[QuizQuestionResponse] = []
     class_section_id: int
+
+    class Config:
+        from_attributes = True
+
+class QuizRequest(BaseModel):
+    name: str | None = None
+    questions: list[QuizQuestionResponse] = []
+    class_section_id: int = 1
 
     class Config:
         from_attributes = True

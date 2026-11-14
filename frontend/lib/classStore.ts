@@ -61,6 +61,7 @@ type ClassStore = {
   // quiz
   quizPopup: boolean;
   setQuizPopup: (input: boolean) => void;
+  setQuizzes: (quizzes: Quiz[], index: number) => void;
 
   addClassQuiz: (classTargetIndex: number) => void;
   deleteClassQuiz: (classTargetIndex: number, quizIndex: number) => void;
@@ -245,7 +246,7 @@ export const cs = create<ClassStore>((set) => ({
   classes: [
     {
       id: 0,
-      className: "Chemistry", //TODO: actually pull class data from backend
+      className: "Class", //TODO: actually pull class data from backend
       students: [],
       color: "",
       canShow: true,
@@ -261,6 +262,14 @@ export const cs = create<ClassStore>((set) => ({
   aboutPopup: false,
 
   setAboutPopup: (aboutPopup) => set({ aboutPopup }),
+  setQuizzes: (quizzes, index) =>
+    set((state) => {
+      return {
+        classes: state.classes.map((c, i) =>
+          i === index ? { ...c, quizzes } : c,
+        ),
+      };
+    }),
 
   update: () =>
     set((state) => ({
