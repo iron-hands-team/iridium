@@ -1,0 +1,39 @@
+# Production overrides. Use together with compose.yaml:
+#
+#   docker compose -f compose.yaml -f compose.prod.yaml up -d --build
+#
+# or run ./scripts/install.sh --production --domain school.example.com
+#
+# Differences from the development setup: built frontend (no dev server), backend
+# without hot reload and with production settings, no source code mounted into
+# containers, the database port is not published, and Caddy uses Caddyfile.prod
+# (automatic HTTPS and security headers). Needs Docker Compose v2.24 or newer.
+services:
+  caddy:
+    volumes:
+      - ./Caddyfile.prod:/etc/caddy/Caddyfile
+      - caddy_data:/data
+      - caddy_config:/config
+    environment:
+      SITE_ADDRESS: ${SITE_ADDRESS:-localhost}
+
+  db:
+    ports: !reset []
+
+  backend:
+    # One worker on purpose: migrations and first-run seeding run at startup.
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000
+    volumes: !reset []
+    environment:
+      ENVIRONMENT: production
+    restart: unless-stopped
+
+  frontend:
+    build:
+      target: production
+    container_name: nextjs-frontend-prod
+    volumes: !reset []
+    environment:
+      NODE_ENV: production
+      PORT: "3000"
+    ports: !reset []

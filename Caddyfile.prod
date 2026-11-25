@@ -1,0 +1,43 @@
+# Production Caddyfile. Used by compose.prod.yaml.
+# SITE_ADDRESS is your domain (for example school.example.com). Caddy gets and renews the TLS certificate automatically.
+{$SITE_ADDRESS:localhost} {
+	encode zstd gzip
+
+	header {
+		Strict-Transport-Security "max-age=31536000"
+		X-Content-Type-Options nosniff
+		X-Frame-Options SAMEORIGIN
+		Referrer-Policy strict-origin-when-cross-origin
+		Permissions-Policy "camera=(), microphone=(), geolocation=()"
+		-Server
+	}
+
+	handle_path /api/* {
+		reverse_proxy fastapi-backend:8000
+	}
+
+	# Student submissions are never served publicly.
+	handle /s3/files/submissions/* {
+		respond 403
+	}
+
+	handle_path /s3/files/* {
+		header {
+			Content-Security-Policy "sandbox; default-src 'none'"
+			X-Content-Type-Options nosniff
+			Content-Disposition attachment
+		}
+
+		reverse_proxy garage-storage:3902 {
+			header_up Host iridium-uploads.web.garage
+		}
+	}
+
+	handle_path /s3/* {
+		reverse_proxy garage-storage:3900
+	}
+
+	handle {
+		reverse_proxy frontend:3000
+	}
+}
