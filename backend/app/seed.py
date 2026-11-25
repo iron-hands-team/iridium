@@ -1,3 +1,6 @@
+import os
+import secrets
+
 from sqlalchemy import text
 from datetime import date, datetime, time, timedelta, timezone
 
@@ -46,10 +49,21 @@ def init_db_and_seed_admin():
         now = datetime.now(timezone.utc)
         today = date.today()
 
+        # Admin password: ADMIN_PASSWORD env var if set. In production with no
+        # ADMIN_PASSWORD, generate a random one and print it once. Dev keeps the
+        # demo default.
+        admin_password = os.getenv("ADMIN_PASSWORD")
+        if not admin_password:
+            if os.getenv("ENVIRONMENT", "development") == "production":
+                admin_password = secrets.token_urlsafe(16)
+                print(f"[iridium] Generated admin password (shown once): {admin_password}", flush=True)
+            else:
+                admin_password = "admin123"
+
         # users below
         admin = User(
             username="admin",
-            hashed_password=hash_password("admin123"),
+            hashed_password=hash_password(admin_password),
             first_name="admin",
             last_name="admin",
             role=UserRole.admin,
