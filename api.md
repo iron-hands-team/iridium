@@ -3,7 +3,7 @@
 Base URL: `https://localhost/api` (internal URL: `http://fastapi-backend:8000`)
 
 Auth: JWT via `LoginManager` (fastapi-login). `/login` sets it as an
-`httponly` cookie (`access-token`, `samesite=none`, `secure=true`) and
+`httponly` cookie (`access-token`, `samesite=lax`, `secure=true`) and
 also returns it in the response body. Authenticated routes accept
 either the cookie or an `Authorization: Bearer <token>` header.
 
@@ -278,9 +278,9 @@ Body: `{ features, archive, messages, slow, censored, paused }`
 Admin only (requires password reverification). Pauses all backend operations and user interactions, effectively freezing/pausing the platform for maintenance, emergency, or other purposes. `204` on success, `400` if password is incorrect, `403` if not accessed by an admin.
 Body: `{ password }`
 
-### `DELETE /clear`
+### `POST /clear`
 
-Admin only (requires password reverification). Drops all database tables and clears everything except for the admin user performaing this very dangerous operation. `204` on success, `400` if password is incorrect, `403` if not accessed by an admin.
+Admin only (requires password reverification). Deletes all data except the admin user performing the operation, the migration history and the audit log. This is very dangerous. Logged as `data_clear`. `204` on success, `400` if password is incorrect, `403` if not accessed by an admin.
 Body: `{ password }`
 
 ---
@@ -292,6 +292,18 @@ Body: `{ password }`
 | `GET /`          | Public | `{ "message": "Iridium API is running" }` |
 | `GET /health`    | Public | `{ "status": "ok" }`                      |
 | `GET /health/db` | Public | Runs `SELECT 1`; confirms DB connectivity |
+
+---
+
+## Audit log and data export
+
+### `GET /audit-log?action=&limit=100&offset=0`
+
+Admin only. Newest first. `limit` is at most 500. Each entry has `id`, `created_at`, `actor_id`, `actor_username`, `action`, `target`, `detail`, `ip`. Recorded actions: `login_success`, `login_failed`, `user_create`, `user_update`, `user_delete`, `users_bulk_delete`, `password_reset`, `password_reset_dismissed`, `settings_update`, `platform_pause`, `platform_resume`, `data_clear`, `data_export`.
+
+### `GET /users/{username}/export`
+
+The user themself or an admin; anyone else gets `404`. Returns everything stored about the user as JSON (profile, posts, messages, memberships, schedule). Never includes the password hash. Anonymous reports are excluded. Logged as `data_export`.
 
 ---
 

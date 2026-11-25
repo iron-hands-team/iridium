@@ -11,7 +11,7 @@
 
 ![Website homepage screenshot](/banner.png)
 
-**Access the deployed demo version [here](https://iridium.tonymac.net) with username `admin` and password `admin123`.**
+**Access the deployed demo version [here](https://iridium.tonymac.net) with username `admin` and password `admin123`. This is a demo only; real installs never ship with demo accounts.**
 
 Iridium is an easy to use online platform for schools to post announcements, view schedules, and manage students and staff, inspired by [TJHSST](https://tjhsst.fcps.edu)'s intranet [Ion](https://github.com/tjcsl/ion).
 
@@ -30,52 +30,64 @@ Iridium is an easy to use online platform for schools to post announcements, vie
 
 ## Quick start
 
-To host Iridium for your school or for other purposes, simply follow these steps below:
+You need Docker with Compose v2.24 or newer, plus `openssl` and `curl`.
 
-1. Clone the GitHub [repository](https://github.com/iron-hands-team/iridium) using the command
-   ```bash
-   git clone https://github.com/iron-hands-team/iridium.git
-   ```
-2. Open it with your favorite code editor or through the terminal
-3. Create the `.env` file using the `.env.example` template and replace the variables with your secrets:
+```bash
+git clone https://github.com/iron-hands-team/iridium.git
+cd iridium
+./scripts/install.sh
+```
 
-   ```bash
-   cp .env.example .env
-   ```
+This creates `.env` with random secrets, sets up Garage storage, starts everything and prints the admin password. Open https://localhost (accept the local certificate warning).
 
-4. Start the Garage container to configure it:
+### Production
 
-   ```bash
-   docker compose up -d garage
-   ```
+```bash
+./scripts/install.sh --production --domain school.example.com
+```
 
-5. Run the following commands to set a new Garage layout and set up the keys:
+Point your domain's DNS at the server first; Caddy gets the HTTPS certificate automatically. Production runs the optimized frontend build, no demo accounts, and no exposed database port. See [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md) for backups, updates and restores, [SECURITY.md](SECURITY.md), [docs/PRIVACY.md](docs/PRIVACY.md) and [docs/DPA-TEMPLATE.md](docs/DPA-TEMPLATE.md).
 
-   ```bash
-   docker exec -it garage-storage /garage status
-   docker exec -it garage-storage /garage layout assign <ID_FROM_PREV_COMMAND> -c 5G -z garage
-   docker exec -it garage-storage /garage layout apply --version 1
-   docker exec -it garage-storage /garage key create iridium-key
-   docker exec -it garage-storage /garage bucket create iridium-uploads
-   docker exec -it garage-storage /garage bucket allow --read --write iridium-uploads --key iridium-key
-   docker exec -it garage-storage /garage bucket website --allow iridium-uploads
-   ```
+### Manual setup
 
-6. Copy the Garage access and secret keys to `.env` (`GARAGE_ACCESS_KEY` and `GARAGE_SECRET_KEY`) and start Docker compose:
+If you prefer to do it by hand, copy `.env.example` to `.env`, fill in the secrets, run `docker compose up -d garage`, then configure Garage:
 
-   ```bash
-   docker compose up -d
-   ```
+```bash
+docker exec garage-storage /garage status
+docker exec garage-storage /garage layout assign <ID_FROM_PREV_COMMAND> -c 5G -z garage
+docker exec garage-storage /garage layout apply --version 1
+docker exec garage-storage /garage key create iridium-key
+docker exec garage-storage /garage bucket create iridium-uploads
+docker exec garage-storage /garage bucket allow --read --write iridium-uploads --key iridium-key
+docker exec garage-storage /garage bucket website --allow iridium-uploads
+```
 
-7. Alternatively, if you want to run the production build of the app, uncomment the frontend production service then comment out the original frontend development service in `compose.yaml` and run:
+Put the key and secret in `.env` (`GARAGE_ACCESS_KEY`, `GARAGE_SECRET_KEY`) and run `docker compose up -d`.
 
-   ```bash
-   docker compose up -d
-   ```
+> **Note**: the Celery service doesn't hot reload, run `docker compose up -d --build celery` to apply changes.
 
-8. Navigate to https://localhost (port 80) to use the fully functional web interface and access the API at https://localhost/api
+## Database migrations
 
-> **Note**: the Celery service doesn't automatically update/hot reload, you have to run `docker compose up celery --build` to rebuild the service and reflect the changes.
+The schema is managed with [Alembic](https://alembic.sqlalchemy.org) and applied automatically when the backend starts. An existing database created before migrations were added is adopted automatically. To change a model:
+
+```bash
+cd backend
+alembic revision --autogenerate -m "describe the change"   # review the generated file
+```
+
+## Tests
+
+Tests run against a real PostgreSQL database and drop and recreate its schema, so use a throwaway database:
+
+```bash
+cd backend
+pip install -r requirements-dev.txt
+export TEST_DATABASE_URL=postgresql://user:password@localhost:5432/iridium_test
+pytest
+cd celery && pytest   # the Celery tasks run in their own process
+```
+
+CI runs both suites on every push and pull request.
 
 ## Contribution
 
