@@ -36,10 +36,41 @@ from app.models import (
     Guide,
 )
 from app.auth import hash_password
+from app.migrations import run_migrations
+
+DEFAULT_FEATURES = ["Classes", "Schedule", "Calendar", "Clubs", "Messages", "Chat"]
+
+
+def _seed_minimal(db, admin_password):
+    """Production seed: one admin, a general channel and default settings. No demo people or content."""
+    admin = User(
+        username="admin",
+        hashed_password=hash_password(admin_password),
+        first_name="admin",
+        last_name="admin",
+        role=UserRole.admin,
+        title="Head Administrator",
+    )
+    db.add(admin)
+    db.add(Channel(name="general", role="all"))
+    db.add(Info(title="My School", description="Set your school details in the admin settings."))
+    db.add(
+        Settings(
+            data={
+                "features": DEFAULT_FEATURES,
+                "archive": {"number": 30, "duration": "Days", "never": False},
+                "messages": {"number": 30, "duration": "Days", "never": False},
+                "slow": {"number": 5, "duration": "Seconds", "enabled": False},
+                "censored": {"words": [], "sensitive": False},
+                "paused": False,
+            }
+        )
+    )
+    db.commit()
 
 
 def init_db_and_seed_admin():
-    Base.metadata.create_all(bind=engine)
+    run_migrations()
 
     db = SessionLocal()
     try:
@@ -59,6 +90,16 @@ def init_db_and_seed_admin():
                 print(f"[iridium] Generated admin password (shown once): {admin_password}", flush=True)
             else:
                 admin_password = "admin123"
+
+        # Demo people and content are for development only. In production they are
+        # skipped unless SEED_DEMO_DATA=true (e.g. for a public demo site).
+        seed_demo = (
+            os.getenv("ENVIRONMENT", "development") != "production"
+            or os.getenv("SEED_DEMO_DATA", "").lower() == "true"
+        )
+        if not seed_demo:
+            _seed_minimal(db, admin_password)
+            return
 
         # users below
         admin = User(

@@ -1,3 +1,4 @@
+import logging
 import os
 from fastapi_login import LoginManager
 import bcrypt
@@ -8,6 +9,12 @@ SECRET_KEY = os.getenv("JWT_SECRET_KEY")
 
 if not SECRET_KEY:
     raise RuntimeError('Please set up secret key.')
+
+if os.getenv("ENVIRONMENT", "development") == "production":
+    if SECRET_KEY.startswith("YOUR_"):
+        raise RuntimeError("JWT_SECRET_KEY is still the placeholder from .env.example. Generate one with: openssl rand -hex 32")
+    if len(SECRET_KEY) < 32:
+        logging.getLogger("iridium").warning("JWT_SECRET_KEY is shorter than 32 characters; use `openssl rand -hex 32`.")
 
 manager = LoginManager(token_url="/login", secret=SECRET_KEY, use_cookie=True, cookie_name="access-token")
 
