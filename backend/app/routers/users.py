@@ -14,6 +14,7 @@ from app.dependencies import require_admin, manager
 from app.s3 import s3_client, s3_internal, BUCKET_NAME, ENDPOINT
 from app.auth import hash_password
 from app.limiter import limiter
+from app.audit import log_action
 
 router = APIRouter()
 
@@ -106,6 +107,7 @@ def delete_upload_url(
 def update_user(
     username: str,
     updates: UserUpdateRequest,
+    request: Request,
     db: Session = Depends(get_db),
     _admin: User = Depends(require_admin),
 ):
@@ -113,9 +115,11 @@ def update_user(
     if user is None:
         raise HTTPException(status_code=404, detail="User not found.")
 
-    for field, value in updates.model_dump(exclude_unset=True).items():
+    changes = updates.model_dump(exclude_unset=True)
+    for field, value in changes.items():
         setattr(user, field, value)
 
+    log_action(db, "user_update", actor=_admin, target=username, detail="fields=" + ",".join(sorted(changes)), request=request)
     db.commit()
     db.refresh(user)
     return user
@@ -123,6 +127,7 @@ def update_user(
 @router.delete("/users/{username}", status_code=204)
 def delete_user(
     username: str,
+    request: Request,
     db: Session = Depends(get_db),
     _admin: User = Depends(require_admin),
 ):
@@ -130,11 +135,13 @@ def delete_user(
     if user is None:
         raise HTTPException(status_code=404, detail="User not found.")
     db.delete(user)
+    log_action(db, "user_delete", actor=_admin, target=username, request=request)
     db.commit()
 
 @router.post("/users/bulk-delete", status_code=204)
 def bulk_delete_users(
     delete_request: BulkDeleteUsersRequest,
+    request: Request,
     db: Session = Depends(get_db),
     current_admin: User = Depends(require_admin),
 ):
@@ -142,9 +149,11 @@ def bulk_delete_users(
         raise HTTPException(
             status_code=400, detail="You cannot delete your own account this way."
         )
-    db.query(User).filter(User.username.in_(delete_request.usernames)).delete(
-        synchronize_session=False
-    )
+    # Delete through the ORM (not a bulk query) so each user's related rows are removed too.
+    users = db.query(User).filter(User.username.in_(delete_request.usernames)).all()
+    for user in users:
+        db.delete(user)
+    log_action(db, "users_bulk_delete", actor=current_admin, detail=f"count={len(users)}", request=request)
     db.commit()
 
 @router.post("/users/{username}/request", status_code=202)
@@ -179,6 +188,7 @@ def request_delete(
 def reset_password(
     username: str,
     req: ResetPasswordRequest,
+    request: Request,
     db: Session = Depends(get_db),
     _admin: User = Depends(require_admin),
 ):
@@ -194,6 +204,7 @@ def reset_password(
     
     user.requesting = False
 
+    log_action(db, "password_reset_dismissed" if req.clear else "password_reset", actor=_admin, target=username, request=request)
     db.commit()
     db.refresh(user)
     return user

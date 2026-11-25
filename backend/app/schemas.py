@@ -599,3 +599,15 @@ class ClubSystemRequest(BaseModel):
 
     class Config:
         from_attributes = True
+
+class AuditLogResponse(BaseModel):
+    id: int
+    created_at: datetime
+    actor_username: str | None = None
+    action: str
+    target: str | None = None
+    detail: str | None = None
+    ip: str | None = None
+
+    class Config:
+        from_attributes = True

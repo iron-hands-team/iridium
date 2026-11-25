@@ -16,7 +16,8 @@ from app.s3 import s3_internal, BUCKET_NAME
 from app.schemas import LoginRequest, UserCreateRequest, UserResponse, TokenResponse
 from app.dependencies import require_admin, pause_guard
 from app.seed import init_db_and_seed_admin
-from app.routers import users, announcements, clubs, events, schedule, classes, info, grades, attendance, messages, chat, notifications, guides, settings, buses
+from app.routers import users, announcements, clubs, events, schedule, classes, info, grades, attendance, messages, chat, notifications, guides, settings, buses, audit, privacy
+from app.audit import log_action
 
 IS_PROD = os.getenv("ENVIRONMENT", "development") == "production"
 FRONTEND_URL = os.getenv("FRONTEND_URL", "http://localhost:3000")
@@ -54,6 +55,8 @@ app.include_router(notifications.router)
 app.include_router(guides.router)
 app.include_router(settings.router)
 app.include_router(buses.router)
+app.include_router(audit.router)
+app.include_router(privacy.router)
 
 @app.get("/")
 def root():
@@ -87,7 +90,12 @@ def login(request: Request, credentials: LoginRequest, response: Response, db: S
         credentials.password, user.hashed_password if user else DUMMY_HASH
     )
     if user is None or not password_ok:
+        log_action(db, "login_failed", actor_username=credentials.username[:80], request=request)
+        db.commit()
         raise HTTPException(status_code=401, detail='Incorrect username or password')
+
+    log_action(db, "login_success", actor=user, request=request)
+    db.commit()
 
     token_expiry = timedelta(minutes=45) 
     token = manager.create_access_token(
@@ -125,6 +133,7 @@ def logout(
 @app.post("/users", response_model=UserResponse)
 def create_user(
     new_user: UserCreateRequest,
+    request: Request,
     db: Session = Depends(get_db),
     _admin: User = Depends(require_admin),
 ):
@@ -143,6 +152,7 @@ def create_user(
         title=new_user.title,
     )
     db.add(user)
+    log_action(db, "user_create", actor=_admin, target=new_user.username, detail=f"role={new_user.role.value}", request=request)
     db.commit()
     db.refresh(user)
     return user

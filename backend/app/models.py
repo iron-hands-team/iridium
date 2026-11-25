@@ -435,3 +435,15 @@ class QuizQuestion(Base):
     answers = Column(ARRAY(String), nullable=False)
     quiz_id = Column(Integer, ForeignKey("quizzes.id"), nullable=False)
     quiz = relationship("Quiz", back_populates="questions")
+
+class AuditLog(Base):
+    """Append-only record of security-relevant actions (logins, user and settings changes, exports)."""
+    __tablename__ = "audit_log"
+    id = Column(Integer, primary_key=True, index=True)
+    created_at = Column(DateTime(timezone=True), default=utcnow, nullable=False, index=True)
+    actor_id = Column(Integer, ForeignKey("users.id", ondelete="SET NULL"), nullable=True)
+    actor_username = Column(String, nullable=True)  # kept even if the user is later deleted
+    action = Column(String, nullable=False, index=True)
+    target = Column(String, nullable=True)
+    detail = Column(String, nullable=True)
+    ip = Column(String, nullable=True)

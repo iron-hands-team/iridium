@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Request
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
 
@@ -7,6 +7,7 @@ from app.database import get_db, Base
 from app.models import User, Settings
 from app.schemas import SettingsRequest, SlowResponse, ClearRequest
 from app.dependencies import require_admin, manager
+from app.audit import log_action
 
 router = APIRouter()
 
@@ -23,6 +24,7 @@ def get_settings(db: Session = Depends(get_db), _current_user: User = Depends(ma
 @router.post("/settings", status_code=204)
 def save_settings(
     settings: SettingsRequest,
+    request: Request,
     db: Session = Depends(get_db),
     _current_user: User = Depends(require_admin),
 ):
@@ -32,6 +34,7 @@ def save_settings(
     data = settings.model_dump(mode="json")
     data["paused"] = paused
     db.add(Settings(data=data))
+    log_action(db, "settings_update", actor=_current_user, request=request)
     db.commit()
 
 
@@ -46,6 +49,7 @@ def reset_settings(
 @router.post("/pause", status_code=204)
 def pause_operations(
     clear: ClearRequest,
+    request: Request,
     db: Session = Depends(get_db),
     current_user: User = Depends(require_admin),
 ):
@@ -59,12 +63,14 @@ def pause_operations(
     data = SettingsRequest.model_validate(settings.data)
     data.paused = not data.paused
     settings.data = data.model_dump(mode="json")
+    log_action(db, "platform_pause" if data.paused else "platform_resume", actor=current_user, request=request)
     db.commit()
 
 
 @router.post("/clear", status_code=204)
 def clear_data(
     clear: ClearRequest,
+    request: Request,
     db: Session = Depends(get_db),
     current_user: User = Depends(require_admin),
 ):
@@ -72,12 +78,13 @@ def clear_data(
     if not verify_password(password, current_user.hashed_password):
         raise HTTPException(status_code=400, detail="Incorrect password")
     for table in reversed(Base.metadata.sorted_tables):
-        if table.name == "alembic_version":
-            continue
+        if table.name in ("alembic_version", "audit_log"):
+            continue  # keep migration state and the audit trail
         if table.name == "users":
             db.execute(table.delete().where(table.c.id != current_user.id))
         else:
             db.execute(table.delete())
+    log_action(db, "data_clear", actor=current_user, request=request)
     db.commit()
 
 
