@@ -295,16 +295,15 @@ Body: `{ password }`
 
 ---
 
-<!-- @iamharry0121 update with new api endpoints -->
+## Other routers
 
-## Not yet built (frontend has no page for these)
+This file only documents the original routes. The backend also has routers
+for classes and quizzes, grades and submissions, attendance, direct messages,
+notifications, guides, buses, and platform settings. See `backend/app/routers/`
+(or `/docs` in development) for the current list.
 
-- Events
-- Clubs
-- Schedule
+There is no self-service password reset. Users request one with
+`POST /users/{username}/request` and an admin completes it with
+`PATCH /users/{username}/reset`.
 
-There's also no password-reset endpoint (`/reset` is a frontend-only
-dead link right now) and no self-service "update your own profile"
-route — `PATCH /users/{username}` is admin-only.
-
-<!-- TODO: this file needs a lot of updating -->
+<!-- TODO: document the routers above -->
