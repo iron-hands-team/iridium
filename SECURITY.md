@@ -6,8 +6,8 @@ Please do not open a public issue. Report it privately through GitHub's "Report 
 
 ## What Iridium does today
 
-- Passwords hashed with bcrypt; login rate limited (5 per minute) and accounts lock for 15 minutes after 5 failed attempts (wrong password or wrong 2FA code).
-- Optional two-factor authentication (TOTP authenticator apps) for every account; admins can reset a user's 2FA if they lose their device.
+- Passwords hashed with bcrypt; login rate limited (5 per minute). After 5 failed attempts (wrong password or wrong 2FA code) that username is blocked for 15 minutes from that IP address only, so a stranger cannot lock the real user out from somewhere else.
+- Optional two-factor authentication (TOTP authenticator apps) for every account, with 8 one-time recovery codes. 2FA secrets are encrypted in the database (`TOTP_ENCRYPTION_KEY`). Admins can reset a user's 2FA.
 - Sessions use signed JWTs in an `httponly`, `secure` (in production), `samesite=lax` cookie, expire after 45 minutes, and are revoked when an admin resets a password.
 - Role-based access (student, teacher, admin) enforced on the server.
 - Audit log of logins (successful and failed), account changes, settings changes, data exports and destructive actions, viewable by admins.
@@ -18,7 +18,7 @@ Please do not open a public issue. Report it privately through GitHub's "Report 
 
 ## What it does not do yet
 
-- Mandatory 2FA, recovery codes, or encryption of the stored 2FA secret (an admin reset is the recovery path).
+- Mandatory 2FA. Distributed password guessing against one account from many IP addresses is only slowed by the per-IP limits.
 - Encryption of uploaded files and database contents at rest (use disk encryption on the server).
 - Email notifications, or a parent/guardian role.
 - A third-party security audit or penetration test. Do not assume this software has been independently assessed.

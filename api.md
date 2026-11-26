@@ -297,13 +297,14 @@ Body: `{ password }`
 
 ## Lockout and two-factor authentication
 
-`POST /login` takes an optional `code`. After 5 failed attempts the account is locked for 15 minutes and login returns `429`. If the account has 2FA on and no `code` is sent, login returns `401` with detail `2fa_required`; a wrong code returns `401` and counts as a failed attempt.
+`POST /login` takes an optional `code`. After 5 failed attempts the username is blocked for 15 minutes from that IP address (other IPs are unaffected) and login returns `429`; this applies to unknown usernames too. `code` may be an authenticator code or a recovery code (single use). If the account has 2FA on and no `code` is sent, login returns `401` with detail `2fa_required`; a wrong code returns `401` and counts as a failed attempt.
 
 | Route                         | Auth  | Notes                                                                   |
 | ----------------------------- | ----- | ----------------------------------------------------------------------- |
-| `GET /2fa`                    | Any   | `{ enabled }`                                                           |
+| `GET /2fa`                    | Any   | `{ enabled, recovery_codes_left }`                                      |
 | `POST /2fa/setup`             | Any   | Returns `{ secret, uri }` (otpauth URI); 2FA is not on until enabled    |
-| `POST /2fa/enable`            | Any   | Body `{ code }`, `204` or `400`                                         |
+| `POST /2fa/enable`            | Any   | Body `{ code }`; returns `{ recovery_codes }` (shown once), or `400`    |
+| `POST /2fa/recovery-codes`    | Any   | Body `{ password, code }`; replaces the codes, returns `{ recovery_codes }` |
 | `POST /2fa/disable`           | Any   | Body `{ password, code }`, `204` or `400`                               |
 | `DELETE /users/{username}/2fa` | Admin | Turns 2FA off for a user who lost their device, `204`                   |
 
@@ -313,7 +314,7 @@ Body: `{ password }`
 
 ### `GET /audit-log?action=&limit=100&offset=0`
 
-Admin only. Newest first. `limit` is at most 500. Each entry has `id`, `created_at`, `actor_id`, `actor_username`, `action`, `target`, `detail`, `ip`. Recorded actions: `login_success`, `login_failed`, `login_blocked`, `account_locked`, `2fa_enabled`, `2fa_disabled`, `2fa_reset`, `user_create`, `user_update`, `user_delete`, `users_bulk_delete`, `password_reset`, `password_reset_dismissed`, `settings_update`, `platform_pause`, `platform_resume`, `data_clear`, `data_export`.
+Admin only. Newest first. `limit` is at most 500. Each entry has `id`, `created_at`, `actor_id`, `actor_username`, `action`, `target`, `detail`, `ip`. Recorded actions: `login_success`, `login_failed`, `login_blocked`, `account_locked`, `2fa_enabled`, `2fa_recovery_used`, `2fa_recovery_regenerated`, `2fa_disabled`, `2fa_reset`, `user_create`, `user_update`, `user_delete`, `users_bulk_delete`, `password_reset`, `password_reset_dismissed`, `settings_update`, `platform_pause`, `platform_resume`, `data_clear`, `data_export`.
 
 ### `GET /users/{username}/export`
 

@@ -60,6 +60,7 @@ This replaces the current database and files and asks you to type `restore` firs
 - Moving an existing database (created before migrations existed) is handled automatically; the backend logs a warning if the stored schema differs from the models.
 - The login rate limit is 5 attempts per minute per client address.
 - Do not expose port 8000 or the database to the internet; the production compose files do not.
-- Accounts lock for 15 minutes after 5 failed logins. An attacker can use this to lock a known username out temporarily; the audit log shows `account_locked` events.
+- After 5 failed logins a username is blocked for 15 minutes from that IP only; the audit log shows `account_locked` events.
+- Keep `TOTP_ENCRYPTION_KEY` in `.env` and in your backups of `.env`. If it is lost, users with 2FA must be reset by an admin. The installer generates it.
 - Admins should turn on 2FA from their profile page.
 - Not yet included: email notifications, a parent role.
