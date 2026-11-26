@@ -15,7 +15,7 @@ export default function TagsSystemPopup() {
   const uf = cls((state) => state.updateFrame);
 
   const clubs = cls((state) => state.clubs);
-  let tags = cls((state) => state.tags);
+  const tags = cls((state) => state.tags);
 
   const addTag = cls((state) => state.addTag);
   const deleteTag = cls((state) => state.deleteTag);
@@ -82,8 +82,7 @@ export default function TagsSystemPopup() {
                       color: tagItem.color,
                       isHidden: tagItem.isHidden,
                     });
-                    tags = setTag(tags, tagIndex, "name", e);
-                    uf(clubs, tags);
+                    uf(clubs, setTag(tags, tagIndex, "name", e));
                   }}
                   placeholder={`Enter Tag Name`}
                 />
@@ -105,8 +104,7 @@ export default function TagsSystemPopup() {
                               color: value,
                               isHidden: tagItem.isHidden,
                             });
-                            tags = setTag(tags, tagIndex, "color", value);
-                            uf(clubs, tags);
+                            uf(clubs, setTag(tags, tagIndex, "color", value));
                           }}
                         ></button>
                       </div>
@@ -120,8 +118,7 @@ export default function TagsSystemPopup() {
                     color: "",
                     isHidden: true,
                   });
-                  tags = deleteTag(tags, tagIndex);
-                  uf(clubs, tags);
+                  uf(clubs, deleteTag(tags, tagIndex));
                 }}
                 styles="w-fit"
                 text="Delete Tag"
@@ -133,8 +130,7 @@ export default function TagsSystemPopup() {
         <div className="w-[300px] flex items-center gap-[10px]">
           <Btn
             onclick={() => {
-              tags = addTag(tags, { name: "", color: "", isHidden: false });
-              uf(clubs, tags);
+              uf(clubs, addTag(tags, { name: "", color: "", isHidden: false }));
             }}
             text="Add Tag"
           />

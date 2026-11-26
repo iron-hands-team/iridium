@@ -15,6 +15,18 @@ import SelectionControlBar from "@/components/club/selectionControlBar";
 import Settings from "@/components/club/clubSettings";
 import toast from "react-hot-toast";
 
+type StoreClub = ReturnType<typeof cls.getState>["clubs"][number];
+
+interface ApiClub {
+  id: number;
+  name: string;
+  description?: string | null;
+  tags: StoreClub["tags"];
+  managers: StoreClub["managers"];
+  location: string;
+  schedule: StoreClub["schedule"];
+}
+
 export default function ClubTeacherBody({
   existing,
 }: {
@@ -83,10 +95,10 @@ export default function ClubTeacherBody({
   useEffect(() => {
     if (existing) {
       setClubs(
-        existing.map((club: any) => ({
+        (existing as unknown as ApiClub[]).map((club) => ({
           id: club.id,
           name: club.name,
-          desc: club.description,
+          desc: club.description ?? "",
           group: "",
           tags: club.tags,
           managers: club.managers,

@@ -9,6 +9,17 @@ import "@/app/globals.css";
 import Btn from "@/components/ui/btn";
 import { FaExclamationTriangle } from "react-icons/fa";
 
+interface ApiQuiz {
+  id: number;
+  name: string;
+  questions: {
+    id: number;
+    question: string;
+    choices: string[];
+    answers: string[];
+  }[];
+}
+
 export default function QuizBody({ existing }: { existing?: object[] }) {
   const classes = cs((state) => state.classes);
   const setQuizzes = cs((state) => state.setQuizzes);
@@ -61,7 +72,7 @@ export default function QuizBody({ existing }: { existing?: object[] }) {
   useEffect(() => {
     if (existing) {
       setQuizzes(
-        existing.map((quiz: any) => ({
+        (existing as ApiQuiz[]).map((quiz) => ({
           id: quiz.id,
           name: quiz.name,
           questions: quiz.questions.map((q) => ({ ...q, canShow: true })),

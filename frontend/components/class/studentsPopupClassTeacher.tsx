@@ -45,7 +45,7 @@ export default function StudentsPopupClassTeacher() {
 							{settingsStudentsIndex != -1 && <div className=" fixed inset-0 flex h-full w-full justify-center items-center bg-black/90" onClick={() => setStudentsPopup(false)}>
 					<div className="bg-black  z-10 h-2/3 w-2/3  flex justify-center items-center border-1 border-zinc-400"  onClick={(e) => e.stopPropagation()}>
 						<div className=" h-[500px] w-3/4 bg-blue">
-							<p><b>{classes[settingsClassIndex].students[settingsStudentsIndex].name}'s</b> Stuff</p>			
+							<p><b>{classes[settingsClassIndex].students[settingsStudentsIndex].name}&apos;s</b> Stuff</p>			
 							<br></br>
 							
 							<div className="flex items-center gap-[10px] mb-[5px]">

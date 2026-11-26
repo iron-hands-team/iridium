@@ -22,15 +22,9 @@ export default function LandingPage() {
 
 	
 	function tp(textPiece: string) {
-			const index = texts.findIndex(t => t == textPiece);
-
-			if (index !== -1) {
-					[arrayTexts[index], arrayTexts[arrayTexts.length-1]] = [arrayTexts[arrayTexts.length-1], arrayTexts[index]]; 
-					return arrayTexts[arrayTexts.length-1];
-			}
-			return "";
+		const index = texts.findIndex((t) => t == textPiece);
+		return index !== -1 ? (arrayTexts[index] ?? "") : "";
 	}
-
 
 	useEffect(() => {
     let currentText = 0;

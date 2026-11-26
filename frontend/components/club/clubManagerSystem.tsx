@@ -5,6 +5,10 @@ import Btn from "@/components/ui/btn";
 import Input from "@/components/ui/input";
 import Textarea from "@/components/ui/textarea";
 
+function withClub<T extends object>(clubs: T[], index: number, patch: Partial<T>) {
+  return clubs.map((club, i) => (i === index ? { ...club, ...patch } : club));
+}
+
 export default function ClubManagerSystem() {
   const clubs = cls((s) => s.clubs);
   const tags = cls((s) => s.tags);
@@ -131,18 +135,16 @@ export default function ClubManagerSystem() {
                 className={`${tagItem.color} p-[10px] rounded-md h-[30px] flex items-center `}
                 onClick={() => {
                   if (!tagHasClub(tagIndex)[0]) {
-                    clubs[cti].tags = addTag(clubs[cti].tags, {
+                    uf(withClub(clubs, cti, { tags: addTag(clubs[cti].tags, {
                       name: tags[tagIndex].name,
                       color: tags[tagIndex].color,
                       isHidden: tags[tagIndex].isHidden,
-                    });
-                    uf(clubs, tags);
+                    }) }), tags);
                   } else {
-                    clubs[cti].tags = deleteTag(
+                    uf(withClub(clubs, cti, { tags: deleteTag(
                       clubs[cti].tags,
                       tagHasClub(tagIndex)[1],
-                    );
-                    uf(clubs, tags);
+                    ) }), tags);
                   }
                 }}
                 /*onClick={()=> setClub(cti, "tag", tagItem)}*/
@@ -162,8 +164,7 @@ export default function ClubManagerSystem() {
             <b>Managers:</b>
             <Btn
               onclick={() => {
-                clubs[cti].managers = addPerson(clubs[cti].managers);
-                uf(clubs, tags);
+                uf(withClub(clubs, cti, { managers: addPerson(clubs[cti].managers) }), tags);
               }}
               text="Add Manager"
             />
@@ -174,26 +175,24 @@ export default function ClubManagerSystem() {
               <Input
                 value={managerItem.name}
                 setValue={(e) => {
-                  clubs[cti].managers = setPerson(
+                  uf(withClub(clubs, cti, { managers: setPerson(
                     clubs[cti].managers,
                     managerIndex,
                     "name",
                     e,
-                  );
-                  uf(clubs, tags);
+                  ) }), tags);
                 }}
                 placeholder="Enter Manager Name"
               />
               <Input
                 value={managerItem.desc}
                 setValue={(e) => {
-                  clubs[cti].managers = setPerson(
+                  uf(withClub(clubs, cti, { managers: setPerson(
                     clubs[cti].managers,
                     managerIndex,
                     "desc",
                     e,
-                  );
-                  uf(clubs, tags);
+                  ) }), tags);
                 }}
                 placeholder="Enter Description"
               />
@@ -220,8 +219,7 @@ export default function ClubManagerSystem() {
             <b>Schedule</b>
             <Btn
               onclick={() => {
-                clubs[cti].schedule = addTime(clubs[cti].schedule);
-                uf(clubs, tags);
+                uf(withClub(clubs, cti, { schedule: addTime(clubs[cti].schedule) }), tags);
               }}
               text="Add Time"
             />
@@ -245,13 +243,12 @@ export default function ClubManagerSystem() {
                 <Input
                   value={scheduleItem.day}
                   setValue={(e) => {
-                    clubs[cti].schedule = setTime(
+                    uf(withClub(clubs, cti, { schedule: setTime(
                       clubs[cti].schedule,
                       scheduleIndex,
                       "day",
                       e,
-                    );
-                    uf(clubs, tags);
+                    ) }), tags);
                   }}
                   placeholder="Enter Day Here: "
                 />
@@ -260,13 +257,12 @@ export default function ClubManagerSystem() {
                 <Input
                   value={scheduleItem.startingTime}
                   setValue={(e) => {
-                    clubs[cti].schedule = setTime(
+                    uf(withClub(clubs, cti, { schedule: setTime(
                       clubs[cti].schedule,
                       scheduleIndex,
                       "startingTime",
                       e,
-                    );
-                    uf(clubs, tags);
+                    ) }), tags);
                   }}
                   placeholder="Enter Starting-Time Here: "
                 />
@@ -275,13 +271,12 @@ export default function ClubManagerSystem() {
                 <Input
                   value={scheduleItem.endingTime}
                   setValue={(e) => {
-                    clubs[cti].schedule = setTime(
+                    uf(withClub(clubs, cti, { schedule: setTime(
                       clubs[cti].schedule,
                       scheduleIndex,
                       "endingTime",
                       e,
-                    );
-                    uf(clubs, tags);
+                    ) }), tags);
                   }}
                   placeholder="Enter Ending-Time Here:"
                 />
@@ -289,11 +284,10 @@ export default function ClubManagerSystem() {
               <div className="w-1/4 ">
                 <Btn
                   onclick={() => {
-                    clubs[cti].schedule = deleteTime(
+                    uf(withClub(clubs, cti, { schedule: deleteTime(
                       clubs[cti].schedule,
                       scheduleIndex,
-                    );
-                    uf(clubs, tags);
+                    ) }), tags);
                   }}
                   text="Delete Time"
                 />

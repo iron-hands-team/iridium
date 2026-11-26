@@ -8,6 +8,19 @@ import EditBus from "./edit-bus";
 import toast from "react-hot-toast";
 import { FaExclamationTriangle } from "react-icons/fa";
 
+interface ApiBus {
+  id: number;
+  name: string;
+  description: string;
+  color: string;
+  destinations: {
+    location: string;
+    color: string;
+    before_school_time: string;
+    after_school_time: string;
+  }[];
+}
+
 interface BusesProps {
   isAdmin: boolean;
   existing?: object[];
@@ -44,14 +57,15 @@ export default function Buses({ isAdmin, existing }: BusesProps) {
   useEffect(() => {
     if (existing) {
       setBuses(
-        existing.map((bus: any) => ({
+        (existing as ApiBus[]).map((bus) => ({
           id: bus.id,
           name: bus.name,
           desc: bus.description,
           color: bus.color,
           destinations: bus.destinations.map((d) => {
             return {
-              ...d,
+              location: d.location,
+              color: d.color,
               beforeSchoolTime: d.before_school_time,
               afterSchoolTime: d.after_school_time,
             };
