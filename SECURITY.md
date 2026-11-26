@@ -6,8 +6,9 @@ Please do not open a public issue. Report it privately through GitHub's "Report 
 
 ## What Iridium does today
 
-- Passwords hashed with bcrypt; login rate limited (5 per minute).
-- Sessions use signed JWTs in an `httponly`, `secure`, `samesite=lax` cookie, expire after 45 minutes, and are revoked when an admin resets a password.
+- Passwords hashed with bcrypt; login rate limited (5 per minute) and accounts lock for 15 minutes after 5 failed attempts (wrong password or wrong 2FA code).
+- Optional two-factor authentication (TOTP authenticator apps) for every account; admins can reset a user's 2FA if they lose their device.
+- Sessions use signed JWTs in an `httponly`, `secure` (in production), `samesite=lax` cookie, expire after 45 minutes, and are revoked when an admin resets a password.
 - Role-based access (student, teacher, admin) enforced on the server.
 - Audit log of logins (successful and failed), account changes, settings changes, data exports and destructive actions, viewable by admins.
 - Per-user data export (self or admin).
@@ -17,8 +18,7 @@ Please do not open a public issue. Report it privately through GitHub's "Report 
 
 ## What it does not do yet
 
-- Two-factor authentication.
-- Account lockout beyond the rate limit.
+- Mandatory 2FA, recovery codes, or encryption of the stored 2FA secret (an admin reset is the recovery path).
 - Encryption of uploaded files and database contents at rest (use disk encryption on the server).
 - Email notifications, or a parent/guardian role.
 - A third-party security audit or penetration test. Do not assume this software has been independently assessed.

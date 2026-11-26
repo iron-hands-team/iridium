@@ -24,7 +24,7 @@ The Provider will:
 
 ## 4. Security
 
-The Provider will follow the measures described in SECURITY.md and docs/DEPLOYMENT.md, including HTTPS, role-based access, audit logging and regular backups. The parties acknowledge that two-factor authentication and an independent security audit are **not** currently provided.
+The Provider will follow the measures described in SECURITY.md and docs/DEPLOYMENT.md, including HTTPS, role-based access, audit logging and regular backups. The parties acknowledge that an independent security audit has **not** been performed.
 
 ## 5. Backups and retention
 

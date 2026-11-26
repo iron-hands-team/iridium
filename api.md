@@ -3,7 +3,7 @@
 Base URL: `https://localhost/api` (internal URL: `http://fastapi-backend:8000`)
 
 Auth: JWT via `LoginManager` (fastapi-login). `/login` sets it as an
-`httponly` cookie (`access-token`, `samesite=lax`, `secure=true`) and
+`httponly` cookie (`access-token`, `samesite=lax`, `secure` in production) and
 also returns it in the response body. Authenticated routes accept
 either the cookie or an `Authorization: Bearer <token>` header.
 
@@ -295,11 +295,25 @@ Body: `{ password }`
 
 ---
 
+## Lockout and two-factor authentication
+
+`POST /login` takes an optional `code`. After 5 failed attempts the account is locked for 15 minutes and login returns `429`. If the account has 2FA on and no `code` is sent, login returns `401` with detail `2fa_required`; a wrong code returns `401` and counts as a failed attempt.
+
+| Route                         | Auth  | Notes                                                                   |
+| ----------------------------- | ----- | ----------------------------------------------------------------------- |
+| `GET /2fa`                    | Any   | `{ enabled }`                                                           |
+| `POST /2fa/setup`             | Any   | Returns `{ secret, uri }` (otpauth URI); 2FA is not on until enabled    |
+| `POST /2fa/enable`            | Any   | Body `{ code }`, `204` or `400`                                         |
+| `POST /2fa/disable`           | Any   | Body `{ password, code }`, `204` or `400`                               |
+| `DELETE /users/{username}/2fa` | Admin | Turns 2FA off for a user who lost their device, `204`                   |
+
+---
+
 ## Audit log and data export
 
 ### `GET /audit-log?action=&limit=100&offset=0`
 
-Admin only. Newest first. `limit` is at most 500. Each entry has `id`, `created_at`, `actor_id`, `actor_username`, `action`, `target`, `detail`, `ip`. Recorded actions: `login_success`, `login_failed`, `user_create`, `user_update`, `user_delete`, `users_bulk_delete`, `password_reset`, `password_reset_dismissed`, `settings_update`, `platform_pause`, `platform_resume`, `data_clear`, `data_export`.
+Admin only. Newest first. `limit` is at most 500. Each entry has `id`, `created_at`, `actor_id`, `actor_username`, `action`, `target`, `detail`, `ip`. Recorded actions: `login_success`, `login_failed`, `login_blocked`, `account_locked`, `2fa_enabled`, `2fa_disabled`, `2fa_reset`, `user_create`, `user_update`, `user_delete`, `users_bulk_delete`, `password_reset`, `password_reset_dismissed`, `settings_update`, `platform_pause`, `platform_resume`, `data_clear`, `data_export`.
 
 ### `GET /users/{username}/export`
 
