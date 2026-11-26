@@ -51,6 +51,7 @@ if [[ ! -f .env ]]; then
   set_env DB_PASSWORD "$(openssl rand -hex 16)"
   set_env JWT_SECRET_KEY "$(openssl rand -hex 32)"
   set_env GARAGE_RPC_SECRET "$(openssl rand -hex 32)"
+  set_env TOTP_ENCRYPTION_KEY "$(openssl rand -base64 32 | tr '+/' '-_')"
   ADMIN_PASSWORD_SHOWN="$(openssl rand -base64 18 | tr -d '/+=' | cut -c1-20)"
   set_env ADMIN_PASSWORD "$ADMIN_PASSWORD_SHOWN"
   if (( PROD )); then

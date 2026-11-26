@@ -28,10 +28,9 @@ class User(Base):
     requesting = Column(Boolean, nullable=True)
     requesting_delete = Column(Boolean, nullable=True)
     token_version = Column(Integer, nullable=False, default=0, server_default="0")
-    failed_logins = Column(Integer, nullable=False, default=0, server_default="0")
-    locked_until = Column(DateTime(timezone=True), nullable=True)
     totp_secret = Column(String, nullable=True)
     totp_enabled = Column(Boolean, nullable=False, default=False, server_default="false")
+    recovery_codes = Column(ARRAY(String), nullable=True)
 
     announcements = relationship("Announcement", back_populates="author", cascade="all, delete-orphan")
     clubs_sponsored = relationship("Club", back_populates="sponsor")
@@ -451,3 +450,15 @@ class AuditLog(Base):
     target = Column(String, nullable=True)
     detail = Column(String, nullable=True)
     ip = Column(String, nullable=True)
+
+
+class LoginThrottle(Base):
+    __tablename__ = "login_throttle"
+    __table_args__ = (UniqueConstraint("username", "ip", name="uq_login_throttle_username_ip"),)
+
+    id = Column(Integer, primary_key=True)
+    username = Column(String, nullable=False, index=True)
+    ip = Column(String, nullable=False)
+    failed = Column(Integer, nullable=False, default=0)
+    locked_until = Column(DateTime(timezone=True), nullable=True)
+    updated_at = Column(DateTime(timezone=True), default=utcnow, nullable=False)

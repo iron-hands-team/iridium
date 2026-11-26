@@ -13,12 +13,18 @@ function TwoFactor() {
   const [code, setCode] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [disabling, setDisabling] = useState<boolean>(false);
+  const [regenerating, setRegenerating] = useState<boolean>(false);
+  const [recoveryCodes, setRecoveryCodes] = useState<string[] | null>(null);
+  const [codesLeft, setCodesLeft] = useState<number>(0);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     fetch("/api/2fa")
       .then((res) => res.json())
-      .then((data) => setEnabled(data.enabled))
+      .then((data) => {
+        setEnabled(data.enabled);
+        setCodesLeft(data.recovery_codes_left);
+      })
       .catch(() => setEnabled(null));
   }, []);
 
@@ -38,6 +44,9 @@ function TwoFactor() {
     });
     if (res.ok) {
       toast.success("Two-factor authentication enabled");
+      const data = await res.json();
+      setRecoveryCodes(data.recovery_codes);
+      setCodesLeft(data.recovery_codes.length);
       setEnabled(true);
       setSetup(null);
       setCode("");
@@ -57,6 +66,25 @@ function TwoFactor() {
       toast.success("Two-factor authentication disabled");
       setEnabled(false);
       setDisabling(false);
+      setCode("");
+      setPassword("");
+    } else {
+      setError((await res.json()).detail);
+    }
+  }
+
+  async function regenerate() {
+    setError(null);
+    const res = await fetch("/api/2fa/recovery-codes", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ password, code }),
+    });
+    if (res.ok) {
+      const data = await res.json();
+      setRecoveryCodes(data.recovery_codes);
+      setCodesLeft(data.recovery_codes.length);
+      setRegenerating(false);
       setCode("");
       setPassword("");
     } else {
@@ -85,8 +113,41 @@ function TwoFactor() {
           <Btn text="Turn on" onclick={enable} primary />
         </div>
       )}
-      {enabled && !disabling && (
-        <Btn text="Turn off 2FA" onclick={() => setDisabling(true)} />
+      {recoveryCodes && (
+        <div className="flex flex-col gap-y-2">
+          <div>
+            Save these recovery codes somewhere safe. Each works once if you
+            lose your authenticator. They won&apos;t be shown again.
+          </div>
+          <code className="bg-zinc-200 dark:bg-zinc-900 p-2 select-all grid grid-cols-2 gap-1">
+            {recoveryCodes.map((c) => (
+              <span key={c}>{c}</span>
+            ))}
+          </code>
+          <Btn text="I saved them" onclick={() => setRecoveryCodes(null)} />
+        </div>
+      )}
+      {enabled && !recoveryCodes && !disabling && !regenerating && (
+        <>
+          <div>Recovery codes left: {codesLeft}</div>
+          <Btn
+            text="New recovery codes"
+            onclick={() => setRegenerating(true)}
+          />
+          <Btn text="Turn off 2FA" onclick={() => setDisabling(true)} />
+        </>
+      )}
+      {regenerating && (
+        <div className="flex flex-col gap-y-3">
+          <Input
+            placeholder="Password"
+            value={password}
+            setValue={setPassword}
+            type="password"
+          />
+          <Input placeholder="123456" value={code} setValue={setCode} />
+          <Btn text="Generate new codes" onclick={regenerate} primary />
+        </div>
       )}
       {enabled && disabling && (
         <div className="flex flex-col gap-y-3">

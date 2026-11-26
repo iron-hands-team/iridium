@@ -32,10 +32,10 @@ def test_running_twice_is_safe(fresh_db):
 
 
 def _make_legacy_schema():
-    tables = [t for t in Base.metadata.sorted_tables if t.name != "audit_log"]
+    tables = [t for t in Base.metadata.sorted_tables if t.name not in ("audit_log", "login_throttle")]
     Base.metadata.create_all(bind=engine, tables=tables)
     with engine.begin() as conn:
-        for col in ("failed_logins", "locked_until", "totp_secret", "totp_enabled"):
+        for col in ("totp_secret", "totp_enabled", "recovery_codes"):
             conn.execute(text(f"alter table users drop column {col}"))
 
 

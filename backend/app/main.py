@@ -18,7 +18,9 @@ from app.dependencies import require_admin, pause_guard
 from app.seed import init_db_and_seed_admin
 from app.routers import users, announcements, clubs, events, schedule, classes, info, grades, attendance, messages, chat, notifications, guides, settings, buses, audit, privacy, twofactor
 from app.audit import log_action
-from app.twofactor import is_locked, register_failure, register_success, verify_code
+from app import lockout
+from app.limiter import client_ip
+from app.twofactor import use_recovery_code, verify_code
 
 IS_PROD = os.getenv("ENVIRONMENT", "development") == "production"
 FRONTEND_URL = os.getenv("FRONTEND_URL", "http://localhost:3000")
@@ -88,32 +90,40 @@ DUMMY_HASH = hash_password("not-a-real-password")
 def login(request: Request, credentials: LoginRequest, response: Response, db: Session = Depends(get_db)):
     user = db.query(User).filter(User.username == credentials.username).first()
 
-    if user is not None and is_locked(user):
-        log_action(db, "login_blocked", actor=user, request=request)
-        db.commit()
+    name = credentials.username[:80]
+    ip = client_ip(request)
+
+    if lockout.is_locked(db, name, ip):
+        if user is not None:
+            log_action(db, "login_blocked", actor=user, request=request)
+            db.commit()
         raise HTTPException(status_code=429, detail="Too many failed attempts. Try again in a few minutes.")
 
     password_ok = verify_password(
         credentials.password, user.hashed_password if user else DUMMY_HASH
     )
     if user is None or not password_ok:
-        if user is not None and register_failure(user):
+        if lockout.register_failure(db, name, ip) and user is not None:
             log_action(db, "account_locked", actor=user, request=request)
-        log_action(db, "login_failed", actor=user, actor_username=credentials.username[:80], request=request)
+        log_action(db, "login_failed", actor=user, actor_username=name, request=request)
         db.commit()
         raise HTTPException(status_code=401, detail='Incorrect username or password')
 
     if user.totp_enabled:
         if not credentials.code:
             raise HTTPException(status_code=401, detail="2fa_required")
-        if not verify_code(user.totp_secret, credentials.code):
-            if register_failure(user):
+        code_ok = verify_code(user.totp_secret, credentials.code)
+        used_recovery = not code_ok and use_recovery_code(user, credentials.code)
+        if not code_ok and not used_recovery:
+            if lockout.register_failure(db, name, ip):
                 log_action(db, "account_locked", actor=user, request=request)
             log_action(db, "login_failed", actor=user, detail="bad 2fa code", request=request)
             db.commit()
             raise HTTPException(status_code=401, detail="Incorrect 2FA code")
+        if used_recovery:
+            log_action(db, "2fa_recovery_used", actor=user, request=request)
 
-    register_success(user)
+    lockout.register_success(db, name, ip)
     log_action(db, "login_success", actor=user, request=request)
     db.commit()
 

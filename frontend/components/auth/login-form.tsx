@@ -106,7 +106,7 @@ function LoginForm() {
         </label>
         {needsCode && (
           <label className={labelStyles}>
-            Authentication code
+            Authentication or recovery code
             <Input placeholder="123456" value={code} setValue={setCode} />
           </label>
         )}
