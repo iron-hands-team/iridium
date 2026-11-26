@@ -18,6 +18,8 @@ function LoginForm() {
     username: "",
     password: "",
   });
+  const [code, setCode] = useState<string>("");
+  const [needsCode, setNeedsCode] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
   const [requesting, setRequesting] = useState<boolean>(false);
@@ -35,7 +37,7 @@ function LoginForm() {
           "Content-Type": "application/json",
         },
         credentials: "include",
-        body: JSON.stringify(userData),
+        body: JSON.stringify({ ...userData, code: code || undefined }),
       });
       if (response.ok) {
         toast("Login successful!", { icon: <FaCheckCircle size={20} /> });
@@ -43,7 +45,9 @@ function LoginForm() {
           window.location.reload();
         }, 500);
       } else {
-        setError((await response.json()).detail);
+        const detail = (await response.json()).detail;
+        if (detail === "2fa_required") setNeedsCode(true);
+        else setError(detail);
       }
     } else {
       setError(validated.error.issues[0].message);
@@ -100,6 +104,12 @@ function LoginForm() {
             type="password"
           />
         </label>
+        {needsCode && (
+          <label className={labelStyles}>
+            Authentication code
+            <Input placeholder="123456" value={code} setValue={setCode} />
+          </label>
+        )}
         <div
           onClick={() => {
             setRequesting(true);

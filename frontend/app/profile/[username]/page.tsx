@@ -5,6 +5,8 @@ import { notFound } from "next/navigation";
 import Edit from "@/components/profile/edit";
 import Avatar from "@/components/profile/avatar";
 import Delete from "@/components/profile/delete";
+import TwoFactor from "@/components/profile/two-factor";
+import ResetTwoFactor from "@/components/profile/reset-two-factor";
 
 //TODO: async metadata
 
@@ -45,6 +47,11 @@ async function Page({ params }: { params: Promise<{ username: string }> }) {
         <div>Role: {user.role[0].toUpperCase() + user.role.slice(1)}</div>
         <div>ID: {user.id}</div>
         {currentUser.role === "admin" && <Edit user={user} />}
+        {currentUser.role === "admin" &&
+          currentUser.username !== user.username && (
+            <ResetTwoFactor username={user.username} />
+          )}
+        {currentUser.username === user.username && <TwoFactor />}
         {currentUser.username === user.username &&
           currentUser.role !== "admin" && <Delete username={user.username} />}
       </div>

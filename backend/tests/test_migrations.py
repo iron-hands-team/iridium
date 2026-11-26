@@ -31,12 +31,19 @@ def test_running_twice_is_safe(fresh_db):
         assert conn.execute(text("select count(*) from alembic_version")).scalar() == 1
 
 
+def _make_legacy_schema():
+    tables = [t for t in Base.metadata.sorted_tables if t.name != "audit_log"]
+    Base.metadata.create_all(bind=engine, tables=tables)
+    with engine.begin() as conn:
+        for col in ("failed_logins", "locked_until", "totp_secret", "totp_enabled"):
+            conn.execute(text(f"alter table users drop column {col}"))
+
+
 def test_legacy_database_is_adopted_and_upgraded(fresh_db):
     """A database made by the old create_all() startup has no alembic_version."""
     from app import models  # noqa: F401
 
-    tables = [t for t in Base.metadata.sorted_tables if t.name != "audit_log"]
-    Base.metadata.create_all(bind=engine, tables=tables)
+    _make_legacy_schema()
     assert "alembic_version" not in _tables()
     assert "audit_log" not in _tables()
 
@@ -57,8 +64,7 @@ def test_schema_drift_in_a_legacy_database_is_reported(fresh_db, caplog):
     from app import models  # noqa: F401
 
     # A legacy database predates the audit_log table.
-    tables = [t for t in Base.metadata.sorted_tables if t.name != "audit_log"]
-    Base.metadata.create_all(bind=engine, tables=tables)
+    _make_legacy_schema()
     with engine.begin() as conn:
         conn.execute(text("alter table announcements drop column archived_at"))
     with caplog.at_level("WARNING", logger="iridium.migrations"):
